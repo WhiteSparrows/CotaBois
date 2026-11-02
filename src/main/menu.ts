@@ -17,6 +17,10 @@ export const MENU_COMMAND_CHANNEL = 'menu:command'
 
 /** Les commandes dont la fonctionnalité existe déjà ; les autres restent grisées. */
 const IMPLEMENTED_COMMANDS: ReadonlySet<MenuCommand> = new Set([
+  'file:new',
+  'file:open',
+  'file:save',
+  'file:save-as',
   'edit:undo',
   'edit:redo',
   'edit:duplicate',
