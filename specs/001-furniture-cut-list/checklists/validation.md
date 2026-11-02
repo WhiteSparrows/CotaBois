@@ -54,7 +54,7 @@ Le scénario V2 (`tests/e2e/us1-caisson.spec.ts`) a échoué une fois, sur une a
 | SC-001, premier usage chronométré | Utilisateur | Installer, lancer, créer un caisson sans documentation |
 | SC-009, impression | Utilisateur | Imprimer le PDF, en noir et blanc si possible |
 | Boîtes de dialogue Windows réelles | Utilisateur | Enregistrer et ouvrir un projet, exporter ; `Documents` doit être proposé |
-| Raccourcis au clavier réel | Utilisateur | `Ctrl+Z`, `Ctrl+Y`, `Ctrl+D`, `Ctrl+S`, `Ctrl+O`, `Ctrl+N` |
+| Raccourcis au clavier réel | Utilisateur | `Ctrl+Z`, `Ctrl+Y`, `Ctrl+D`, `Ctrl+S`, `Ctrl+O`, `Ctrl+N`. `Ctrl+X`, `Ctrl+C` et `Ctrl+V` sont testés par des événements envoyés à la fenêtre, à confirmer aussi au vrai clavier |
 | Fluidité perçue | Utilisateur | Ouvrir `tests/fixtures/projects/200-pieces.cotabois` et faire tourner la vue |
 | V7 sur un Windows vierge, réseau coupé | Utilisateur | Windows Sandbox, à activer par l'utilisateur |
 | Windows 10 | Personne pour l'instant | Aucune machine disponible |

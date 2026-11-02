@@ -75,15 +75,21 @@ export function duplicatePiece(project: Project, pieceId: string, id: string): R
   if (!found.ok) return found
   const piece = found.value
 
-  const name = `${piece.name.slice(0, MAX_PIECE_NAME - COPY_SUFFIX.length)}${COPY_SUFFIX}`
-  return addPiece(project, { ...piece, name, position: freePositionBeside(project, piece) }, id)
+  return addCopy(project, found.value, id)
 }
 
-/** Au contact de la pièce si la place est libre, sinon au bord du meuble. */
-function freePositionBeside(project: Project, piece: Piece): Vector {
+/** Ajoute une copie d'une pièce, présente ou non dans le projet : c'est aussi le collage. */
+export function addCopy(project: Project, piece: Piece, id: string): Result<Project> {
+  const name = `${piece.name.slice(0, MAX_PIECE_NAME - COPY_SUFFIX.length)}${COPY_SUFFIX}`
+  return addPiece(project, { ...piece, name, position: freePositionNear(project, piece) }, id)
+}
+
+/** À sa place si elle est libre, sinon au contact de la pièce, sinon au bord du meuble. */
+function freePositionNear(project: Project, piece: Piece): Vector {
   const { x, y, z } = piece.position
   const size = pieceSize(piece)
   const candidates: Vector[] = [
+    { x, y, z },
     { x: x + size.x, y, z },
     { x: x - size.x, y, z },
     { x, y: y + size.y, z },

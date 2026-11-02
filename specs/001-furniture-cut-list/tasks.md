@@ -202,6 +202,8 @@ description: "Liste des tâches pour la conception de meubles et la liste de dé
 - [ ] T074 Construire l'installeur final et rejouer V7 sur un Windows vierge, en consignant le résultat dans `specs/001-furniture-cut-list/checklists/validation.md` ; l'activation de Windows Sandbox est faite par l'utilisateur (SC-007, SC-008)
 - [ ] T075 Faire chronométrer par l'utilisateur la création d'un caisson au premier usage, sans documentation, et consigner le résultat dans `specs/001-furniture-cut-list/checklists/validation.md` (SC-001)
 
+- [X] T076 [US3] Ajouter couper, copier et coller pour les pièces, au clavier et dans le menu, sans gêner le texte des champs, dans `src/core/pieces.ts`, `src/renderer/store.ts`, `src/renderer/App.tsx` et `src/main/menu.ts`, et bloquer raccourcis et commandes pendant une boîte de dialogue (FR-009) ; demande faite après un essai du logiciel
+
 ---
 
 ## Dependencies & Execution Order

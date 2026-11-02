@@ -44,13 +44,18 @@ Sans modification, le processus principal ferme directement la fenêtre. Le titr
 | Fichier | Exporter en CSV… | `file:export-csv` |
 | Édition | Annuler (Ctrl+Z) | `edit:undo` |
 | Édition | Rétablir (Ctrl+Y) | `edit:redo` |
+| Édition | Couper (Ctrl+X) | `edit:cut` |
+| Édition | Copier (Ctrl+C) | `edit:copy` |
+| Édition | Coller (Ctrl+V) | `edit:paste` |
 | Édition | Dupliquer (Ctrl+D) | `edit:duplicate` |
 | Édition | Supprimer (Suppr) | `edit:delete` |
 | Affichage | Recadrer sur le meuble (F) | `view:frame` |
 
 Quitter est géré par le menu standard et passe par le même contrôle de fermeture.
 
-`F` et `Suppr` sont seulement affichés dans le menu : l'interface les gère elle-même et les ignore pendant une saisie dans un champ.
+`F`, `Suppr`, `Ctrl+X`, `Ctrl+C` et `Ctrl+V` sont seulement affichés dans le menu : l'interface les gère elle-même. Dans un champ, le navigateur les traite comme du texte, et le menu passe par `editText(action)`, qui appelle les commandes de la fenêtre. Ailleurs, couper, copier et coller portent sur les pièces, avec un presse-papiers propre au logiciel, conservé d'un projet à l'autre.
+
+Aucune commande ne s'exécute tant qu'une boîte de dialogue est ouverte.
 
 ## Règles de sécurité
 

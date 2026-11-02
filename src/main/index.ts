@@ -53,6 +53,12 @@ function createWindow(): void {
 
   window.once('ready-to-show', () => window.show())
   installMenu(window)
+  // Couper, Copier et Coller du menu, quand un champ a le focus.
+  ipcMain.on('window:edit-text', (_event, action: unknown) => {
+    if (action === 'cut') window.webContents.cut()
+    if (action === 'copy') window.webContents.copy()
+    if (action === 'paste') window.webContents.paste()
+  })
   registerFileHandlers(window)
   registerPdfHandler(window)
   guardClose(window)

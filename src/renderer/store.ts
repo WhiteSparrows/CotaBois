@@ -3,8 +3,9 @@ import { applyCaisson } from '../core/caisson'
 import { toCsv } from '../core/csv'
 import { computeCutList } from '../core/cutList'
 import { canRedo, canUndo, createHistory, pushState, redo as redoHistory, undo as undoHistory, type History } from '../core/history'
-import { createEmptyProject, type Axis, type CaissonParams, type Project, type Vector } from '../core/model'
+import { createEmptyProject, type Axis, type CaissonParams, type Piece, type Project, type Vector } from '../core/model'
 import {
+  addCopy,
   addPiece,
   duplicatePiece,
   newPanelInput,
@@ -47,6 +48,8 @@ let pendingAction: GuardedAction | null = null
 let fileError: string | null = null
 let report: ReportContent | null = null
 let captureReportImage: (() => string) | null = null
+/** Propre au logiciel, et conservé d'un projet à l'autre. Les champs utilisent le presse-papiers de Windows. */
+let copiedPieces: readonly Piece[] = []
 let state: EditorState = toState(history, [], 0)
 const listeners = new Set<() => void>()
 
@@ -126,6 +129,31 @@ export function duplicateSelection(): void {
 
 export function deleteSelection(): void {
   publish(pushState(history, removePieces(state.project, state.selection)), [])
+}
+
+export function copySelection(): void {
+  const selected = state.project.pieces.filter((piece) => state.selection.includes(piece.id))
+  if (selected.length > 0) copiedPieces = selected
+}
+
+export function cutSelection(): void {
+  copySelection()
+  deleteSelection()
+}
+
+/** Une seule action annulable, quel que soit le nombre de pièces collées. */
+export function pasteCopiedPieces(): void {
+  let project = state.project
+  const pasted: string[] = []
+  for (const piece of copiedPieces) {
+    const id = nextId()
+    const result = addCopy(project, piece, id)
+    if (result.ok) {
+      project = result.value
+      pasted.push(id)
+    }
+  }
+  if (pasted.length > 0) publish(pushState(history, project), pasted)
 }
 
 export function updateSelectedPiece(pieceId: string, changes: PieceChanges): Result<Project> {
@@ -304,5 +332,7 @@ export function registerCommand(command: MenuCommand, handler: () => void): () =
 }
 
 export function runCommand(command: MenuCommand): void {
+  // Une boîte de dialogue attend une réponse : rien ne doit changer le projet derrière elle.
+  if (document.querySelector('dialog[open]')) return
   commandHandlers.get(command)?.()
 }

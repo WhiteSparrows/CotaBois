@@ -7,7 +7,7 @@ Logiciel de bureau pour Windows, en français : on conçoit un meuble en 3D et o
 ## Ce qu'il permet
 
 - Créer un caisson à partir de ses dimensions, ou dessiner un meuble panneau par panneau.
-- Ajuster les pièces en 3D : poignées avec alignement automatique, cotes, matériau, quarts de tour, duplication, annulation.
+- Ajuster les pièces en 3D : poignées avec alignement automatique, cotes, matériau, quarts de tour, copier-coller, duplication, annulation.
 - Lire la liste de découpe : pièces identiques regroupées, cotes exactes à 0,1 mm, totaux de surface par matériau et épaisseur.
 - Enregistrer les projets dans des fichiers `.cotabois`.
 - Exporter la liste en PDF pour l'atelier, ou en CSV pour un tableur.

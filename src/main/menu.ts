@@ -9,6 +9,9 @@ export type MenuCommand =
   | 'file:export-csv'
   | 'edit:undo'
   | 'edit:redo'
+  | 'edit:cut'
+  | 'edit:copy'
+  | 'edit:paste'
   | 'edit:duplicate'
   | 'edit:delete'
   | 'view:frame'
@@ -25,6 +28,9 @@ const IMPLEMENTED_COMMANDS: ReadonlySet<MenuCommand> = new Set([
   'file:export-csv',
   'edit:undo',
   'edit:redo',
+  'edit:cut',
+  'edit:copy',
+  'edit:paste',
   'edit:duplicate',
   'edit:delete',
   'view:frame'
@@ -32,7 +38,7 @@ const IMPLEMENTED_COMMANDS: ReadonlySet<MenuCommand> = new Set([
 
 interface CommandOptions {
   accelerator?: string
-  /** Pour une touche seule : affichée, mais gérée par l'interface afin de ne pas gêner la saisie. */
+  /** Affiché, mais géré par l'interface : un raccourci du menu l'emporterait sur la saisie dans les champs. */
   displayOnly?: boolean
 }
 
@@ -66,6 +72,10 @@ export function installMenu(window: BrowserWindow): void {
       submenu: [
         command('Annuler', 'edit:undo', { accelerator: 'Ctrl+Z' }),
         command('Rétablir', 'edit:redo', { accelerator: 'Ctrl+Y' }),
+        { type: 'separator' },
+        command('Couper', 'edit:cut', { accelerator: 'Ctrl+X', displayOnly: true }),
+        command('Copier', 'edit:copy', { accelerator: 'Ctrl+C', displayOnly: true }),
+        command('Coller', 'edit:paste', { accelerator: 'Ctrl+V', displayOnly: true }),
         { type: 'separator' },
         command('Dupliquer', 'edit:duplicate', { accelerator: 'Ctrl+D' }),
         command('Supprimer', 'edit:delete', { accelerator: 'Delete', displayOnly: true })

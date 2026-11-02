@@ -4,6 +4,7 @@ import { computeCutList } from '../../src/core/cutList'
 import { boundsOverlap, findOverlaps, pieceBounds, pieceSize } from '../../src/core/geometry'
 import { createEmptyProject, type Piece, type Project } from '../../src/core/model'
 import {
+  addCopy,
   addPiece,
   duplicatePiece,
   newPanelInput,
@@ -116,6 +117,41 @@ describe('duplicatePiece', () => {
 
   it('refuse une pièce inconnue', () => {
     expect(duplicatePiece(project(panel('a')), 'zzz', 'b').ok).toBe(false)
+  })
+})
+
+describe('addCopy', () => {
+  it('colle une pièce qui a depuis disparu du projet', () => {
+    const original = panel('a', { name: 'Plateau', material: 'Chêne' })
+    const start = removePieces(project(original, panel('b', { position: { x: 90000, y: 0, z: 0 } })), ['a'])
+    const copy = value(addCopy(start, original, 'c')).pieces.at(-1)
+    expect(copy).toMatchObject({ id: 'c', name: 'Plateau (copie)', material: 'Chêne', shape: original.shape, thickness: 180 })
+  })
+
+  it('colle dans un autre projet, à la place d\'origine si elle est libre', () => {
+    const original = panel('a', { position: { x: 500, y: 600, z: 700 } })
+    const copy = value(addCopy(createEmptyProject(), original, 'c')).pieces[0]
+    expect(copy?.position).toEqual({ x: 500, y: 600, z: 700 })
+  })
+
+  it('ne chevauche rien, même collée plusieurs fois de suite', () => {
+    const original = panel('a')
+    let current = project(original)
+    for (let i = 1; i <= 8; i++) current = value(addCopy(current, original, `c${i}`))
+    expect(current.pieces).toHaveLength(9)
+    expect(findOverlaps(current)).toEqual([])
+  })
+
+  it('garde les cotes de découpe', () => {
+    const original = panel('a')
+    const lines = computeCutList(value(addCopy(project(original), original, 'c'))).lines
+    expect(lines).toHaveLength(1)
+    expect(lines[0]).toMatchObject({ quantity: 2, length: 10000, width: 5000, thickness: 180 })
+  })
+
+  it('marque le caisson comme retouché', () => {
+    const start = caisson()
+    expect(value(addCopy(start, start.pieces[0]!, 'c')).template?.customized).toBe(true)
   })
 })
 

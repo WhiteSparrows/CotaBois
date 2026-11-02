@@ -24,6 +24,7 @@ const api = {
   exportPdf: (suggestedName: string): Promise<FileResult<{ fileName: string }>> =>
     ipcRenderer.invoke('file:export-pdf', suggestedName),
 
+  editText: (action: 'cut' | 'copy' | 'paste'): void => ipcRenderer.send('window:edit-text', action),
   setDirty: (isDirty: boolean): void => ipcRenderer.send('window:set-dirty', isDirty),
   confirmClose: (): void => ipcRenderer.send('window:confirm-close')
 }

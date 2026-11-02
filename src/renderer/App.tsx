@@ -8,12 +8,15 @@ import { UnsavedDialog } from './panels/UnsavedDialog'
 import { ReportView } from './report/ReportView'
 import {
   addPanel,
+  copySelection,
+  cutSelection,
   deleteSelection,
   dismissFileError,
   duplicateSelection,
   exportCsv,
   exportPdf,
   movePiece,
+  pasteCopiedPieces,
   redo,
   registerCommand,
   requestAction,
@@ -89,6 +92,11 @@ export function App() {
       commitActiveField()
       action()
     }
+    // Dans un champ, ces commandes portent sur le texte ; ailleurs, sur les pièces.
+    const onPiecesOrText = (textAction: 'cut' | 'copy' | 'paste', onPieces: () => void) => () => {
+      if (isTyping(document.activeElement)) window.cotabois.editText(textAction)
+      else onPieces()
+    }
     const unregister = [
       registerCommand('file:new', afterCommit(() => requestAction('new'))),
       registerCommand('file:open', afterCommit(() => requestAction('open'))),
@@ -98,6 +106,9 @@ export function App() {
       registerCommand('file:export-csv', afterCommit(() => void exportCsv())),
       registerCommand('edit:undo', afterCommit(undo)),
       registerCommand('edit:redo', afterCommit(redo)),
+      registerCommand('edit:cut', onPiecesOrText('cut', cutSelection)),
+      registerCommand('edit:copy', onPiecesOrText('copy', copySelection)),
+      registerCommand('edit:paste', onPiecesOrText('paste', pasteCopiedPieces)),
       registerCommand('edit:duplicate', afterCommit(duplicateSelection)),
       registerCommand('edit:delete', deleteSelection)
     ]
@@ -114,11 +125,18 @@ export function App() {
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent): void {
-      if (isTyping(event.target) || event.ctrlKey || event.altKey || event.metaKey) return
+      // Dans un champ, le navigateur gère seul la saisie et le presse-papiers.
+      if (isTyping(event.target) || event.altKey || event.metaKey) return
       const key = event.key.toLowerCase()
+      if (event.ctrlKey) {
+        if (key === 'x') runCommand('edit:cut')
+        if (key === 'c') runCommand('edit:copy')
+        if (key === 'v') runCommand('edit:paste')
+        return
+      }
       if (key === 'f') runCommand('view:frame')
       if (key === 'delete') runCommand('edit:delete')
-      if (key === 'escape') selectPieces([])
+      if (key === 'escape' && !document.querySelector('dialog[open]')) selectPieces([])
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)

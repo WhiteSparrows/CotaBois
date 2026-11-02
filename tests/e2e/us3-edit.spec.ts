@@ -241,6 +241,124 @@ test('supprimer, y compris avec la touche Suppr, sans gêner la saisie', async (
   await app.close()
 })
 
+/** Un raccourci envoyé à la fenêtre, comme le clavier : il passe par la gestion du texte du navigateur. */
+async function pressCtrl(app: ElectronApplication, keyCode: string) {
+  await app.evaluate(({ BrowserWindow }, code) => {
+    const contents = BrowserWindow.getAllWindows()[0]!.webContents
+    contents.sendInputEvent({ type: 'keyDown', keyCode: code, modifiers: ['control'] })
+    contents.sendInputEvent({ type: 'keyUp', keyCode: code, modifiers: ['control'] })
+  }, keyCode)
+  await settle(await app.firstWindow())
+}
+
+test('copier, couper et coller des pièces au clavier', async () => {
+  const { app, page } = await launchApp()
+  await createCaisson(page)
+  const pieces = page.getByTestId('viewport')
+
+  // Copier le fond, puis le coller deux fois : les copies ne chevauchent rien
+  await cutRows(page).nth(2).click()
+  await page.getByTestId('cut-list').locator('tr[data-selected="true"] button').focus()
+  await pressCtrl(app, 'C')
+  await pressCtrl(app, 'V')
+  await expect(pieces).toHaveAttribute('data-piece-count', '9')
+  await pressCtrl(app, 'V')
+  await expect(pieces).toHaveAttribute('data-piece-count', '10')
+  await expect(cutRows(page).nth(2)).toHaveText(/^3\s*Fond, Fond \(copie\)\s*1800\s*800\s*5/)
+  await expect(page.getByTestId('overlap-warning')).toHaveCount(0)
+
+  // La copie collée devient la sélection, et une seule action suffit à l'annuler
+  await expect(field(page, 'Nom')).toHaveValue('Fond (copie)')
+  await page.getByRole('button', { name: 'Annuler', exact: true }).click()
+  await expect(pieces).toHaveAttribute('data-piece-count', '9')
+
+  // Couper : la pièce disparaît, et se recolle ensuite
+  await cutRows(page).nth(0).click()
+  await page.getByTestId('cut-list').locator('tr[data-selected="true"] button').focus()
+  await expect(page.getByText('2 pièces sélectionnées')).toBeVisible()
+  await pressCtrl(app, 'X')
+  await expect(pieces).toHaveAttribute('data-piece-count', '7')
+  await pressCtrl(app, 'V')
+  await expect(pieces).toHaveAttribute('data-piece-count', '9')
+  await expect(page.getByText('2 pièces sélectionnées')).toBeVisible()
+
+  await app.close()
+})
+
+test('copier-coller depuis le menu, et vers un nouveau projet', async () => {
+  const { app, page } = await launchApp()
+  await createCaisson(page)
+  await cutRows(page).nth(2).click()
+  await clickMenu(app, 'Copier')
+  await clickMenu(app, 'Nouveau')
+  await page.getByRole('alertdialog').getByRole('button', { name: 'Ne pas enregistrer' }).click()
+  await expect(page.getByTestId('viewport')).toHaveAttribute('data-piece-count', '0')
+
+  await clickMenu(app, 'Coller')
+  await expect(page.getByTestId('viewport')).toHaveAttribute('data-piece-count', '1')
+  await expect(cutRows(page).nth(0)).toHaveText(/^1\s*Fond \(copie\)\s*1800\s*800\s*5/)
+  await app.close()
+})
+
+test('dans un champ, copier et coller restent du texte', async () => {
+  const { app, page } = await launchApp()
+  await createCaisson(page)
+
+  // Des pièces sont au presse-papiers du logiciel : elles ne doivent pas arriver pendant une saisie
+  await cutRows(page).nth(2).click()
+  await page.getByTestId('cut-list').locator('tr[data-selected="true"] button').focus()
+  await pressCtrl(app, 'C')
+
+  const name = field(page, 'Nom')
+  await name.fill('Dos du meuble')
+  await name.focus()
+  await pressCtrl(app, 'A')
+  await pressCtrl(app, 'C')
+  expect(await app.evaluate(({ clipboard }) => clipboard.readText())).toBe('Dos du meuble')
+
+  const material = field(page, 'Matériau')
+  await material.focus()
+  await pressCtrl(app, 'V')
+  await expect(material).toHaveValue('Dos du meuble')
+  await expect(page.getByTestId('viewport')).toHaveAttribute('data-piece-count', '8')
+
+  // Le menu suit la même règle
+  await material.fill('')
+  await clickMenu(app, 'Coller')
+  await expect(material).toHaveValue('Dos du meuble')
+  await expect(page.getByTestId('viewport')).toHaveAttribute('data-piece-count', '8')
+
+  await app.close()
+})
+
+test('une boîte de dialogue ouverte bloque les raccourcis', async () => {
+  const { app, page } = await launchApp()
+  await createCaisson(page)
+  await cutRows(page).nth(2).click()
+  await page.getByTestId('cut-list').locator('tr[data-selected="true"] button').focus()
+  await pressCtrl(app, 'C')
+
+  await clickMenu(app, 'Nouveau')
+  await expect(page.getByRole('alertdialog')).toBeVisible()
+
+  // Une vérification après chaque action : l'une pourrait défaire ce qu'une autre a fait.
+  const expectUntouched = async () => {
+    await settle(page)
+    await expect(page.getByTestId('viewport')).toHaveAttribute('data-piece-count', '8')
+    await expect(page.getByRole('alertdialog')).toBeVisible()
+  }
+  await page.keyboard.press('Delete')
+  await expectUntouched()
+  await pressCtrl(app, 'V')
+  await expectUntouched()
+  for (const entry of ['Supprimer', 'Dupliquer', 'Coller', 'Annuler']) {
+    await clickMenu(app, entry)
+    await expectUntouched()
+  }
+
+  await app.close()
+})
+
 test('changer les dimensions d\'un caisson retouché demande confirmation', async () => {
   const { app, page } = await launchApp()
   await createCaisson(page)
