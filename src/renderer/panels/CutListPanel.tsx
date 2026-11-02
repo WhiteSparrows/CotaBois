@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { computeCutList } from '../../core/cutList'
 import { projectBounds } from '../../core/geometry'
 import { formatMm, formatSquareMeters } from '../../core/units'
-import { selectPieces, useEditor } from '../store'
+import { exportCsv, exportPdf, selectPieces, useEditor } from '../store'
 
 const NO_MATERIAL = '—'
 
@@ -10,10 +10,19 @@ export function CutListPanel() {
   const { project, selection } = useEditor()
   const { lines, totals } = useMemo(() => computeCutList(project), [project])
   const bounds = useMemo(() => projectBounds(project), [project])
+  const isEmpty = lines.length === 0
 
   return (
     <section className="panel cut-panel" aria-label="Liste de découpe">
       <h2>Liste de découpe</h2>
+      <div className="button-row export-actions">
+        <button type="button" className="secondary" disabled={isEmpty} onClick={() => void exportPdf()}>
+          Exporter en PDF
+        </button>
+        <button type="button" className="secondary" disabled={isEmpty} onClick={() => void exportCsv()}>
+          Exporter en CSV
+        </button>
+      </div>
       {bounds && (
         <p className="overall-size">
           Dimensions d'ensemble :{' '}
@@ -23,8 +32,11 @@ export function CutListPanel() {
         </p>
       )}
 
-      {lines.length === 0 ? (
-        <p className="empty-note">Aucune pièce pour l'instant.</p>
+      {isEmpty ? (
+        <>
+          <p className="empty-note">Aucune pièce pour l'instant.</p>
+          <p className="empty-note">Ajoutez une pièce pour pouvoir exporter la liste.</p>
+        </>
       ) : (
         <>
           <table className="data-table" data-testid="cut-list">

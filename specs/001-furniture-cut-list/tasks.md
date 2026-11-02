@@ -151,19 +151,19 @@ description: "Liste des tâches pour la conception de meubles et la liste de dé
 
 ### Tests for User Story 4 ⚠️
 
-- [ ] T054 [P] [US4] Créer dans `tests/fixtures/projects/` un fichier `.cotabois` valide en version 1, un fichier abîmé, un fichier sans `formatVersion` et un fichier de version future
-- [ ] T055 [P] [US4] Écrire `tests/core/projectFile.test.ts` : aller-retour strictement égal, codes `file-corrupted`, `not-a-project` et `format-too-recent`, `id` en double, `shape.kind` inconnu, aucune ouverture partielle (FR-023, FR-025, SC-006)
-- [ ] T056 [P] [US4] Écrire `tests/e2e/us4-project.spec.ts`, avec dialogues simulés : enregistrer, rouvrir, question à la fermeture, fichier invalide sans effet sur le projet en cours (FR-024, FR-025)
+- [X] T054 [P] [US4] Créer dans `tests/fixtures/projects/` un fichier `.cotabois` valide en version 1, un fichier abîmé, un fichier sans `formatVersion` et un fichier de version future
+- [X] T055 [P] [US4] Écrire `tests/core/projectFile.test.ts` : aller-retour strictement égal, codes `file-corrupted`, `not-a-project` et `format-too-recent`, `id` en double, `shape.kind` inconnu, aucune ouverture partielle (FR-023, FR-025, SC-006)
+- [X] T056 [P] [US4] Écrire `tests/e2e/us4-project.spec.ts`, avec dialogues simulés : enregistrer, rouvrir, question à la fermeture, fichier invalide sans effet sur le projet en cours (FR-024, FR-025)
 
 ### Implementation for User Story 4
 
-- [ ] T057 [US4] Implémenter `serializeProject`, `parseProject` et la chaîne de migrations, vide pour l'instant, dans `src/core/projectFile.ts`, selon `contracts/project-file.md` (FR-023, FR-025)
-- [ ] T058 [US4] Implémenter dans `src/main/files.ts` les dialogues, la lecture, l'écriture atomique par fichier temporaire et renommage, le chemin courant détenu par le processus principal et `Documents` comme dossier par défaut (FR-023, FR-030)
-- [ ] T059 [US4] Exposer `openProject`, `projectOpened`, `saveProject`, `saveProjectAs`, `newProject`, `setDirty`, `setTitle`, `onCloseRequested` et `confirmClose` dans `src/preload/index.ts` et `src/main/index.ts`, selon `contracts/desktop-bridge.md`
-- [ ] T060 [US4] Ajouter dans `src/renderer/store.ts` les actions de fichier, l'état « modifié » calculé par rapport à `savedProject`, y compris après annulation, et la remise à zéro de l'historique à l'ouverture (FR-023, FR-024)
-- [ ] T061 [US4] Créer `src/renderer/panels/UnsavedDialog.tsx` : enregistrer, abandonner ou annuler, avant de fermer, d'ouvrir ou de créer un projet (FR-024)
-- [ ] T062 [US4] Afficher les erreurs de lecture et d'écriture sans altérer le projet en cours, y compris disque plein et dossier protégé, dans `src/renderer/App.tsx` (FR-025)
-- [ ] T063 [US4] Activer `file:new`, `file:open`, `file:save` et `file:save-as` dans `src/main/menu.ts` et `src/renderer/store.ts`, et afficher le nom du projet et l'indicateur de modification dans le titre de la fenêtre
+- [X] T057 [US4] Implémenter `serializeProject`, `parseProject` et la chaîne de migrations, vide pour l'instant, dans `src/core/projectFile.ts`, selon `contracts/project-file.md` (FR-023, FR-025)
+- [X] T058 [US4] Implémenter dans `src/main/files.ts` les dialogues, la lecture, l'écriture atomique par fichier temporaire et renommage, le chemin courant détenu par le processus principal et `Documents` comme dossier par défaut (FR-023, FR-030)
+- [X] T059 [US4] Exposer `openProject`, `projectOpened`, `saveProject`, `saveProjectAs`, `newProject`, `setDirty`, `setTitle`, `onCloseRequested` et `confirmClose` dans `src/preload/index.ts` et `src/main/index.ts`, selon `contracts/desktop-bridge.md`
+- [X] T060 [US4] Ajouter dans `src/renderer/store.ts` les actions de fichier, l'état « modifié » calculé par rapport à `savedProject`, y compris après annulation, et la remise à zéro de l'historique à l'ouverture (FR-023, FR-024)
+- [X] T061 [US4] Créer `src/renderer/panels/UnsavedDialog.tsx` : enregistrer, abandonner ou annuler, avant de fermer, d'ouvrir ou de créer un projet (FR-024)
+- [X] T062 [US4] Afficher les erreurs de lecture et d'écriture sans altérer le projet en cours, y compris disque plein et dossier protégé, dans `src/renderer/App.tsx` (FR-025)
+- [X] T063 [US4] Activer `file:new`, `file:open`, `file:save` et `file:save-as` dans `src/main/menu.ts` et `src/renderer/store.ts`, et afficher le nom du projet et l'indicateur de modification dans le titre de la fenêtre
 
 **Checkpoint**: V4 passe. Le logiciel peut servir sur plusieurs séances de travail.
 
@@ -177,16 +177,16 @@ description: "Liste des tâches pour la conception de meubles et la liste de dé
 
 ### Tests for User Story 5 ⚠️
 
-- [ ] T064 [P] [US5] Écrire `tests/core/csv.test.ts` : BOM, séparateur `;`, virgule décimale, CRLF, guillemets, protection des textes commençant par `=`, `+`, `-` ou `@`, exemple de `contracts/exports.md` (FR-027)
-- [ ] T065 [P] [US5] Écrire `tests/e2e/us5-export.spec.ts`, avec dialogues simulés : CSV et PDF non vides, nom de fichier proposé, exports indisponibles sans pièce (FR-026, FR-027)
+- [X] T064 [P] [US5] Écrire `tests/core/csv.test.ts` : BOM, séparateur `;`, virgule décimale, CRLF, guillemets, protection des textes commençant par `=`, `+`, `-` ou `@`, exemple de `contracts/exports.md` (FR-027)
+- [X] T065 [P] [US5] Écrire `tests/e2e/us5-export.spec.ts`, avec dialogues simulés : CSV et PDF non vides, nom de fichier proposé, exports indisponibles sans pièce (FR-026, FR-027)
 
 ### Implementation for User Story 5
 
-- [ ] T066 [US5] Implémenter `toCsv` dans `src/core/csv.ts`, selon `contracts/exports.md` (FR-027)
-- [ ] T067 [P] [US5] Ajouter la capture d'une image isométrique sur fond blanc dans `src/renderer/viewport/Viewport.ts` (FR-026)
-- [ ] T068 [US5] Créer `src/renderer/report/ReportView.tsx` et `src/renderer/report/report.css` : vue d'impression avec nom du projet, date, dimensions d'ensemble, image, liste et totaux, en-tête répété, lignes jamais coupées, lisible en noir et blanc (FR-026, SC-009)
-- [ ] T069 [US5] Implémenter `src/main/pdf.ts` avec `printToPDF` en A4 portrait, marges de 15 mm et numéro de page, et ajouter l'écriture du CSV dans `src/main/files.ts`, avec les noms de fichiers proposés sans caractères interdits (FR-026, FR-027)
-- [ ] T070 [US5] Exposer `exportCsv` et `exportPdf` dans `src/preload/index.ts`, les activer dans `src/main/menu.ts` et `src/renderer/store.ts`, et les rendre indisponibles sans pièce, avec la raison affichée
+- [X] T066 [US5] Implémenter `toCsv` dans `src/core/csv.ts`, selon `contracts/exports.md` (FR-027)
+- [X] T067 [P] [US5] Ajouter la capture d'une image isométrique sur fond blanc dans `src/renderer/viewport/Viewport.ts` (FR-026)
+- [X] T068 [US5] Créer `src/renderer/report/ReportView.tsx` et `src/renderer/report/report.css` : vue d'impression avec nom du projet, date, dimensions d'ensemble, image, liste et totaux, en-tête répété, lignes jamais coupées, lisible en noir et blanc (FR-026, SC-009)
+- [X] T069 [US5] Implémenter `src/main/pdf.ts` avec `printToPDF` en A4 portrait, marges de 15 mm et numéro de page, et ajouter l'écriture du CSV dans `src/main/files.ts`, avec les noms de fichiers proposés sans caractères interdits (FR-026, FR-027)
+- [X] T070 [US5] Exposer `exportCsv` et `exportPdf` dans `src/preload/index.ts`, les activer dans `src/main/menu.ts` et `src/renderer/store.ts`, et les rendre indisponibles sans pièce, avec la raison affichée
 
 **Checkpoint**: V5 passe. Tous les parcours sont fonctionnels.
 
@@ -196,9 +196,9 @@ description: "Liste des tâches pour la conception de meubles et la liste de dé
 
 **Purpose**: Vérifier l'ensemble, y compris ce que les tests automatiques ne peuvent pas prouver.
 
-- [ ] T071 [P] Générer le projet de test de 200 pièces `tests/fixtures/projects/200-pieces.cotabois`, et mesurer V6 sur le portable de référence ; optimiser uniquement si un seuil de SC-002, SC-004 ou SC-005 n'est pas atteint
-- [ ] T072 [P] Mettre à jour `README.md` : présentation, installation et commandes de développement
-- [ ] T073 Exécuter tous les tests et la vérification des types, et rejouer V1 à V6 de `quickstart.md`, en consignant les résultats dans `specs/001-furniture-cut-list/checklists/validation.md`
+- [X] T071 [P] Générer le projet de test de 200 pièces `tests/fixtures/projects/200-pieces.cotabois`, et mesurer V6 sur le portable de référence ; optimiser uniquement si un seuil de SC-002, SC-004 ou SC-005 n'est pas atteint
+- [X] T072 [P] Mettre à jour `README.md` : présentation, installation et commandes de développement
+- [X] T073 Exécuter tous les tests et la vérification des types, et rejouer V1 à V6 de `quickstart.md`, en consignant les résultats dans `specs/001-furniture-cut-list/checklists/validation.md`
 - [ ] T074 Construire l'installeur final et rejouer V7 sur un Windows vierge, en consignant le résultat dans `specs/001-furniture-cut-list/checklists/validation.md` ; l'activation de Windows Sandbox est faite par l'utilisateur (SC-007, SC-008)
 - [ ] T075 Faire chronométrer par l'utilisateur la création d'un caisson au premier usage, sans documentation, et consigner le résultat dans `specs/001-furniture-cut-list/checklists/validation.md` (SC-001)
 

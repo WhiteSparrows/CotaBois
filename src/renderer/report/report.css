@@ -1,0 +1,112 @@
+.report {
+  display: none;
+}
+
+/* Spécificité renforcée : ces règles doivent l'emporter sur styles.css, quel que soit l'ordre de chargement. */
+@media print {
+  html,
+  html body,
+  html #root {
+    height: auto;
+    overflow: visible;
+    background: #fff;
+  }
+
+  html body .app {
+    display: none;
+  }
+
+  /* Noir sur blanc : le document doit rester lisible sur une imprimante monochrome. */
+  .report {
+    display: block;
+    color: #000;
+    font-size: 10.5pt;
+    line-height: 1.35;
+  }
+
+  .report-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #000;
+  }
+
+  .report-header h1 {
+    margin: 0;
+    font-size: 18pt;
+    font-weight: 600;
+  }
+
+  .report-header p {
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  .report-size {
+    margin: 10px 0;
+  }
+
+  .report-image {
+    display: block;
+    max-width: 100%;
+    max-height: 95mm;
+    margin: 0 auto 8px;
+  }
+
+  .report h2 {
+    margin: 14px 0 6px;
+    font-size: 12pt;
+    font-weight: 600;
+    break-after: avoid;
+  }
+
+  .report-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .report-table thead {
+    display: table-header-group;
+  }
+
+  .report-table tr {
+    break-inside: avoid;
+  }
+
+  .report-table th {
+    padding: 5px 6px;
+    font-size: 9pt;
+    font-weight: 600;
+    text-align: left;
+    vertical-align: bottom;
+    border-bottom: 1.5px solid #000;
+  }
+
+  .report-table td {
+    padding: 5px 6px;
+    vertical-align: top;
+    border-bottom: 0.5px solid #000;
+  }
+
+  .report-table .number {
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .report-table .strong {
+    font-weight: 600;
+  }
+
+  .report-note {
+    margin: 6px 0 0;
+    font-size: 9pt;
+  }
+
+  .report-totals {
+    width: 70%;
+    break-inside: avoid;
+  }
+}

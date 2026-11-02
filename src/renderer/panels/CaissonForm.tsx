@@ -68,10 +68,8 @@ export function CaissonForm() {
   const [pendingParams, setPendingParams] = useState<CaissonParams | null>(null)
 
   useEffect(() => {
-    if (template) {
-      setDrafts(toDrafts(template.params))
-      setError(null)
-    }
+    setDrafts(template ? toDrafts(template.params) : DEFAULT_DRAFTS)
+    setError(null)
   }, [template?.params])
 
   // Générer un caisson remplace toutes les pièces : on ne perd pas un travail manuel sans prévenir.

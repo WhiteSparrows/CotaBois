@@ -1,0 +1,4007 @@
+{
+  "formatVersion": 1,
+  "name": "Projet de 200 pièces",
+  "template": null,
+  "pieces": [
+    {
+      "id": "p1",
+      "name": "Module 1 - Côté gauche",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p2",
+      "name": "Module 1 - Côté droit",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 6020,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p3",
+      "name": "Module 1 - Dessous",
+      "shape": {
+        "kind": "rectangle",
+        "length": 5840,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 180,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p4",
+      "name": "Module 1 - Dessus",
+      "shape": {
+        "kind": "rectangle",
+        "length": 5840,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 180,
+        "y": 19820,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p5",
+      "name": "Module 1 - Étagère 1",
+      "shape": {
+        "kind": "rectangle",
+        "length": 5840,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 180,
+        "y": 3423,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p6",
+      "name": "Module 1 - Étagère 2",
+      "shape": {
+        "kind": "rectangle",
+        "length": 5840,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 180,
+        "y": 6667,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p7",
+      "name": "Module 1 - Étagère 3",
+      "shape": {
+        "kind": "rectangle",
+        "length": 5840,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 180,
+        "y": 9910,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p8",
+      "name": "Module 1 - Étagère 4",
+      "shape": {
+        "kind": "rectangle",
+        "length": 5840,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 180,
+        "y": 13153,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p9",
+      "name": "Module 1 - Étagère 5",
+      "shape": {
+        "kind": "rectangle",
+        "length": 5840,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 180,
+        "y": 16397,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p10",
+      "name": "Repère",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 6200
+      },
+      "thickness": 50,
+      "material": "Contreplaqué",
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+x"
+      }
+    },
+    {
+      "id": "p11",
+      "name": "Module 2 - Côté gauche",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 6200,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p12",
+      "name": "Module 2 - Côté droit",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 12420,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p13",
+      "name": "Module 2 - Dessous",
+      "shape": {
+        "kind": "rectangle",
+        "length": 6040,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 6380,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p14",
+      "name": "Module 2 - Dessus",
+      "shape": {
+        "kind": "rectangle",
+        "length": 6040,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 6380,
+        "y": 19820,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p15",
+      "name": "Module 2 - Étagère 1",
+      "shape": {
+        "kind": "rectangle",
+        "length": 6040,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 6380,
+        "y": 3423,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p16",
+      "name": "Module 2 - Étagère 2",
+      "shape": {
+        "kind": "rectangle",
+        "length": 6040,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 6380,
+        "y": 6667,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p17",
+      "name": "Module 2 - Étagère 3",
+      "shape": {
+        "kind": "rectangle",
+        "length": 6040,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 6380,
+        "y": 9910,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p18",
+      "name": "Module 2 - Étagère 4",
+      "shape": {
+        "kind": "rectangle",
+        "length": 6040,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 6380,
+        "y": 13153,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p19",
+      "name": "Module 2 - Étagère 5",
+      "shape": {
+        "kind": "rectangle",
+        "length": 6040,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 6380,
+        "y": 16397,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p20",
+      "name": "Module 2 - Fond",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 6400
+      },
+      "thickness": 50,
+      "material": "Contreplaqué",
+      "position": {
+        "x": 6200,
+        "y": 0,
+        "z": 0
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+x"
+      }
+    },
+    {
+      "id": "p21",
+      "name": "Module 3 - Côté gauche",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 12600,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p22",
+      "name": "Module 3 - Côté droit",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 19020,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p23",
+      "name": "Module 3 - Dessous",
+      "shape": {
+        "kind": "rectangle",
+        "length": 6240,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 12780,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p24",
+      "name": "Module 3 - Dessus",
+      "shape": {
+        "kind": "rectangle",
+        "length": 6240,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 12780,
+        "y": 19820,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p25",
+      "name": "Module 3 - Étagère 1",
+      "shape": {
+        "kind": "rectangle",
+        "length": 6240,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 12780,
+        "y": 3423,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p26",
+      "name": "Module 3 - Étagère 2",
+      "shape": {
+        "kind": "rectangle",
+        "length": 6240,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 12780,
+        "y": 6667,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p27",
+      "name": "Module 3 - Étagère 3",
+      "shape": {
+        "kind": "rectangle",
+        "length": 6240,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 12780,
+        "y": 9910,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p28",
+      "name": "Module 3 - Étagère 4",
+      "shape": {
+        "kind": "rectangle",
+        "length": 6240,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 12780,
+        "y": 13153,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p29",
+      "name": "Module 3 - Étagère 5",
+      "shape": {
+        "kind": "rectangle",
+        "length": 6240,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 12780,
+        "y": 16397,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p30",
+      "name": "Module 3 - Fond",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 6600
+      },
+      "thickness": 50,
+      "material": "Contreplaqué",
+      "position": {
+        "x": 12600,
+        "y": 0,
+        "z": 0
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+x"
+      }
+    },
+    {
+      "id": "p31",
+      "name": "Module 4 - Côté gauche",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 19200,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p32",
+      "name": "Module 4 - Côté droit",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 25820,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p33",
+      "name": "Module 4 - Dessous",
+      "shape": {
+        "kind": "rectangle",
+        "length": 6440,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 19380,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p34",
+      "name": "Module 4 - Dessus",
+      "shape": {
+        "kind": "rectangle",
+        "length": 6440,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 19380,
+        "y": 19820,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p35",
+      "name": "Module 4 - Étagère 1",
+      "shape": {
+        "kind": "rectangle",
+        "length": 6440,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 19380,
+        "y": 3423,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p36",
+      "name": "Module 4 - Étagère 2",
+      "shape": {
+        "kind": "rectangle",
+        "length": 6440,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 19380,
+        "y": 6667,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p37",
+      "name": "Module 4 - Étagère 3",
+      "shape": {
+        "kind": "rectangle",
+        "length": 6440,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 19380,
+        "y": 9910,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p38",
+      "name": "Module 4 - Étagère 4",
+      "shape": {
+        "kind": "rectangle",
+        "length": 6440,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 19380,
+        "y": 13153,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p39",
+      "name": "Module 4 - Étagère 5",
+      "shape": {
+        "kind": "rectangle",
+        "length": 6440,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 19380,
+        "y": 16397,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p40",
+      "name": "Module 4 - Fond",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 6800
+      },
+      "thickness": 50,
+      "material": "Contreplaqué",
+      "position": {
+        "x": 19200,
+        "y": 0,
+        "z": 0
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+x"
+      }
+    },
+    {
+      "id": "p41",
+      "name": "Module 5 - Côté gauche",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 26000,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p42",
+      "name": "Module 5 - Côté droit",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 32820,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p43",
+      "name": "Module 5 - Dessous",
+      "shape": {
+        "kind": "rectangle",
+        "length": 6640,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 26180,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p44",
+      "name": "Module 5 - Dessus",
+      "shape": {
+        "kind": "rectangle",
+        "length": 6640,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 26180,
+        "y": 19820,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p45",
+      "name": "Module 5 - Étagère 1",
+      "shape": {
+        "kind": "rectangle",
+        "length": 6640,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 26180,
+        "y": 3423,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p46",
+      "name": "Module 5 - Étagère 2",
+      "shape": {
+        "kind": "rectangle",
+        "length": 6640,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 26180,
+        "y": 6667,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p47",
+      "name": "Module 5 - Étagère 3",
+      "shape": {
+        "kind": "rectangle",
+        "length": 6640,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 26180,
+        "y": 9910,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p48",
+      "name": "Module 5 - Étagère 4",
+      "shape": {
+        "kind": "rectangle",
+        "length": 6640,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 26180,
+        "y": 13153,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p49",
+      "name": "Module 5 - Étagère 5",
+      "shape": {
+        "kind": "rectangle",
+        "length": 6640,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 26180,
+        "y": 16397,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p50",
+      "name": "Module 5 - Fond",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 7000
+      },
+      "thickness": 50,
+      "material": "Contreplaqué",
+      "position": {
+        "x": 26000,
+        "y": 0,
+        "z": 0
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+x"
+      }
+    },
+    {
+      "id": "p51",
+      "name": "Module 6 - Côté gauche",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 33000,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p52",
+      "name": "Module 6 - Côté droit",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 40020,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p53",
+      "name": "Module 6 - Dessous",
+      "shape": {
+        "kind": "rectangle",
+        "length": 6840,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 33180,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p54",
+      "name": "Module 6 - Dessus",
+      "shape": {
+        "kind": "rectangle",
+        "length": 6840,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 33180,
+        "y": 19820,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p55",
+      "name": "Module 6 - Étagère 1",
+      "shape": {
+        "kind": "rectangle",
+        "length": 6840,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 33180,
+        "y": 3423,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p56",
+      "name": "Module 6 - Étagère 2",
+      "shape": {
+        "kind": "rectangle",
+        "length": 6840,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 33180,
+        "y": 6667,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p57",
+      "name": "Module 6 - Étagère 3",
+      "shape": {
+        "kind": "rectangle",
+        "length": 6840,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 33180,
+        "y": 9910,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p58",
+      "name": "Module 6 - Étagère 4",
+      "shape": {
+        "kind": "rectangle",
+        "length": 6840,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 33180,
+        "y": 13153,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p59",
+      "name": "Module 6 - Étagère 5",
+      "shape": {
+        "kind": "rectangle",
+        "length": 6840,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 33180,
+        "y": 16397,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p60",
+      "name": "Module 6 - Fond",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 7200
+      },
+      "thickness": 50,
+      "material": "Contreplaqué",
+      "position": {
+        "x": 33000,
+        "y": 0,
+        "z": 0
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+x"
+      }
+    },
+    {
+      "id": "p61",
+      "name": "Module 7 - Côté gauche",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 40200,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p62",
+      "name": "Module 7 - Côté droit",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 47420,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p63",
+      "name": "Module 7 - Dessous",
+      "shape": {
+        "kind": "rectangle",
+        "length": 7040,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 40380,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p64",
+      "name": "Module 7 - Dessus",
+      "shape": {
+        "kind": "rectangle",
+        "length": 7040,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 40380,
+        "y": 19820,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p65",
+      "name": "Module 7 - Étagère 1",
+      "shape": {
+        "kind": "rectangle",
+        "length": 7040,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 40380,
+        "y": 3423,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p66",
+      "name": "Module 7 - Étagère 2",
+      "shape": {
+        "kind": "rectangle",
+        "length": 7040,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 40380,
+        "y": 6667,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p67",
+      "name": "Module 7 - Étagère 3",
+      "shape": {
+        "kind": "rectangle",
+        "length": 7040,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 40380,
+        "y": 9910,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p68",
+      "name": "Module 7 - Étagère 4",
+      "shape": {
+        "kind": "rectangle",
+        "length": 7040,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 40380,
+        "y": 13153,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p69",
+      "name": "Module 7 - Étagère 5",
+      "shape": {
+        "kind": "rectangle",
+        "length": 7040,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 40380,
+        "y": 16397,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p70",
+      "name": "Module 7 - Fond",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 7400
+      },
+      "thickness": 50,
+      "material": "Contreplaqué",
+      "position": {
+        "x": 40200,
+        "y": 0,
+        "z": 0
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+x"
+      }
+    },
+    {
+      "id": "p71",
+      "name": "Module 8 - Côté gauche",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 47600,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p72",
+      "name": "Module 8 - Côté droit",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 55020,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p73",
+      "name": "Module 8 - Dessous",
+      "shape": {
+        "kind": "rectangle",
+        "length": 7240,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 47780,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p74",
+      "name": "Module 8 - Dessus",
+      "shape": {
+        "kind": "rectangle",
+        "length": 7240,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 47780,
+        "y": 19820,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p75",
+      "name": "Module 8 - Étagère 1",
+      "shape": {
+        "kind": "rectangle",
+        "length": 7240,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 47780,
+        "y": 3423,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p76",
+      "name": "Module 8 - Étagère 2",
+      "shape": {
+        "kind": "rectangle",
+        "length": 7240,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 47780,
+        "y": 6667,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p77",
+      "name": "Module 8 - Étagère 3",
+      "shape": {
+        "kind": "rectangle",
+        "length": 7240,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 47780,
+        "y": 9910,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p78",
+      "name": "Module 8 - Étagère 4",
+      "shape": {
+        "kind": "rectangle",
+        "length": 7240,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 47780,
+        "y": 13153,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p79",
+      "name": "Module 8 - Étagère 5",
+      "shape": {
+        "kind": "rectangle",
+        "length": 7240,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 47780,
+        "y": 16397,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p80",
+      "name": "Module 8 - Fond",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 7600
+      },
+      "thickness": 50,
+      "material": "Contreplaqué",
+      "position": {
+        "x": 47600,
+        "y": 0,
+        "z": 0
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+x"
+      }
+    },
+    {
+      "id": "p81",
+      "name": "Module 9 - Côté gauche",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 55200,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p82",
+      "name": "Module 9 - Côté droit",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 62820,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p83",
+      "name": "Module 9 - Dessous",
+      "shape": {
+        "kind": "rectangle",
+        "length": 7440,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 55380,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p84",
+      "name": "Module 9 - Dessus",
+      "shape": {
+        "kind": "rectangle",
+        "length": 7440,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 55380,
+        "y": 19820,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p85",
+      "name": "Module 9 - Étagère 1",
+      "shape": {
+        "kind": "rectangle",
+        "length": 7440,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 55380,
+        "y": 3423,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p86",
+      "name": "Module 9 - Étagère 2",
+      "shape": {
+        "kind": "rectangle",
+        "length": 7440,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 55380,
+        "y": 6667,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p87",
+      "name": "Module 9 - Étagère 3",
+      "shape": {
+        "kind": "rectangle",
+        "length": 7440,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 55380,
+        "y": 9910,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p88",
+      "name": "Module 9 - Étagère 4",
+      "shape": {
+        "kind": "rectangle",
+        "length": 7440,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 55380,
+        "y": 13153,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p89",
+      "name": "Module 9 - Étagère 5",
+      "shape": {
+        "kind": "rectangle",
+        "length": 7440,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 55380,
+        "y": 16397,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p90",
+      "name": "Module 9 - Fond",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 7800
+      },
+      "thickness": 50,
+      "material": "Contreplaqué",
+      "position": {
+        "x": 55200,
+        "y": 0,
+        "z": 0
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+x"
+      }
+    },
+    {
+      "id": "p91",
+      "name": "Module 10 - Côté gauche",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 63000,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p92",
+      "name": "Module 10 - Côté droit",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 70820,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p93",
+      "name": "Module 10 - Dessous",
+      "shape": {
+        "kind": "rectangle",
+        "length": 7640,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 63180,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p94",
+      "name": "Module 10 - Dessus",
+      "shape": {
+        "kind": "rectangle",
+        "length": 7640,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 63180,
+        "y": 19820,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p95",
+      "name": "Module 10 - Étagère 1",
+      "shape": {
+        "kind": "rectangle",
+        "length": 7640,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 63180,
+        "y": 3423,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p96",
+      "name": "Module 10 - Étagère 2",
+      "shape": {
+        "kind": "rectangle",
+        "length": 7640,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 63180,
+        "y": 6667,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p97",
+      "name": "Module 10 - Étagère 3",
+      "shape": {
+        "kind": "rectangle",
+        "length": 7640,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 63180,
+        "y": 9910,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p98",
+      "name": "Module 10 - Étagère 4",
+      "shape": {
+        "kind": "rectangle",
+        "length": 7640,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 63180,
+        "y": 13153,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p99",
+      "name": "Module 10 - Étagère 5",
+      "shape": {
+        "kind": "rectangle",
+        "length": 7640,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 63180,
+        "y": 16397,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p100",
+      "name": "Module 10 - Fond",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 8000
+      },
+      "thickness": 50,
+      "material": "Contreplaqué",
+      "position": {
+        "x": 63000,
+        "y": 0,
+        "z": 0
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+x"
+      }
+    },
+    {
+      "id": "p101",
+      "name": "Module 11 - Côté gauche",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 71000,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p102",
+      "name": "Module 11 - Côté droit",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 79020,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p103",
+      "name": "Module 11 - Dessous",
+      "shape": {
+        "kind": "rectangle",
+        "length": 7840,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 71180,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p104",
+      "name": "Module 11 - Dessus",
+      "shape": {
+        "kind": "rectangle",
+        "length": 7840,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 71180,
+        "y": 19820,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p105",
+      "name": "Module 11 - Étagère 1",
+      "shape": {
+        "kind": "rectangle",
+        "length": 7840,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 71180,
+        "y": 3423,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p106",
+      "name": "Module 11 - Étagère 2",
+      "shape": {
+        "kind": "rectangle",
+        "length": 7840,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 71180,
+        "y": 6667,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p107",
+      "name": "Module 11 - Étagère 3",
+      "shape": {
+        "kind": "rectangle",
+        "length": 7840,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 71180,
+        "y": 9910,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p108",
+      "name": "Module 11 - Étagère 4",
+      "shape": {
+        "kind": "rectangle",
+        "length": 7840,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 71180,
+        "y": 13153,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p109",
+      "name": "Module 11 - Étagère 5",
+      "shape": {
+        "kind": "rectangle",
+        "length": 7840,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 71180,
+        "y": 16397,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p110",
+      "name": "Module 11 - Fond",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 8200
+      },
+      "thickness": 50,
+      "material": "Contreplaqué",
+      "position": {
+        "x": 71000,
+        "y": 0,
+        "z": 0
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+x"
+      }
+    },
+    {
+      "id": "p111",
+      "name": "Module 12 - Côté gauche",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 79200,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p112",
+      "name": "Module 12 - Côté droit",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 87420,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p113",
+      "name": "Module 12 - Dessous",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8040,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 79380,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p114",
+      "name": "Module 12 - Dessus",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8040,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 79380,
+        "y": 19820,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p115",
+      "name": "Module 12 - Étagère 1",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8040,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 79380,
+        "y": 3423,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p116",
+      "name": "Module 12 - Étagère 2",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8040,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 79380,
+        "y": 6667,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p117",
+      "name": "Module 12 - Étagère 3",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8040,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 79380,
+        "y": 9910,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p118",
+      "name": "Module 12 - Étagère 4",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8040,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 79380,
+        "y": 13153,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p119",
+      "name": "Module 12 - Étagère 5",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8040,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 79380,
+        "y": 16397,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p120",
+      "name": "Module 12 - Fond",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 8400
+      },
+      "thickness": 50,
+      "material": "Contreplaqué",
+      "position": {
+        "x": 79200,
+        "y": 0,
+        "z": 0
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+x"
+      }
+    },
+    {
+      "id": "p121",
+      "name": "Module 13 - Côté gauche",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 87600,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p122",
+      "name": "Module 13 - Côté droit",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 96020,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p123",
+      "name": "Module 13 - Dessous",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8240,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 87780,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p124",
+      "name": "Module 13 - Dessus",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8240,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 87780,
+        "y": 19820,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p125",
+      "name": "Module 13 - Étagère 1",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8240,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 87780,
+        "y": 3423,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p126",
+      "name": "Module 13 - Étagère 2",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8240,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 87780,
+        "y": 6667,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p127",
+      "name": "Module 13 - Étagère 3",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8240,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 87780,
+        "y": 9910,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p128",
+      "name": "Module 13 - Étagère 4",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8240,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 87780,
+        "y": 13153,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p129",
+      "name": "Module 13 - Étagère 5",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8240,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 87780,
+        "y": 16397,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p130",
+      "name": "Module 13 - Fond",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 8600
+      },
+      "thickness": 50,
+      "material": "Contreplaqué",
+      "position": {
+        "x": 87600,
+        "y": 0,
+        "z": 0
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+x"
+      }
+    },
+    {
+      "id": "p131",
+      "name": "Module 14 - Côté gauche",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 96200,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p132",
+      "name": "Module 14 - Côté droit",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 104820,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p133",
+      "name": "Module 14 - Dessous",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8440,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 96380,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p134",
+      "name": "Module 14 - Dessus",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8440,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 96380,
+        "y": 19820,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p135",
+      "name": "Module 14 - Étagère 1",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8440,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 96380,
+        "y": 3423,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p136",
+      "name": "Module 14 - Étagère 2",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8440,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 96380,
+        "y": 6667,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p137",
+      "name": "Module 14 - Étagère 3",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8440,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 96380,
+        "y": 9910,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p138",
+      "name": "Module 14 - Étagère 4",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8440,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 96380,
+        "y": 13153,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p139",
+      "name": "Module 14 - Étagère 5",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8440,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 96380,
+        "y": 16397,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p140",
+      "name": "Module 14 - Fond",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 8800
+      },
+      "thickness": 50,
+      "material": "Contreplaqué",
+      "position": {
+        "x": 96200,
+        "y": 0,
+        "z": 0
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+x"
+      }
+    },
+    {
+      "id": "p141",
+      "name": "Module 15 - Côté gauche",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 105000,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p142",
+      "name": "Module 15 - Côté droit",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 113820,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p143",
+      "name": "Module 15 - Dessous",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8640,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 105180,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p144",
+      "name": "Module 15 - Dessus",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8640,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 105180,
+        "y": 19820,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p145",
+      "name": "Module 15 - Étagère 1",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8640,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 105180,
+        "y": 3423,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p146",
+      "name": "Module 15 - Étagère 2",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8640,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 105180,
+        "y": 6667,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p147",
+      "name": "Module 15 - Étagère 3",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8640,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 105180,
+        "y": 9910,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p148",
+      "name": "Module 15 - Étagère 4",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8640,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 105180,
+        "y": 13153,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p149",
+      "name": "Module 15 - Étagère 5",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8640,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 105180,
+        "y": 16397,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p150",
+      "name": "Module 15 - Fond",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 9000
+      },
+      "thickness": 50,
+      "material": "Contreplaqué",
+      "position": {
+        "x": 105000,
+        "y": 0,
+        "z": 0
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+x"
+      }
+    },
+    {
+      "id": "p151",
+      "name": "Module 16 - Côté gauche",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 114000,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p152",
+      "name": "Module 16 - Côté droit",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 123020,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p153",
+      "name": "Module 16 - Dessous",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8840,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 114180,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p154",
+      "name": "Module 16 - Dessus",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8840,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 114180,
+        "y": 19820,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p155",
+      "name": "Module 16 - Étagère 1",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8840,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 114180,
+        "y": 3423,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p156",
+      "name": "Module 16 - Étagère 2",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8840,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 114180,
+        "y": 6667,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p157",
+      "name": "Module 16 - Étagère 3",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8840,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 114180,
+        "y": 9910,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p158",
+      "name": "Module 16 - Étagère 4",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8840,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 114180,
+        "y": 13153,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p159",
+      "name": "Module 16 - Étagère 5",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8840,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 114180,
+        "y": 16397,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p160",
+      "name": "Module 16 - Fond",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 9200
+      },
+      "thickness": 50,
+      "material": "Contreplaqué",
+      "position": {
+        "x": 114000,
+        "y": 0,
+        "z": 0
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+x"
+      }
+    },
+    {
+      "id": "p161",
+      "name": "Module 17 - Côté gauche",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 123200,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p162",
+      "name": "Module 17 - Côté droit",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 132420,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p163",
+      "name": "Module 17 - Dessous",
+      "shape": {
+        "kind": "rectangle",
+        "length": 9040,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 123380,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p164",
+      "name": "Module 17 - Dessus",
+      "shape": {
+        "kind": "rectangle",
+        "length": 9040,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 123380,
+        "y": 19820,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p165",
+      "name": "Module 17 - Étagère 1",
+      "shape": {
+        "kind": "rectangle",
+        "length": 9040,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 123380,
+        "y": 3423,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p166",
+      "name": "Module 17 - Étagère 2",
+      "shape": {
+        "kind": "rectangle",
+        "length": 9040,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 123380,
+        "y": 6667,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p167",
+      "name": "Module 17 - Étagère 3",
+      "shape": {
+        "kind": "rectangle",
+        "length": 9040,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 123380,
+        "y": 9910,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p168",
+      "name": "Module 17 - Étagère 4",
+      "shape": {
+        "kind": "rectangle",
+        "length": 9040,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 123380,
+        "y": 13153,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p169",
+      "name": "Module 17 - Étagère 5",
+      "shape": {
+        "kind": "rectangle",
+        "length": 9040,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 123380,
+        "y": 16397,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p170",
+      "name": "Module 17 - Fond",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 9400
+      },
+      "thickness": 50,
+      "material": "Contreplaqué",
+      "position": {
+        "x": 123200,
+        "y": 0,
+        "z": 0
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+x"
+      }
+    },
+    {
+      "id": "p171",
+      "name": "Module 18 - Côté gauche",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 132600,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p172",
+      "name": "Module 18 - Côté droit",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 142020,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p173",
+      "name": "Module 18 - Dessous",
+      "shape": {
+        "kind": "rectangle",
+        "length": 9240,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 132780,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p174",
+      "name": "Module 18 - Dessus",
+      "shape": {
+        "kind": "rectangle",
+        "length": 9240,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 132780,
+        "y": 19820,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p175",
+      "name": "Module 18 - Étagère 1",
+      "shape": {
+        "kind": "rectangle",
+        "length": 9240,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 132780,
+        "y": 3423,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p176",
+      "name": "Module 18 - Étagère 2",
+      "shape": {
+        "kind": "rectangle",
+        "length": 9240,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 132780,
+        "y": 6667,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p177",
+      "name": "Module 18 - Étagère 3",
+      "shape": {
+        "kind": "rectangle",
+        "length": 9240,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 132780,
+        "y": 9910,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p178",
+      "name": "Module 18 - Étagère 4",
+      "shape": {
+        "kind": "rectangle",
+        "length": 9240,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 132780,
+        "y": 13153,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p179",
+      "name": "Module 18 - Étagère 5",
+      "shape": {
+        "kind": "rectangle",
+        "length": 9240,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 132780,
+        "y": 16397,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p180",
+      "name": "Module 18 - Fond",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 9600
+      },
+      "thickness": 50,
+      "material": "Contreplaqué",
+      "position": {
+        "x": 132600,
+        "y": 0,
+        "z": 0
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+x"
+      }
+    },
+    {
+      "id": "p181",
+      "name": "Module 19 - Côté gauche",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 142200,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p182",
+      "name": "Module 19 - Côté droit",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 151820,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p183",
+      "name": "Module 19 - Dessous",
+      "shape": {
+        "kind": "rectangle",
+        "length": 9440,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 142380,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p184",
+      "name": "Module 19 - Dessus",
+      "shape": {
+        "kind": "rectangle",
+        "length": 9440,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 142380,
+        "y": 19820,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p185",
+      "name": "Module 19 - Étagère 1",
+      "shape": {
+        "kind": "rectangle",
+        "length": 9440,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 142380,
+        "y": 3423,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p186",
+      "name": "Module 19 - Étagère 2",
+      "shape": {
+        "kind": "rectangle",
+        "length": 9440,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 142380,
+        "y": 6667,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p187",
+      "name": "Module 19 - Étagère 3",
+      "shape": {
+        "kind": "rectangle",
+        "length": 9440,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 142380,
+        "y": 9910,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p188",
+      "name": "Module 19 - Étagère 4",
+      "shape": {
+        "kind": "rectangle",
+        "length": 9440,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 142380,
+        "y": 13153,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p189",
+      "name": "Module 19 - Étagère 5",
+      "shape": {
+        "kind": "rectangle",
+        "length": 9440,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 142380,
+        "y": 16397,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p190",
+      "name": "Module 19 - Fond",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 9800
+      },
+      "thickness": 50,
+      "material": "Contreplaqué",
+      "position": {
+        "x": 142200,
+        "y": 0,
+        "z": 0
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+x"
+      }
+    },
+    {
+      "id": "p191",
+      "name": "Module 20 - Côté gauche",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 152000,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p192",
+      "name": "Module 20 - Côté droit",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 161820,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p193",
+      "name": "Module 20 - Dessous",
+      "shape": {
+        "kind": "rectangle",
+        "length": 9640,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 152180,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p194",
+      "name": "Module 20 - Dessus",
+      "shape": {
+        "kind": "rectangle",
+        "length": 9640,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 152180,
+        "y": 19820,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p195",
+      "name": "Module 20 - Étagère 1",
+      "shape": {
+        "kind": "rectangle",
+        "length": 9640,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 152180,
+        "y": 3423,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p196",
+      "name": "Module 20 - Étagère 2",
+      "shape": {
+        "kind": "rectangle",
+        "length": 9640,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 152180,
+        "y": 6667,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p197",
+      "name": "Module 20 - Étagère 3",
+      "shape": {
+        "kind": "rectangle",
+        "length": 9640,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 152180,
+        "y": 9910,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p198",
+      "name": "Module 20 - Étagère 4",
+      "shape": {
+        "kind": "rectangle",
+        "length": 9640,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 152180,
+        "y": 13153,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p199",
+      "name": "Module 20 - Étagère 5",
+      "shape": {
+        "kind": "rectangle",
+        "length": 9640,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 152180,
+        "y": 16397,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p200",
+      "name": "Module 20 - Fond",
+      "shape": {
+        "kind": "rectangle",
+        "length": 20000,
+        "width": 10000
+      },
+      "thickness": 50,
+      "material": "Contreplaqué",
+      "position": {
+        "x": 152000,
+        "y": 0,
+        "z": 0
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+x"
+      }
+    }
+  ]
+}
