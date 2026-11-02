@@ -22,4 +22,5 @@ nsis:
   createStartMenuShortcut: true
   shortcutName: CotaBois
   runAfterFinish: true
-  deleteAppDataOnUninstall: false
+  # Seulement le cache du logiciel : les projets sont dans les dossiers choisis par l'utilisateur.
+  deleteAppDataOnUninstall: true
