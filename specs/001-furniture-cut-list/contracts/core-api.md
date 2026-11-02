@@ -50,7 +50,7 @@ Chaque fonction renvoie un résultat contenant un nouveau projet et passe `templ
 | Fonction | Rôle |
 |---|---|
 | `computeCutList(project)` | Renvoie les `CutLine` et les `CutTotals`. Déterministe. |
-| `toCsv(project, cutList)` | Texte du CSV, voir [exports.md](exports.md). |
+| `toCsv(cutList)` | Texte du CSV, voir [exports.md](exports.md). |
 | `serializeProject(project)` | Texte du fichier, voir [project-file.md](project-file.md). |
 | `parseProject(text)` | Projet ou erreur, avec migrations. |
 
