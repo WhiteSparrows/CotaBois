@@ -3,6 +3,7 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { applyCaisson } from '../../src/core/caisson'
 import { computeCutList } from '../../src/core/cutList'
+import { findOverlaps } from '../../src/core/geometry'
 import { createEmptyProject, type Project } from '../../src/core/model'
 import { addPiece, newPanelInput, rotatePiece } from '../../src/core/pieces'
 import { FORMAT_VERSION, parseProject, safeFileName, serializeProject } from '../../src/core/projectFile'
@@ -91,6 +92,16 @@ describe('serializeProject', () => {
 
   it('indique la version du format', () => {
     expect(JSON.parse(serializeProject(createEmptyProject())).formatVersion).toBe(FORMAT_VERSION)
+  })
+})
+
+describe('projet de 200 pièces', () => {
+  it('est un projet valide, sans chevauchement, avec une seule pièce « Repère »', () => {
+    const project = value(parseProject(fixture('200-pieces.cotabois')))
+    expect(project.pieces).toHaveLength(200)
+    expect(findOverlaps(project)).toEqual([])
+    expect(project.pieces.filter((piece) => piece.name === 'Repère')).toHaveLength(1)
+    expect(computeCutList(project).lines.find((line) => line.names.includes('Repère'))?.quantity).toBe(1)
   })
 })
 
