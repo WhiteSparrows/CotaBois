@@ -19,6 +19,10 @@ const api = {
   saveProjectAs: (text: string, suggestedName: string): Promise<FileResult<{ fileName: string }>> =>
     ipcRenderer.invoke('file:save-as', text, suggestedName),
   newProject: (): Promise<void> => ipcRenderer.invoke('file:new'),
+  exportCsv: (text: string, suggestedName: string): Promise<FileResult<{ fileName: string }>> =>
+    ipcRenderer.invoke('file:export-csv', text, suggestedName),
+  exportPdf: (suggestedName: string): Promise<FileResult<{ fileName: string }>> =>
+    ipcRenderer.invoke('file:export-pdf', suggestedName),
 
   setDirty: (isDirty: boolean): void => ipcRenderer.send('window:set-dirty', isDirty),
   confirmClose: (): void => ipcRenderer.send('window:confirm-close')

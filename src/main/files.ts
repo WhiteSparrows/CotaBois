@@ -12,9 +12,9 @@ const EXTENSION = 'cotabois'
 const FILTERS = [{ name: 'Projet CotaBois', extensions: [EXTENSION] }]
 const MAX_PROJECT_BYTES = 50 * 1024 * 1024
 
-function saveErrorMessage(error: unknown): string {
+export function saveErrorMessage(error: unknown, subject = 'Le projet'): string {
   const code = (error as NodeJS.ErrnoException).code
-  const prefix = "Le projet n'a pas pu être enregistré."
+  const prefix = `${subject} n'a pas pu être enregistré.`
   if (code === 'ENOSPC') return `${prefix} Le disque est plein.`
   if (code === 'EACCES' || code === 'EPERM') return `${prefix} Ce dossier est protégé ou le fichier est utilisé.`
   return `${prefix} Vérifiez l'emplacement choisi.`
@@ -85,4 +85,23 @@ export function registerFileHandlers(window: BrowserWindow): void {
   ipcMain.handle('file:new', () => {
     currentPath = null
   })
+
+  // Un export n'est pas un enregistrement : le chemin du projet ne change pas.
+  ipcMain.handle(
+    'file:export-csv',
+    async (_event, text: string, suggestedName: string): Promise<FileResult<{ fileName: string }>> => {
+      const { canceled, filePath } = await dialog.showSaveDialog(window, {
+        title: 'Exporter la liste de découpe en CSV',
+        defaultPath: join(app.getPath('documents'), `${suggestedName}.csv`),
+        filters: [{ name: 'Fichier CSV', extensions: ['csv'] }]
+      })
+      if (canceled || !filePath) return { status: 'canceled' }
+      try {
+        await writeFileAtomic(filePath, text)
+        return { status: 'ok', fileName: basename(filePath) }
+      } catch (error) {
+        return { status: 'error', message: saveErrorMessage(error, 'Le fichier') }
+      }
+    }
+  )
 }

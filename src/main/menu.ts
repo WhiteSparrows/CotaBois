@@ -21,6 +21,8 @@ const IMPLEMENTED_COMMANDS: ReadonlySet<MenuCommand> = new Set([
   'file:open',
   'file:save',
   'file:save-as',
+  'file:export-pdf',
+  'file:export-csv',
   'edit:undo',
   'edit:redo',
   'edit:duplicate',

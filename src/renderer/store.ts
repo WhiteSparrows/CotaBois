@@ -1,5 +1,7 @@
 import { useSyncExternalStore } from 'react'
 import { applyCaisson } from '../core/caisson'
+import { toCsv } from '../core/csv'
+import { computeCutList } from '../core/cutList'
 import { canRedo, canUndo, createHistory, pushState, redo as redoHistory, undo as undoHistory, type History } from '../core/history'
 import { createEmptyProject, type Axis, type CaissonParams, type Project, type Vector } from '../core/model'
 import {
@@ -19,6 +21,12 @@ import type { MenuCommand } from '../main/menu'
 /** Ce qui attend la réponse de l'utilisateur, parce que le projet n'est pas enregistré. */
 export type GuardedAction = 'new' | 'open' | 'close'
 
+/** Le contenu de la vue d'impression, pour le temps de l'export en PDF. */
+export interface ReportContent {
+  imageUrl: string | null
+  date: string
+}
+
 export interface EditorState {
   project: Project
   selection: readonly string[]
@@ -28,6 +36,7 @@ export interface EditorState {
   dirty: boolean
   pendingAction: GuardedAction | null
   fileError: string | null
+  report: ReportContent | null
   /** Change à chaque fois que la vue doit recadrer le meuble. */
   frameToken: number
 }
@@ -36,6 +45,8 @@ let history: History = createHistory(createEmptyProject())
 let savedProject: Project = history.present
 let pendingAction: GuardedAction | null = null
 let fileError: string | null = null
+let report: ReportContent | null = null
+let captureReportImage: (() => string) | null = null
 let state: EditorState = toState(history, [], 0)
 const listeners = new Set<() => void>()
 
@@ -49,6 +60,7 @@ function toState(current: History, selection: readonly string[], frameToken: num
     dirty: current.present !== savedProject,
     pendingAction,
     fileError,
+    report,
     frameToken
   }
 }
@@ -229,6 +241,59 @@ export async function resolvePendingAction(answer: 'save' | 'discard' | 'cancel'
   if (!action || answer === 'cancel') return
   if (answer === 'save' && !(await saveProject())) return
   await perform(action)
+}
+
+export function setReportImageSource(capture: (() => string) | null): void {
+  captureReportImage = capture
+}
+
+function exportFileName(): string {
+  return `${safeFileName(state.project.name)} - découpe`
+}
+
+/** Les menus restent actifs : sans pièce, on explique pourquoi rien ne se passe. */
+function canExport(): boolean {
+  if (state.project.pieces.length > 0) return true
+  fileError = 'Ajoutez une pièce pour pouvoir exporter la liste de découpe.'
+  refresh()
+  return false
+}
+
+function showExportResult(status: 'ok' | 'canceled', message?: string): void
+function showExportResult(status: 'error', message: string): void
+function showExportResult(status: 'ok' | 'canceled' | 'error', message?: string): void {
+  fileError = status === 'error' ? (message ?? null) : null
+  refresh()
+}
+
+export async function exportCsv(): Promise<void> {
+  if (!canExport()) return
+  const result = await window.cotabois.exportCsv(toCsv(computeCutList(state.project)), exportFileName())
+  if (result.status === 'error') showExportResult('error', result.message)
+  else showExportResult(result.status)
+}
+
+function nextFrames(): Promise<void> {
+  return new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))
+}
+
+export async function exportPdf(): Promise<void> {
+  if (report || !canExport()) return
+
+  const imageUrl = captureReportImage?.() ?? null
+  if (imageUrl) {
+    const image = new Image()
+    image.src = imageUrl
+    await image.decode()
+  }
+  report = { imageUrl, date: new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long' }).format(new Date()) }
+  refresh()
+  await nextFrames()
+
+  const result = await window.cotabois.exportPdf(exportFileName())
+  report = null
+  if (result.status === 'error') showExportResult('error', result.message)
+  else showExportResult(result.status)
 }
 
 const commandHandlers = new Map<MenuCommand, () => void>()

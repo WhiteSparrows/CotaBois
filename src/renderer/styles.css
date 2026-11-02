@@ -185,6 +185,10 @@ button.ghost:hover {
   background: var(--surface-sunken);
 }
 
+.export-actions {
+  margin-bottom: 14px;
+}
+
 .panel-heading {
   display: flex;
   align-items: baseline;

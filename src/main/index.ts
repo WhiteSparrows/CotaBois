@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain, session } from 'electron'
 import { join } from 'node:path'
 import { registerFileHandlers } from './files'
 import { installMenu } from './menu'
+import { registerPdfHandler } from './pdf'
 
 /** CotaBois fonctionne hors ligne : une fois empaqueté, aucune requête ne peut sortir. */
 function blockNetwork(): void {
@@ -53,6 +54,7 @@ function createWindow(): void {
   window.once('ready-to-show', () => window.show())
   installMenu(window)
   registerFileHandlers(window)
+  registerPdfHandler(window)
   guardClose(window)
 
   const devServerUrl = process.env['ELECTRON_RENDERER_URL']

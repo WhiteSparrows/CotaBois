@@ -32,10 +32,10 @@ export async function chooseFile(app: ElectronApplication, path: string | null):
       canceled: chosen === null,
       filePaths: chosen === null ? [] : [chosen]
     })) as typeof dialog.showOpenDialog
-    dialog.showSaveDialog = (async () => ({
-      canceled: chosen === null,
-      filePath: chosen ?? ''
-    })) as typeof dialog.showSaveDialog
+    dialog.showSaveDialog = (async (_window: unknown, options: { defaultPath?: string }) => {
+      ;(globalThis as { lastSaveDefaultPath?: string }).lastSaveDefaultPath = options.defaultPath
+      return { canceled: chosen === null, filePath: chosen ?? '' }
+    }) as unknown as typeof dialog.showSaveDialog
   }, path)
 }
 

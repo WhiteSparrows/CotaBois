@@ -5,11 +5,14 @@ import { CommitField } from './panels/CommitField'
 import { CutListPanel } from './panels/CutListPanel'
 import { PiecePanel } from './panels/PiecePanel'
 import { UnsavedDialog } from './panels/UnsavedDialog'
+import { ReportView } from './report/ReportView'
 import {
   addPanel,
   deleteSelection,
   dismissFileError,
   duplicateSelection,
+  exportCsv,
+  exportPdf,
   movePiece,
   redo,
   registerCommand,
@@ -19,6 +22,7 @@ import {
   saveProjectAs,
   selectPieces,
   setProjectName,
+  setReportImageSource,
   undo,
   useEditor
 } from './store'
@@ -37,7 +41,7 @@ function commitActiveField(): void {
 const MAX_LISTED_OVERLAPS = 3
 
 export function App() {
-  const { project, selection, canUndo, canRedo, dirty, pendingAction, fileError, frameToken } = useEditor()
+  const { project, selection, canUndo, canRedo, dirty, pendingAction, fileError, report, frameToken } = useEditor()
   const containerRef = useRef<HTMLDivElement>(null)
   const viewportRef = useRef<Viewport | null>(null)
   const framedToken = useRef(0)
@@ -56,8 +60,10 @@ export function App() {
       })
       viewportRef.current = viewport
       const unregister = registerCommand('view:frame', () => viewport.frame())
+      setReportImageSource(() => viewport.captureImage())
       return () => {
         unregister()
+        setReportImageSource(null)
         viewport.dispose()
         viewportRef.current = null
       }
@@ -88,6 +94,8 @@ export function App() {
       registerCommand('file:open', afterCommit(() => requestAction('open'))),
       registerCommand('file:save', afterCommit(() => void saveProject())),
       registerCommand('file:save-as', afterCommit(() => void saveProjectAs())),
+      registerCommand('file:export-pdf', afterCommit(() => void exportPdf())),
+      registerCommand('file:export-csv', afterCommit(() => void exportCsv())),
       registerCommand('edit:undo', afterCommit(undo)),
       registerCommand('edit:redo', afterCommit(redo)),
       registerCommand('edit:duplicate', afterCommit(duplicateSelection)),
@@ -119,6 +127,7 @@ export function App() {
   const nameOf = (id: string) => project.pieces.find((piece) => piece.id === id)?.name ?? ''
 
   return (
+    <>
     <div className="app">
       <aside className="side-panel">
         <div className="panel project-panel">
@@ -188,5 +197,7 @@ export function App() {
 
       {pendingAction && <UnsavedDialog projectName={project.name} />}
     </div>
+    {report && <ReportView project={project} content={report} />}
+    </>
   )
 }
