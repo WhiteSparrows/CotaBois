@@ -196,9 +196,9 @@ description: "Liste des tâches pour la conception de meubles et la liste de dé
 
 **Purpose**: Vérifier l'ensemble, y compris ce que les tests automatiques ne peuvent pas prouver.
 
-- [ ] T071 [P] Générer le projet de test de 200 pièces `tests/fixtures/projects/200-pieces.cotabois`, et mesurer V6 sur le portable de référence ; optimiser uniquement si un seuil de SC-002, SC-004 ou SC-005 n'est pas atteint
-- [ ] T072 [P] Mettre à jour `README.md` : présentation, installation et commandes de développement
-- [ ] T073 Exécuter tous les tests et la vérification des types, et rejouer V1 à V6 de `quickstart.md`, en consignant les résultats dans `specs/001-furniture-cut-list/checklists/validation.md`
+- [X] T071 [P] Générer le projet de test de 200 pièces `tests/fixtures/projects/200-pieces.cotabois`, et mesurer V6 sur le portable de référence ; optimiser uniquement si un seuil de SC-002, SC-004 ou SC-005 n'est pas atteint
+- [X] T072 [P] Mettre à jour `README.md` : présentation, installation et commandes de développement
+- [X] T073 Exécuter tous les tests et la vérification des types, et rejouer V1 à V6 de `quickstart.md`, en consignant les résultats dans `specs/001-furniture-cut-list/checklists/validation.md`
 - [ ] T074 Construire l'installeur final et rejouer V7 sur un Windows vierge, en consignant le résultat dans `specs/001-furniture-cut-list/checklists/validation.md` ; l'activation de Windows Sandbox est faite par l'utilisateur (SC-007, SC-008)
 - [ ] T075 Faire chronométrer par l'utilisateur la création d'un caisson au premier usage, sans documentation, et consigner le résultat dans `specs/001-furniture-cut-list/checklists/validation.md` (SC-001)
 
