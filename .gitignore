@@ -1,0 +1,16 @@
+node_modules/
+out/
+dist/
+test-results/
+playwright-report/
+*.log
+.env*
+Thumbs.db
+.DS_Store
+*.tmp
+.vscode/
+.idea/
+
+# Agent : seuls les skills Spec Kit sont versionnés
+.claude/*
+!.claude/skills/
