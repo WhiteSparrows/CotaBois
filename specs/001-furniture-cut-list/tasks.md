@@ -151,19 +151,19 @@ description: "Liste des tâches pour la conception de meubles et la liste de dé
 
 ### Tests for User Story 4 ⚠️
 
-- [ ] T054 [P] [US4] Créer dans `tests/fixtures/projects/` un fichier `.cotabois` valide en version 1, un fichier abîmé, un fichier sans `formatVersion` et un fichier de version future
-- [ ] T055 [P] [US4] Écrire `tests/core/projectFile.test.ts` : aller-retour strictement égal, codes `file-corrupted`, `not-a-project` et `format-too-recent`, `id` en double, `shape.kind` inconnu, aucune ouverture partielle (FR-023, FR-025, SC-006)
-- [ ] T056 [P] [US4] Écrire `tests/e2e/us4-project.spec.ts`, avec dialogues simulés : enregistrer, rouvrir, question à la fermeture, fichier invalide sans effet sur le projet en cours (FR-024, FR-025)
+- [X] T054 [P] [US4] Créer dans `tests/fixtures/projects/` un fichier `.cotabois` valide en version 1, un fichier abîmé, un fichier sans `formatVersion` et un fichier de version future
+- [X] T055 [P] [US4] Écrire `tests/core/projectFile.test.ts` : aller-retour strictement égal, codes `file-corrupted`, `not-a-project` et `format-too-recent`, `id` en double, `shape.kind` inconnu, aucune ouverture partielle (FR-023, FR-025, SC-006)
+- [X] T056 [P] [US4] Écrire `tests/e2e/us4-project.spec.ts`, avec dialogues simulés : enregistrer, rouvrir, question à la fermeture, fichier invalide sans effet sur le projet en cours (FR-024, FR-025)
 
 ### Implementation for User Story 4
 
-- [ ] T057 [US4] Implémenter `serializeProject`, `parseProject` et la chaîne de migrations, vide pour l'instant, dans `src/core/projectFile.ts`, selon `contracts/project-file.md` (FR-023, FR-025)
-- [ ] T058 [US4] Implémenter dans `src/main/files.ts` les dialogues, la lecture, l'écriture atomique par fichier temporaire et renommage, le chemin courant détenu par le processus principal et `Documents` comme dossier par défaut (FR-023, FR-030)
-- [ ] T059 [US4] Exposer `openProject`, `projectOpened`, `saveProject`, `saveProjectAs`, `newProject`, `setDirty`, `setTitle`, `onCloseRequested` et `confirmClose` dans `src/preload/index.ts` et `src/main/index.ts`, selon `contracts/desktop-bridge.md`
-- [ ] T060 [US4] Ajouter dans `src/renderer/store.ts` les actions de fichier, l'état « modifié » calculé par rapport à `savedProject`, y compris après annulation, et la remise à zéro de l'historique à l'ouverture (FR-023, FR-024)
-- [ ] T061 [US4] Créer `src/renderer/panels/UnsavedDialog.tsx` : enregistrer, abandonner ou annuler, avant de fermer, d'ouvrir ou de créer un projet (FR-024)
-- [ ] T062 [US4] Afficher les erreurs de lecture et d'écriture sans altérer le projet en cours, y compris disque plein et dossier protégé, dans `src/renderer/App.tsx` (FR-025)
-- [ ] T063 [US4] Activer `file:new`, `file:open`, `file:save` et `file:save-as` dans `src/main/menu.ts` et `src/renderer/store.ts`, et afficher le nom du projet et l'indicateur de modification dans le titre de la fenêtre
+- [X] T057 [US4] Implémenter `serializeProject`, `parseProject` et la chaîne de migrations, vide pour l'instant, dans `src/core/projectFile.ts`, selon `contracts/project-file.md` (FR-023, FR-025)
+- [X] T058 [US4] Implémenter dans `src/main/files.ts` les dialogues, la lecture, l'écriture atomique par fichier temporaire et renommage, le chemin courant détenu par le processus principal et `Documents` comme dossier par défaut (FR-023, FR-030)
+- [X] T059 [US4] Exposer `openProject`, `projectOpened`, `saveProject`, `saveProjectAs`, `newProject`, `setDirty`, `setTitle`, `onCloseRequested` et `confirmClose` dans `src/preload/index.ts` et `src/main/index.ts`, selon `contracts/desktop-bridge.md`
+- [X] T060 [US4] Ajouter dans `src/renderer/store.ts` les actions de fichier, l'état « modifié » calculé par rapport à `savedProject`, y compris après annulation, et la remise à zéro de l'historique à l'ouverture (FR-023, FR-024)
+- [X] T061 [US4] Créer `src/renderer/panels/UnsavedDialog.tsx` : enregistrer, abandonner ou annuler, avant de fermer, d'ouvrir ou de créer un projet (FR-024)
+- [X] T062 [US4] Afficher les erreurs de lecture et d'écriture sans altérer le projet en cours, y compris disque plein et dossier protégé, dans `src/renderer/App.tsx` (FR-025)
+- [X] T063 [US4] Activer `file:new`, `file:open`, `file:save` et `file:save-as` dans `src/main/menu.ts` et `src/renderer/store.ts`, et afficher le nom du projet et l'indicateur de modification dans le titre de la fenêtre
 
 **Checkpoint**: V4 passe. Le logiciel peut servir sur plusieurs séances de travail.
 
