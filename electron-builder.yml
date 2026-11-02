@@ -1,0 +1,25 @@
+appId: com.cotabois.app
+productName: CotaBois
+directories:
+  output: dist
+  buildResources: build
+files:
+  - out/**
+  - package.json
+electronLanguages:
+  - fr
+  - en-US
+win:
+  target: nsis
+  icon: build/icon.ico
+nsis:
+  oneClick: true
+  perMachine: false
+  language: "1036"
+  installerLanguages:
+    - fr_FR
+  createDesktopShortcut: always
+  createStartMenuShortcut: true
+  shortcutName: CotaBois
+  runAfterFinish: true
+  deleteAppDataOnUninstall: false
