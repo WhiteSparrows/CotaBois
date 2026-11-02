@@ -1,0 +1,58 @@
+{
+  "formatVersion": 1,
+  "name": "Bibliothèque du salon",
+  "template": {
+    "kind": "caisson",
+    "params": {
+      "width": 8000,
+      "height": 18000,
+      "depth": 4000,
+      "boardThickness": 180,
+      "backThickness": 50,
+      "shelfCount": 0
+    },
+    "customized": true
+  },
+  "pieces": [
+    {
+      "id": "p1",
+      "name": "Côté gauche",
+      "shape": {
+        "kind": "rectangle",
+        "length": 18000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p2",
+      "name": "Fond",
+      "shape": {
+        "kind": "rectangle",
+        "length": 18000,
+        "width": 8000
+      },
+      "thickness": 50,
+      "material": "",
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+x"
+      }
+    }
+  ]
+}
