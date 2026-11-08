@@ -4,6 +4,7 @@ import { join } from 'node:path'
 import { chooseFile, cleanEnv, clickMenu, launchApp } from './helpers'
 
 const LARGE_PROJECT = join(__dirname, '../fixtures/projects/200-pieces.cotabois')
+const LARGE_SHAPES_PROJECT = join(__dirname, '../fixtures/projects/200-pieces-shapes.cotabois')
 const EXECUTABLE = join(__dirname, '../../dist/win-unpacked/CotaBois.exe')
 
 function median(values: number[]): number {
@@ -32,9 +33,14 @@ function measureLengthChange(page: Page, value: string): Promise<number> {
   }, value)
 }
 
-test('SC-004 et SC-005 : 200 pièces restent fluides', async () => {
+const LARGE_PROJECTS: ReadonlyArray<[string, string]> = [
+  ['200 rectangles', LARGE_PROJECT],
+  ['200 pièces dont 50 de forme', LARGE_SHAPES_PROJECT]
+]
+
+for (const [label, projectPath] of LARGE_PROJECTS) test(`SC-004 et SC-005 : fluidité avec ${label}`, async () => {
   const { app, page } = await launchApp()
-  await chooseFile(app, LARGE_PROJECT)
+  await chooseFile(app, projectPath)
   await clickMenu(app, 'Ouvrir…')
   await expect(page.getByTestId('viewport')).toHaveAttribute('data-piece-count', '200')
 
@@ -49,7 +55,7 @@ test('SC-004 et SC-005 : 200 pièces restent fluides', async () => {
     durations.push(await measureLengthChange(page, length))
     await expect(row).toContainText(length)
   }
-  console.log(`Modification sur 200 pièces : médiane ${median(durations).toFixed(0)} ms, max ${Math.max(...durations).toFixed(0)} ms`)
+  console.log(`Modification (${label}) : médiane ${median(durations).toFixed(0)} ms, max ${Math.max(...durations).toFixed(0)} ms`)
   expect(Math.max(...durations)).toBeLessThan(1000)
 
   // Rotation de la vue : écart entre deux images, pendant un long glissement
@@ -90,7 +96,7 @@ test('SC-004 et SC-005 : 200 pièces restent fluides', async () => {
   })
   const p95 = percentile(frames, 0.95)
   console.log(
-    `Rotation sur 200 pièces : ${frames.length} images, médiane ${median(frames).toFixed(1)} ms, ` +
+    `Rotation (${label}) : ${frames.length} images, médiane ${median(frames).toFixed(1)} ms, ` +
       `95e centile ${p95.toFixed(1)} ms, max ${Math.max(...frames).toFixed(1)} ms`
   )
   // 30 images par seconde au moins, 95 % du temps

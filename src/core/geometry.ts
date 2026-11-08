@@ -1,4 +1,4 @@
-import { axisOf, shapeExtent, type Axis, type Piece, type Project, type Vector } from './model'
+import { axisOf, shapeExtent, type Axis, type Piece, type Project, type SignedAxis, type Vector } from './model'
 
 const AXES: readonly Axis[] = ['x', 'y', 'z']
 
@@ -30,6 +30,39 @@ export function pieceBounds(piece: Piece): Bounds {
     min: { x, y, z },
     max: { x: x + size.x, y: y + size.y, z: z + size.z }
   }
+}
+
+export interface PieceFrame {
+  /** Le point (u = 0, v = 0, épaisseur = 0) de la pièce, dans le repère du meuble. */
+  origin: Vector
+  u: Vector
+  v: Vector
+  /** u × v : le repère est direct, et l'épaisseur s'étend le long de ce vecteur. */
+  normal: Vector
+}
+
+function axisVector(signedAxis: SignedAxis): Vector {
+  const vector: Vector = { x: 0, y: 0, z: 0 }
+  vector[axisOf(signedAxis)] = signedAxis.startsWith('+') ? 1 : -1
+  return vector
+}
+
+/** Le repère propre d'une pièce, où se décrit sa forme. */
+export function pieceFrame(piece: Piece): PieceFrame {
+  const u = axisVector(piece.orientation.u)
+  const v = axisVector(piece.orientation.v)
+  const normal: Vector = {
+    x: u.y * v.z - u.z * v.y,
+    y: u.z * v.x - u.x * v.z,
+    z: u.x * v.y - u.y * v.x
+  }
+  const size = pieceSize(piece)
+  // Un axe négatif part de l'autre face de l'encombrement.
+  const origin = { ...piece.position }
+  for (const axis of AXES) {
+    if (u[axis] + v[axis] + normal[axis] < 0) origin[axis] += size[axis]
+  }
+  return { origin, u, v, normal }
 }
 
 export function projectBounds(project: Project): ProjectBounds | null {

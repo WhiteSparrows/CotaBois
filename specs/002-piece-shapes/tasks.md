@@ -24,9 +24,9 @@ description: "Liste des tâches pour les pièces de forme : arrondis et découpe
 
 **Purpose**: Les données de référence, calculées à la main, dont dépendent tous les tests.
 
-- [ ] T001 [P] Créer `tests/fixtures/shape-references.ts` : formes de référence calculées à la main, dont l'exemple de `data-model.md` (tablette 8000 × 3000, maximum réel de `topLeft` égal à 1199), et un jeu de formes impossibles couvrant chaque règle de validation (SC-002, SC-007)
-- [ ] T002 [P] Créer `tests/fixtures/projects/valid-v2.cotabois` selon `contracts/project-file-v2.md`, avec coins modifiés, encoche et trou rond
-- [ ] T003 [P] Étendre `scripts/make-200-pieces.mjs` pour générer aussi `tests/fixtures/projects/200-pieces-shapes.cotabois`, en version 2 : 200 pièces dont 50 de forme, avec au moins 10 formes distinctes ; conserver `200-pieces.cotabois` en version 1, utile à la compatibilité (SC-004, SC-005)
+- [X] T001 [P] Créer `tests/fixtures/shape-references.ts` : formes de référence calculées à la main, dont l'exemple de `data-model.md` (tablette 8000 × 3000, maximum réel de `topLeft` égal à 1199), et un jeu de formes impossibles couvrant chaque règle de validation (SC-002, SC-007)
+- [X] T002 [P] Créer `tests/fixtures/projects/valid-v2.cotabois` selon `contracts/project-file-v2.md`, avec coins modifiés, encoche et trou rond
+- [X] T003 [P] Étendre `scripts/make-200-pieces.mjs` pour générer aussi `tests/fixtures/projects/200-pieces-shapes.cotabois`, en version 2 : 200 pièces dont 50 de forme, avec au moins 10 formes distinctes ; conserver `200-pieces.cotabois` en version 1, utile à la compatibilité (SC-004, SC-005)
 
 ---
 
@@ -40,22 +40,22 @@ description: "Liste des tâches pour les pièces de forme : arrondis et découpe
 
 > **NOTE: Écrire ces tests d'abord et vérifier qu'ils échouent avant d'implémenter.**
 
-- [ ] T004 [P] Écrire `tests/core/shape.test.ts`, validation : limites des champs (« De 0 à 50 » découpes, `radius` et `size` « 1 ou plus », `cornerRadius` « au plus la moitié du plus petit côté », `distance` « entre 0 et la dimension de la pièce »), somme des tailles des coins sur chaque côté, découpe dans le rectangle, découpe ne s'étendant pas sur toute une dimension ni sur deux bords opposés, cercle strictement intérieur, découpes qui ne se touchent pas, découpe ne touchant pas le carré d'un coin modifié, trou de diamètre impair vérifié exactement, message avec la valeur maximale (FR-002, FR-005, FR-006, FR-007, FR-008, FR-021)
-- [ ] T005 [P] Écrire dans `tests/core/shape.test.ts` les cas de `normalizeShape`, `resolveCutout` depuis chaque bord de référence, `shapeContains` (coins, arcs, chanfreins, trous), `shapeOutline`, et une comparaison avec une grille d'échantillons qui confirme qu'une forme valide reste d'un seul tenant (FR-005)
-- [ ] T006 [P] Écrire dans `tests/core/projectFile.test.ts` : aller-retour d'une forme strictement égal, migration de la version 1, format exact de la version 2, refus d'une forme invalide avec le nom de la pièce, refus d'une version supérieure à 2, `shaped` sans modification lu comme un rectangle (FR-021, FR-022), et adapter le test existant du format écrit
-- [ ] T007 [P] Écrire dans `tests/core/pieces.test.ts` : une découpe garde son bord de référence quand `length` ou `width` change, changement refusé si la forme ne tient plus, forme conservée par rotation, duplication et copier-coller (FR-012, FR-013)
-- [ ] T008 [P] Écrire `tests/e2e/shapes-display.spec.ts` : ouverture de `valid-v2.cotabois`, la pièce de forme est affichée dans chaque orientation, sans erreur de console (FR-014)
+- [X] T004 [P] Écrire `tests/core/shape.test.ts`, validation : limites des champs (« De 0 à 50 » découpes, `radius` et `size` « 1 ou plus », `cornerRadius` « au plus la moitié du plus petit côté », `distance` « entre 0 et la dimension de la pièce »), somme des tailles des coins sur chaque côté, découpe dans le rectangle, découpe ne s'étendant pas sur toute une dimension ni sur deux bords opposés, cercle strictement intérieur, découpes qui ne se touchent pas, découpe ne touchant pas le carré d'un coin modifié, trou de diamètre impair vérifié exactement, message avec la valeur maximale (FR-002, FR-005, FR-006, FR-007, FR-008, FR-021)
+- [X] T005 [P] Écrire dans `tests/core/shape.test.ts` les cas de `normalizeShape`, `resolveCutout` depuis chaque bord de référence, `shapeContains` (coins, arcs, chanfreins, trous), `shapeOutline`, et une comparaison avec une grille d'échantillons qui confirme qu'une forme valide reste d'un seul tenant (FR-005)
+- [X] T006 [P] Écrire dans `tests/core/projectFile.test.ts` : aller-retour d'une forme strictement égal, migration de la version 1, format exact de la version 2, refus d'une forme invalide avec le nom de la pièce, refus d'une version supérieure à 2, `shaped` sans modification lu comme un rectangle (FR-021, FR-022), et adapter le test existant du format écrit
+- [X] T007 [P] Écrire dans `tests/core/pieces.test.ts` : une découpe garde son bord de référence quand `length` ou `width` change, changement refusé si la forme ne tient plus, forme conservée par rotation, duplication et copier-coller (FR-012, FR-013)
+- [X] T008 [P] Écrire `tests/e2e/shapes-display.spec.ts` : ouverture de `valid-v2.cotabois`, la pièce de forme est affichée dans chaque orientation, sans erreur de console (FR-014)
 
 ### Implementation
 
-- [ ] T009 Ajouter dans `src/core/model.ts` les types `ShapedShape`, `CornerTreatment`, `Cutout`, étendre `Shape`, et appeler la validation de forme depuis `validatePiece`
-- [ ] T010 Implémenter dans `src/core/shape.ts` : `validateShape`, `normalizeShape`, `resolveCutout`, `maxCornerSize`, en entiers, en doublant les coordonnées pour les diamètres impairs (FR-002, FR-005, FR-006, FR-007, FR-008, FR-021)
-- [ ] T011 Implémenter dans `src/core/shape.ts` : `shapeContains` et `shapeOutline`, avec segments et arcs exacts (FR-014)
-- [ ] T012 Adapter `updatePiece` et la copie de forme dans `src/core/pieces.ts` pour revalider après un changement de dimension et conserver la forme (FR-012, FR-013)
-- [ ] T013 Passer `src/core/projectFile.ts` en version 2, avec lecture et écriture des formes et migration de la version 1 (FR-021, FR-022)
-- [ ] T014 Créer `src/renderer/viewport/shapeMesh.ts` : géométrie extrudée depuis `shapeOutline`, 16 segments par quart de tour, contours limités aux vraies arêtes, cache par forme et épaisseur (FR-014, SC-005)
-- [ ] T015 Dans `src/renderer/viewport/Viewport.ts`, afficher les pièces de forme avec une matrice construite à partir des axes signés `u`, `v` et de leur produit vectoriel, sélection et poignées comprises, en gardant la boîte partagée pour les rectangles (FR-012, FR-014)
-- [ ] T016 Écrire et exécuter `tests/e2e/v6-performance.spec.ts`, cas `200-pieces-shapes.cotabois` : modification en moins de 1 s, rotation fluide avec image qui change réellement ; si un seuil n'est pas tenu, corriger avant de continuer (SC-004, SC-005, F8)
+- [X] T009 Ajouter dans `src/core/model.ts` les types `ShapedShape`, `CornerTreatment`, `Cutout`, étendre `Shape`, et appeler la validation de forme depuis `validatePiece`
+- [X] T010 Implémenter dans `src/core/shape.ts` : `validateShape`, `normalizeShape`, `resolveCutout`, `maxCornerSize`, en entiers, en doublant les coordonnées pour les diamètres impairs (FR-002, FR-005, FR-006, FR-007, FR-008, FR-021)
+- [X] T011 Implémenter dans `src/core/shape.ts` : `shapeContains` et `shapeOutline`, avec segments et arcs exacts (FR-014)
+- [X] T012 Adapter `updatePiece` et la copie de forme dans `src/core/pieces.ts` pour revalider après un changement de dimension et conserver la forme (FR-012, FR-013)
+- [X] T013 Passer `src/core/projectFile.ts` en version 2, avec lecture et écriture des formes et migration de la version 1 (FR-021, FR-022)
+- [X] T014 Créer `src/renderer/viewport/shapeMesh.ts` : géométrie extrudée depuis `shapeOutline`, 16 segments par quart de tour, contours limités aux vraies arêtes, cache par forme et épaisseur (FR-014, SC-005)
+- [X] T015 Dans `src/renderer/viewport/Viewport.ts`, afficher les pièces de forme avec une matrice construite à partir des axes signés `u`, `v` et de leur produit vectoriel, sélection et poignées comprises, en gardant la boîte partagée pour les rectangles (FR-012, FR-014)
+- [X] T016 Écrire et exécuter `tests/e2e/v6-performance.spec.ts`, cas `200-pieces-shapes.cotabois` : modification en moins de 1 s, rotation fluide avec image qui change réellement ; si un seuil n'est pas tenu, corriger avant de continuer (SC-004, SC-005, F8)
 
 **Checkpoint**: Une pièce de forme chargée d'un fichier s'affiche correctement et le meuble de 200 pièces reste fluide. Le principal risque technique est levé.
 

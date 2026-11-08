@@ -4,22 +4,31 @@ import {
   validatePiece,
   validateProjectName,
   type CaissonParams,
+  type CornerName,
+  type CornerTreatment,
+  type Cutout,
+  type EdgeDistance,
   type Orientation,
   type Piece,
   type Project,
+  type Shape,
   type SignedAxis,
   type Template,
   type Vector
 } from './model'
 import { err, ok, type Result } from './result'
+import { CORNER_NAMES, normalizeShape } from './shape'
 
-export const FORMAT_VERSION = 1
+export const FORMAT_VERSION = 2
 
 /**
  * Migrations successives, indexées par la version de départ. Toute évolution incompatible du format
  * ajoute ici une étape, pour que les anciens fichiers restent lisibles.
  */
-const MIGRATIONS: Record<number, (data: Record<string, unknown>) => Record<string, unknown>> = {}
+const MIGRATIONS: Record<number, (data: Record<string, unknown>) => Record<string, unknown>> = {
+  // La version 2 ajoute les pièces de forme : un fichier en version 1 est déjà valide.
+  1: (data) => data
+}
 
 const SIGNED_AXES: ReadonlySet<string> = new Set(['+x', '-x', '+y', '-y', '+z', '-z'])
 
@@ -34,6 +43,38 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function corrupted<T = never>(detail: string): Result<T> {
   return err('file-corrupted', `Ce fichier est abîmé. ${detail}`)
+}
+
+function serializeCutout(cutout: Cutout): Record<string, unknown> {
+  const fromU = { edge: cutout.fromU.edge, distance: cutout.fromU.distance }
+  const fromV = { edge: cutout.fromV.edge, distance: cutout.fromV.distance }
+  if (cutout.kind === 'circle') return { id: cutout.id, kind: cutout.kind, diameter: cutout.diameter, fromU, fromV }
+  return {
+    id: cutout.id,
+    kind: cutout.kind,
+    sizeU: cutout.sizeU,
+    sizeV: cutout.sizeV,
+    cornerRadius: cutout.cornerRadius,
+    fromU,
+    fromV
+  }
+}
+
+function serializeCorner(treatment: CornerTreatment): Record<string, unknown> {
+  if (treatment.kind === 'round') return { kind: treatment.kind, radius: treatment.radius }
+  if (treatment.kind === 'chamfer') return { kind: treatment.kind, size: treatment.size }
+  return { kind: treatment.kind }
+}
+
+function serializeShape(shape: Shape): Record<string, unknown> {
+  if (shape.kind === 'rectangle') return { kind: shape.kind, length: shape.length, width: shape.width }
+  return {
+    kind: shape.kind,
+    length: shape.length,
+    width: shape.width,
+    corners: Object.fromEntries(CORNER_NAMES.map((corner) => [corner, serializeCorner(shape.corners[corner])])),
+    cutouts: shape.cutouts.map(serializeCutout)
+  }
 }
 
 export function serializeProject(project: Project): string {
@@ -52,7 +93,7 @@ export function serializeProject(project: Project): string {
   const pieces = project.pieces.map((piece) => ({
     id: piece.id,
     name: piece.name,
-    shape: { kind: piece.shape.kind, length: piece.shape.length, width: piece.shape.width },
+    shape: serializeShape(piece.shape),
     thickness: piece.thickness,
     material: piece.material,
     position: { x: piece.position.x, y: piece.position.y, z: piece.position.z },
@@ -148,16 +189,61 @@ function readOrientation(raw: unknown): Orientation | null {
   return { u: u as SignedAxis, v: v as SignedAxis }
 }
 
+function readEdgeDistance<Edge extends string>(raw: unknown, edges: readonly Edge[]): EdgeDistance<Edge> | null {
+  if (!isRecord(raw) || typeof raw['distance'] !== 'number') return null
+  const edge = edges.find((candidate) => candidate === raw['edge'])
+  return edge ? { edge, distance: raw['distance'] } : null
+}
+
+function readCutout(raw: unknown): Cutout | null {
+  if (!isRecord(raw) || typeof raw['id'] !== 'string') return null
+  const fromU = readEdgeDistance(raw['fromU'], ['left', 'right'] as const)
+  const fromV = readEdgeDistance(raw['fromV'], ['bottom', 'top'] as const)
+  if (!fromU || !fromV) return null
+
+  const { id, kind, diameter, sizeU, sizeV, cornerRadius } = raw
+  if (kind === 'circle' && typeof diameter === 'number') return { id, kind, diameter, fromU, fromV }
+  if (kind === 'rectangle' && typeof sizeU === 'number' && typeof sizeV === 'number' && typeof cornerRadius === 'number') {
+    return { id, kind, sizeU, sizeV, cornerRadius, fromU, fromV }
+  }
+  return null
+}
+
+function readCorner(raw: unknown): CornerTreatment | null {
+  if (!isRecord(raw)) return null
+  if (raw['kind'] === 'straight') return { kind: 'straight' }
+  if (raw['kind'] === 'round' && typeof raw['radius'] === 'number') return { kind: 'round', radius: raw['radius'] }
+  if (raw['kind'] === 'chamfer' && typeof raw['size'] === 'number') return { kind: 'chamfer', size: raw['size'] }
+  return null
+}
+
+function readShape(raw: unknown): Shape | null {
+  if (!isRecord(raw)) return null
+  const { kind, length, width, corners, cutouts } = raw
+  if (typeof length !== 'number' || typeof width !== 'number') return null
+  if (kind === 'rectangle') return { kind, length, width }
+  if (kind !== 'shaped' || !isRecord(corners) || !Array.isArray(cutouts)) return null
+
+  const treatments = {} as Record<CornerName, CornerTreatment>
+  for (const corner of CORNER_NAMES) {
+    const treatment = readCorner(corners[corner])
+    if (!treatment) return null
+    treatments[corner] = treatment
+  }
+  const parsedCutouts = cutouts.map(readCutout)
+  if (parsedCutouts.some((cutout) => cutout === null)) return null
+  return normalizeShape({ kind, length, width, corners: treatments, cutouts: parsedCutouts as Cutout[] })
+}
+
 function readPiece(raw: unknown): Result<Piece> {
   const invalid = (detail: string) => err<Piece>('invalid-piece', detail)
   if (!isRecord(raw)) return invalid("ce n'est pas une pièce.")
 
-  const { id, name, shape, thickness, material } = raw
+  const { id, name, thickness, material } = raw
   if (typeof id !== 'string' || id === '') return invalid('son identifiant est absent.')
   if (typeof name !== 'string') return invalid('son nom est absent.')
-  if (!isRecord(shape) || shape['kind'] !== 'rectangle') return invalid('sa forme est absente ou inconnue.')
-  const { length, width } = shape
-  if (typeof length !== 'number' || typeof width !== 'number') return invalid('ses cotes sont invalides.')
+  const shape = readShape(raw['shape'])
+  if (!shape) return invalid('sa forme est absente, inconnue ou incomplète.')
   if (typeof thickness !== 'number') return invalid('son épaisseur est invalide.')
   if (typeof material !== 'string') return invalid('son matériau est invalide.')
 
@@ -171,7 +257,7 @@ function readPiece(raw: unknown): Result<Piece> {
   return validatePiece({
     id,
     name,
-    shape: { kind: 'rectangle', length, width },
+    shape,
     thickness,
     material,
     position,

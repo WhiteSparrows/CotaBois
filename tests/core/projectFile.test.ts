@@ -8,6 +8,7 @@ import { createEmptyProject, type Project } from '../../src/core/model'
 import { addPiece, newPanelInput, rotatePiece } from '../../src/core/pieces'
 import { FORMAT_VERSION, parseProject, safeFileName, serializeProject } from '../../src/core/projectFile'
 import type { Result } from '../../src/core/result'
+import { shaped, TABLET } from '../fixtures/shape-references'
 
 function fixture(name: string): string {
   // Git peut convertir les fins de ligne à la récupération du dépôt sous Windows.
@@ -29,6 +30,12 @@ type Mutable = Record<string, any>
 /** Le fichier valide, modifié par `change`. */
 function validWith(change: (data: Mutable) => void): string {
   const data = JSON.parse(fixture('valid-v1.cotabois')) as Mutable
+  change(data)
+  return JSON.stringify(data)
+}
+
+function validV2With(change: (data: Mutable) => void): string {
+  const data = JSON.parse(fixture('valid-v2.cotabois')) as Mutable
   change(data)
   return JSON.stringify(data)
 }
@@ -85,13 +92,62 @@ describe('serializeProject', () => {
     expect(computeCutList(value(parseProject(serializeProject(project))))).toEqual(computeCutList(project))
   })
 
-  it('écrit le format exact de la version 1, lisible et stable', () => {
-    const text = fixture('valid-v1.cotabois')
+  it('écrit le format exact de la version 2, lisible et stable', () => {
+    const text = fixture('valid-v2.cotabois')
     expect(serializeProject(value(parseProject(text)))).toBe(text)
   })
 
   it('indique la version du format', () => {
-    expect(JSON.parse(serializeProject(createEmptyProject())).formatVersion).toBe(FORMAT_VERSION)
+    expect(FORMAT_VERSION).toBe(2)
+    expect(JSON.parse(serializeProject(createEmptyProject())).formatVersion).toBe(2)
+  })
+})
+
+describe('format version 2 : pièces de forme', () => {
+  it('lit les coins et les découpes', () => {
+    const shape = value(parseProject(fixture('valid-v2.cotabois'))).pieces[0]?.shape
+    expect(shape).toMatchObject({
+      kind: 'shaped',
+      corners: { bottomRight: { kind: 'chamfer', size: 100 }, topLeft: { kind: 'round', radius: 400 } }
+    })
+    expect(shape?.kind === 'shaped' && shape.cutouts.map((cutout) => cutout.kind)).toEqual(['rectangle', 'circle'])
+  })
+
+  it('fait un aller-retour strictement égal, avec les cotes saisies', () => {
+    const project = { ...createEmptyProject(), pieces: [{ ...value(addPiece(createEmptyProject(), newPanelInput(createEmptyProject()), 'p1')).pieces[0]!, shape: TABLET }] }
+    expect(value(parseProject(serializeProject(project)))).toEqual(project)
+  })
+
+  it('migre la version 1 sans rien changer', () => {
+    const project = value(parseProject(fixture('valid-v1.cotabois')))
+    expect(project.pieces[0]?.shape).toEqual({ kind: 'rectangle', length: 18000, width: 3950 })
+    expect(project.pieces[1]?.shape).toEqual({ kind: 'rectangle', length: 18000, width: 8000 })
+  })
+
+  it('lit comme un rectangle une forme sans modification', () => {
+    const text = validV2With((d) => {
+      d['pieces'][0]['shape'] = { ...shaped(8000, 3000) }
+    })
+    expect(value(parseProject(text)).pieces[0]?.shape).toEqual({ kind: 'rectangle', length: 8000, width: 3000 })
+  })
+
+  it('refuse une version supérieure à 2', () => {
+    expect(errorOf(parseProject(validV2With((d) => (d['formatVersion'] = 3)))).code).toBe('format-too-recent')
+  })
+
+  it.each<[string, (data: Mutable) => void]>([
+    ['coin inconnu', (d) => (d['pieces'][0]['shape']['corners']['topLeft'] = { kind: 'ovale' })],
+    ['coin absent', (d) => delete d['pieces'][0]['shape']['corners']['topLeft']],
+    ['rayon non numérique', (d) => (d['pieces'][0]['shape']['corners']['topLeft'] = { kind: 'round', radius: '40' })],
+    ['découpes absentes', (d) => delete d['pieces'][0]['shape']['cutouts']],
+    ['découpe de type inconnu', (d) => (d['pieces'][0]['shape']['cutouts'][1]['kind'] = 'etoile')],
+    ['bord inconnu', (d) => (d['pieces'][0]['shape']['cutouts'][1]['fromU']['edge'] = 'bottom')],
+    ['distance absente', (d) => delete d['pieces'][0]['shape']['cutouts'][1]['fromV']['distance']],
+    ['forme invalide', (d) => (d['pieces'][0]['shape']['cutouts'][1]['diameter'] = 100_000)]
+  ])('refuse tout le fichier : %s, en nommant la pièce', (_label, change) => {
+    const error = errorOf(parseProject(validV2With(change)))
+    expect(error.code).toBe('file-corrupted')
+    expect(error.message).toContain('Tablette')
   })
 })
 
@@ -102,6 +158,17 @@ describe('projet de 200 pièces', () => {
     expect(findOverlaps(project)).toEqual([])
     expect(project.pieces.filter((piece) => piece.name === 'Repère')).toHaveLength(1)
     expect(computeCutList(project).lines.find((line) => line.names.includes('Repère'))?.quantity).toBe(1)
+  })
+})
+
+describe('projet de 200 pièces dont 50 de forme', () => {
+  it('est valide, sans chevauchement, avec au moins 10 formes distinctes', () => {
+    const project = value(parseProject(fixture('200-pieces-shapes.cotabois')))
+    const shapedPieces = project.pieces.filter((piece) => piece.shape.kind === 'shaped')
+    expect(project.pieces).toHaveLength(200)
+    expect(shapedPieces.length).toBeGreaterThanOrEqual(50)
+    expect(new Set(shapedPieces.map((piece) => JSON.stringify(piece.shape))).size).toBeGreaterThanOrEqual(10)
+    expect(findOverlaps(project)).toEqual([])
   })
 })
 

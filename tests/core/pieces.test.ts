@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest'
 import { applyCaisson } from '../../src/core/caisson'
 import { computeCutList } from '../../src/core/cutList'
 import { boundsOverlap, findOverlaps, pieceBounds, pieceSize } from '../../src/core/geometry'
-import { createEmptyProject, type Piece, type Project } from '../../src/core/model'
+import { createEmptyProject, type Piece, type Project, type ShapedShape } from '../../src/core/model'
+import { resolveCutout } from '../../src/core/shape'
+import { box, round, shaped, TABLET } from '../fixtures/shape-references'
 import {
   addCopy,
   addPiece,
@@ -117,6 +119,41 @@ describe('duplicatePiece', () => {
 
   it('refuse une pièce inconnue', () => {
     expect(duplicatePiece(project(panel('a')), 'zzz', 'b').ok).toBe(false)
+  })
+})
+
+describe('pièces de forme : conservation de la forme', () => {
+  const shapedPanel = (id: string, shape: ShapedShape = TABLET) => panel(id, { shape, name: 'Tablette' })
+
+  it('suit une rotation, sans changer ses cotes', () => {
+    const next = value(rotatePiece(project(shapedPanel('a')), 'a', 'y'))
+    expect(next.pieces[0]?.shape).toEqual(TABLET)
+  })
+
+  it('suit une duplication et un copier-coller', () => {
+    const original = shapedPanel('a')
+    expect(value(duplicatePiece(project(original), 'a', 'b')).pieces[1]?.shape).toEqual(TABLET)
+    expect(value(addCopy(createEmptyProject(), original, 'c')).pieces[0]?.shape).toEqual(TABLET)
+  })
+
+  it('change de longueur en gardant la distance au bord de référence', () => {
+    const shape = shaped(8000, 3000, {}, [box('fixe', 500, 300, ['left', 1000], ['bottom', 500]), box('suit', 500, 300, ['right', 1000], ['bottom', 500])])
+    const next = value(updatePiece(project(shapedPanel('a', shape)), 'a', { length: 9000 })).pieces[0]!.shape
+    expect(next).toMatchObject({ length: 9000 })
+    expect(resolveCutout(next as ShapedShape, shape.cutouts[0]!)).toMatchObject({ minU: 1000, maxU: 1500 })
+    expect(resolveCutout(next as ShapedShape, shape.cutouts[1]!)).toMatchObject({ minU: 7500, maxU: 8000 })
+  })
+
+  it('refuse une dimension qui ne laisse plus tenir la forme, sans modifier le projet', () => {
+    const start = project(shapedPanel('a'))
+    const result = updatePiece(start, 'a', { length: 1500 })
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.error.field).toBe('shape')
+    expect(start.pieces[0]?.shape).toEqual(TABLET)
+  })
+
+  it('refuse une pièce dont la forme est invalide', () => {
+    expect(addPiece(createEmptyProject(), { ...newPanelInput(createEmptyProject()), shape: shaped(8000, 3000, { topLeft: round(0) }) }, 'a').ok).toBe(false)
   })
 })
 

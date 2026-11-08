@@ -1,4 +1,5 @@
 import { err, ok, type Result } from './result'
+import { validateShape } from './shape'
 import type { Tenths } from './units'
 
 export const MAX_DIMENSION = 100_000
@@ -22,14 +23,58 @@ export interface Orientation {
   v: SignedAxis
 }
 
-/** Seule variante pour l'instant : d'autres formes s'ajouteront ici. */
 export interface RectangleShape {
   kind: 'rectangle'
   length: Tenths
   width: Tenths
 }
 
-export type Shape = RectangleShape
+export type CornerTreatment =
+  | { kind: 'straight' }
+  | { kind: 'round'; radius: Tenths }
+  | { kind: 'chamfer'; size: Tenths }
+
+export type CornerName = 'bottomLeft' | 'bottomRight' | 'topRight' | 'topLeft'
+
+/** Distance à un bord choisi : la découpe suit ce bord si la pièce change de dimension. */
+export interface EdgeDistance<Edge extends string> {
+  edge: Edge
+  distance: Tenths
+}
+
+interface CutoutPosition {
+  id: string
+  fromU: EdgeDistance<'left' | 'right'>
+  fromV: EdgeDistance<'bottom' | 'top'>
+}
+
+/** La distance va du bord choisi au côté le plus proche. Touchant un bord, c'est une encoche. */
+export interface RectangleCutout extends CutoutPosition {
+  kind: 'rectangle'
+  sizeU: Tenths
+  sizeV: Tenths
+  /** Ne s'applique qu'aux angles situés à l'intérieur de la pièce. */
+  cornerRadius: Tenths
+}
+
+/** La distance va du bord choisi au centre. */
+export interface CircleCutout extends CutoutPosition {
+  kind: 'circle'
+  diameter: Tenths
+}
+
+export type Cutout = RectangleCutout | CircleCutout
+
+/** Retranchée du rectangle `length` × `width`, qu'elle ne dépasse jamais. `u` suit la longueur, `v` la largeur. */
+export interface ShapedShape {
+  kind: 'shaped'
+  length: Tenths
+  width: Tenths
+  corners: Record<CornerName, CornerTreatment>
+  cutouts: readonly Cutout[]
+}
+
+export type Shape = RectangleShape | ShapedShape
 
 export interface Piece {
   id: string
@@ -108,6 +153,10 @@ export function validatePiece(piece: Piece): Result<Piece> {
   }
   if (!isValidDimension(piece.thickness)) {
     return err('invalid-piece', `L'épaisseur doit être ${DIMENSION_RANGE}.`, 'thickness')
+  }
+  if (piece.shape.kind === 'shaped') {
+    const shapeValidation = validateShape(piece.shape)
+    if (!shapeValidation.ok) return err('invalid-piece', shapeValidation.error.message, 'shape')
   }
 
   const { x, y, z } = piece.position
