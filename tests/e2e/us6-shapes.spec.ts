@@ -1,5 +1,8 @@
 import { expect, test, type Page } from '@playwright/test'
-import { launchApp } from './helpers'
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { chooseFile, launchApp } from './helpers'
 
 function field(page: Page, label: string) {
   return page.getByLabel(label, { exact: true })
@@ -186,6 +189,85 @@ test('F2 : un clic à travers un trou sélectionne la pièce située derrière',
 
   await page.mouse.click(x!, y!)
   await expect(field(page, 'Nom')).toHaveValue('Plancher')
+
+  await app.close()
+})
+
+test('F4 : une pièce retournée partage son plan, et une forme différente en a un autre', async () => {
+  const { app, page } = await launchApp()
+  const dir = mkdtempSync(join(tmpdir(), 'cotabois-shapes-'))
+  try {
+    await addTablet(page)
+    await openEditor(page)
+    await roundCorner(page, 'haut gauche', '40')
+    await page.getByRole('button', { name: 'Trou rond' }).click()
+    await page.getByRole('button', { name: 'Terminer' }).click()
+
+    // La copie porte la même forme, retournée : même ligne, même plan
+    await page.getByRole('button', { name: 'Dupliquer' }).click()
+    await page.getByRole('button', { name: 'Pivoter autour de X' }).click()
+    await page.getByRole('button', { name: 'Pivoter autour de X' }).click()
+
+    // Mêmes cotes, un seul arrondi différent : une autre ligne, un autre plan
+    await page.getByRole('button', { name: 'Dupliquer' }).click()
+    await openEditor(page)
+    await commitField(page, 'Rayon haut gauche', '50')
+    await page.getByRole('button', { name: 'Terminer' }).click()
+
+    await expect(cutRows(page)).toHaveCount(2)
+    const texts = await cutRows(page).allInnerTexts()
+    expect(texts.filter((text) => /Plan 1/.test(text))).toHaveLength(1)
+    expect(texts.filter((text) => /Plan 2/.test(text))).toHaveLength(1)
+    expect(texts.some((text) => /^2\s/.test(text))).toBe(true)
+    expect(texts.some((text) => /^1\s/.test(text))).toBe(true)
+
+    // Le CSV renvoie aux plans
+    const csvPath = join(dir, 'liste.csv')
+    await chooseFile(app, csvPath)
+    await page.getByRole('button', { name: 'Exporter en CSV' }).click()
+    await expect.poll(() => existsSync(csvPath)).toBe(true)
+    const csv = readFileSync(csvPath, 'utf8').replace('﻿', '').split('\r\n')
+    expect(csv[0]).toMatch(/;Plan$/)
+    expect(csv.slice(1, 3).map((row) => row.split(';').at(-1)).sort()).toEqual(['1', '2'])
+
+    // Le rapport contient un plan par forme distincte, le temps de l'impression
+    const pdfPath = join(dir, 'liste.pdf')
+    await chooseFile(app, pdfPath)
+    await page.getByRole('button', { name: 'Exporter en PDF' }).click()
+    await expect.poll(() => existsSync(pdfPath), { timeout: 20_000 }).toBe(true)
+    const pdf = readFileSync(pdfPath).toString('latin1')
+    expect(pdf.startsWith('%PDF-')).toBe(true)
+    expect(pdf.match(/\/Type\s*\/Page\b(?!s)/g)!.length).toBeGreaterThanOrEqual(1)
+  } finally {
+    await app.close()
+    rmSync(dir, { recursive: true, force: true })
+  }
+})
+
+test('F4 : le rapport imprimé contient un plan par forme, avec ses cotes', async () => {
+  const { app, page } = await launchApp()
+  await addTablet(page)
+  await openEditor(page)
+  await roundCorner(page, 'haut gauche', '40')
+  await page.getByRole('button', { name: 'Trou rond' }).click()
+  await commitCutoutField(page, 1, 'Diamètre', '60')
+  await page.getByRole('button', { name: 'Terminer' }).click()
+
+  // La boîte de dialogue attend : le rapport reste en place, et on peut l'observer.
+  await app.evaluate(({ dialog }) => {
+    dialog.showSaveDialog = (async () => {
+      await new Promise((resolve) => setTimeout(resolve, 1500))
+      return { canceled: true, filePath: '' }
+    }) as unknown as typeof dialog.showSaveDialog
+  })
+  await page.getByRole('button', { name: 'Exporter en PDF' }).click()
+
+  const plans = page.getByTestId('shape-plan')
+  await expect(plans).toHaveCount(1)
+  await expect(plans).toContainText('Plan 1')
+  await expect(plans).toContainText('Coin haut gauche : arrondi R 40')
+  await expect(plans).toContainText('Trou rond Ø 60')
+  await expect(page.getByTestId('report')).toHaveCount(0)
 
   await app.close()
 })

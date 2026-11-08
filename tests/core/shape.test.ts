@@ -3,6 +3,7 @@ import type { Cutout, ShapedShape } from '../../src/core/model'
 import {
   asShaped,
   canonicalShapeKey,
+  describeShape,
   maxCornerSize,
   normalizeShape,
   resolveCutout,
@@ -187,6 +188,33 @@ describe('withCutoutReference', () => {
   it('ne change rien si le bord est déjà le bon', () => {
     const cutout = circle('a', 600, ['left', 1500], ['bottom', 1000])
     expect(withCutoutReference(shape, cutout, 'u', 'left')).toBe(cutout)
+  })
+})
+
+describe('describeShape', () => {
+  it('donne chaque cote en toutes lettres, avec les bords de référence saisis', () => {
+    const shape = shaped(8000, 3000, { topLeft: round(400), bottomRight: chamfer(105) }, [
+      box('a', 500, 300, ['left', 0], ['bottom', 0], 50),
+      box('b', 1000, 600, ['right', 1500], ['top', 800]),
+      circle('c', 605, ['left', 1500], ['bottom', 1500])
+    ])
+    expect(describeShape(shape).map(({ number, text }) => [number, text])).toEqual([
+      [1, 'Coin bas droit : chanfrein 10,5'],
+      [2, 'Coin haut gauche : arrondi R 40'],
+      [3, 'Encoche 50 × 30 : à 0 du bord gauche et 0 du bord bas, angles R 5'],
+      [4, 'Trou rectangulaire 100 × 60 : à 150 du bord droit et 80 du bord haut'],
+      [5, 'Trou rond Ø 60,5 : centre à 150 du bord gauche et 150 du bord bas']
+    ])
+  })
+
+  it('indique où placer chaque numéro sur le dessin', () => {
+    const notes = describeShape(shaped(8000, 3000, { topLeft: round(400) }, [circle('c', 600, ['left', 1500], ['bottom', 1000])]))
+    expect(notes[0]).toMatchObject({ corner: 'topLeft', at: { u: 0, v: 3000 } })
+    expect(notes[1]).toMatchObject({ at: { u: 1500, v: 1000 } })
+  })
+
+  it('ne décrit rien pour une forme sans modification', () => {
+    expect(describeShape(shaped(8000, 3000))).toEqual([])
   })
 })
 

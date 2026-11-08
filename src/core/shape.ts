@@ -541,6 +541,58 @@ export function touchesBoundary(shape: ShapedShape, box: CutoutBox): boolean {
   return box.minU === 0 || box.minV === 0 || box.maxU === shape.length || box.maxV === shape.width
 }
 
+export interface ShapeNote {
+  number: number
+  text: string
+  /** Où placer le numéro sur le dessin. */
+  at: PlanePoint
+  /** Pour un coin : le numéro se place à l'extérieur de la pièce. */
+  corner?: CornerName
+  /** Pour une découpe : son encombrement, pour ne pas la cacher sous son numéro. */
+  size?: { u: number; v: number }
+}
+
+const EDGE_LABELS: Record<string, string> = { left: 'gauche', right: 'droit', bottom: 'bas', top: 'haut' }
+
+function describeCorner(treatment: CornerTreatment): string {
+  if (treatment.kind === 'round') return `arrondi R ${formatMm(treatment.radius)}`
+  return treatment.kind === 'chamfer' ? `chanfrein ${formatMm(treatment.size)}` : 'droit'
+}
+
+function describeCutout(shape: ShapedShape, cutout: Cutout, box: ResolvedCutout): string {
+  const position = (prefix: string) =>
+    `${prefix}${formatMm(cutout.fromU.distance)} du bord ${EDGE_LABELS[cutout.fromU.edge]} et ${formatMm(cutout.fromV.distance)} du bord ${EDGE_LABELS[cutout.fromV.edge]}`
+
+  if (cutout.kind === 'circle') return `Trou rond Ø ${formatMm(cutout.diameter)} : ${position('centre à ')}`
+
+  const name = touchesBoundary(shape, box) ? 'Encoche' : 'Trou rectangulaire'
+  const angles = cutout.cornerRadius > 0 ? `, angles R ${formatMm(cutout.cornerRadius)}` : ''
+  return `${name} ${formatMm(cutout.sizeU)} × ${formatMm(cutout.sizeV)} : ${position('à ')}${angles}`
+}
+
+/** Les lignes du tableau d'un plan coté : chaque coin modifié, puis chaque découpe. */
+export function describeShape(shape: ShapedShape): ShapeNote[] {
+  const notes: Array<Omit<ShapeNote, 'number'>> = []
+
+  for (const corner of CORNER_NAMES) {
+    const treatment = shape.corners[corner]
+    if (treatment.kind === 'straight') continue
+    const u = corner === 'bottomLeft' || corner === 'topLeft' ? 0 : shape.length
+    const v = corner === 'bottomLeft' || corner === 'bottomRight' ? 0 : shape.width
+    notes.push({ text: `Coin ${CORNER_LABELS[corner]} : ${describeCorner(treatment)}`, at: { u, v }, corner })
+  }
+
+  for (const cutout of shape.cutouts) {
+    const box = resolveCutout(shape, cutout)
+    notes.push({
+      text: describeCutout(shape, cutout, box),
+      at: { u: (box.minU + box.maxU) / 2, v: (box.minV + box.maxV) / 2 },
+      size: { u: box.maxU - box.minU, v: box.maxV - box.minV }
+    })
+  }
+  return notes.map((note, index) => ({ ...note, number: index + 1 }))
+}
+
 type PointMap = (point: PlanePoint) => PlanePoint
 
 function cornerToken(treatment: CornerTreatment): string {
