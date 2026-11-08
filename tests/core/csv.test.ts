@@ -24,6 +24,9 @@ function line(changes: Partial<CutLine>): CutLine {
     width: 500,
     thickness: 180,
     material: '',
+    shapeKey: '',
+    shape: null,
+    plan: null,
     ...changes
   }
 }

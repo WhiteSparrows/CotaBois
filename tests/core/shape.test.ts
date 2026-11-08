@@ -1,13 +1,16 @@
 import { describe, expect, it } from 'vitest'
-import type { ShapedShape } from '../../src/core/model'
+import type { Cutout, ShapedShape } from '../../src/core/model'
 import {
   asShaped,
+  canonicalShapeKey,
   maxCornerSize,
   normalizeShape,
   resolveCutout,
   shapeContains,
   shapeOutline,
+  suggestCutout,
   validateShape,
+  withCutoutReference,
   type OutlinePath
 } from '../../src/core/shape'
 import { box, chamfer, circle, IMPOSSIBLE_SHAPES, round, shaped, TABLET } from '../fixtures/shape-references'
@@ -99,6 +102,91 @@ describe('maxCornerSize', () => {
 
   it('vaut 0 quand une découpe occupe le coin', () => {
     expect(maxCornerSize(TABLET, 'bottomLeft')).toBe(0)
+  })
+})
+
+describe('canonicalShapeKey', () => {
+  const ORIGINAL = shaped(8000, 3000, { topLeft: round(400) }, [box('a', 500, 300, ['left', 0], ['bottom', 0], 50), circle('b', 600, ['left', 1500], ['bottom', 1200])])
+  const key = canonicalShapeKey(ORIGINAL)
+
+  it('est vide pour un rectangle', () => {
+    expect(canonicalShapeKey({ kind: 'rectangle', length: 100, width: 50 })).toBe('')
+  })
+
+  it.each<[string, ShapedShape]>([
+    ['retournée de gauche à droite', shaped(8000, 3000, { topRight: round(400) }, [box('a', 500, 300, ['right', 0], ['bottom', 0], 50), circle('b', 600, ['right', 1500], ['bottom', 1200])])],
+    ['retournée de haut en bas', shaped(8000, 3000, { bottomLeft: round(400) }, [box('a', 500, 300, ['left', 0], ['top', 0], 50), circle('b', 600, ['left', 1500], ['top', 1200])])],
+    ['tournée d\'un demi-tour', shaped(8000, 3000, { bottomRight: round(400) }, [box('a', 500, 300, ['right', 0], ['top', 0], 50), circle('b', 600, ['right', 1500], ['top', 1200])])],
+    ['longueur et largeur inversées', shaped(3000, 8000, { bottomRight: round(400) }, [box('a', 300, 500, ['left', 0], ['bottom', 0], 50), circle('b', 600, ['left', 1200], ['bottom', 1500])])],
+    ['cotée depuis d\'autres bords', shaped(8000, 3000, { topLeft: round(400) }, [box('a', 500, 300, ['left', 0], ['top', 2700], 50), circle('b', 600, ['right', 6500], ['top', 1800])])],
+    ['découpes dans un autre ordre, avec d\'autres identifiants', shaped(8000, 3000, { topLeft: round(400) }, [circle('x', 600, ['left', 1500], ['bottom', 1200]), box('y', 500, 300, ['left', 0], ['bottom', 0], 50)])]
+  ])('reconnaît la même forme : %s', (_label, other) => {
+    expect(canonicalShapeKey(other)).toBe(key)
+  })
+
+  it('reconnaît un carré tourné d\'un quart de tour', () => {
+    const square = shaped(4000, 4000, { topLeft: round(400) }, [box('a', 500, 300, ['left', 0], ['bottom', 0])])
+    // Quart de tour : (u, v) devient (v, 4000 − u)
+    const quarter = shaped(4000, 4000, { topRight: round(400) }, [box('a', 300, 500, ['left', 0], ['top', 0])])
+    expect(canonicalShapeKey(quarter)).toBe(canonicalShapeKey(square))
+  })
+
+  it.each<[string, ShapedShape]>([
+    ['autre rayon', shaped(8000, 3000, { topLeft: round(401) }, ORIGINAL.cutouts as Cutout[])],
+    ['chanfrein au lieu d\'un arrondi', shaped(8000, 3000, { topLeft: chamfer(400) }, ORIGINAL.cutouts as Cutout[])],
+    ['trou déplacé d\'un dixième', shaped(8000, 3000, { topLeft: round(400) }, [ORIGINAL.cutouts[0]!, circle('b', 600, ['left', 1501], ['bottom', 1200])])],
+    ['autre rayon d\'angle', shaped(8000, 3000, { topLeft: round(400) }, [box('a', 500, 300, ['left', 0], ['bottom', 0], 60), ORIGINAL.cutouts[1]!])],
+    ['coin déplacé sans son trou', shaped(8000, 3000, { topRight: round(400) }, ORIGINAL.cutouts as Cutout[])]
+  ])('distingue une autre forme : %s', (_label, other) => {
+    expect(canonicalShapeKey(other)).not.toBe(key)
+  })
+})
+
+describe('suggestCutout', () => {
+  it.each(['notch', 'rectangle', 'circle'] as const)('propose un emplacement valide pour %s', (kind) => {
+    const result = suggestCutout(shaped(8000, 3000), kind)
+    expect(result.ok).toBe(true)
+    if (result.ok) expect(validateShape(shaped(8000, 3000, {}, [{ ...result.value, id: 'n' } as Cutout])).ok).toBe(true)
+  })
+
+  it('évite ce qui existe déjà', () => {
+    const shape = shaped(8000, 3000, { bottomLeft: round(400) }, [box('a', 500, 300, ['right', 0], ['bottom', 0])])
+    const result = suggestCutout(shape, 'notch')
+    expect(result.ok).toBe(true)
+    if (result.ok) expect(validateShape({ ...shape, cutouts: [...shape.cutouts, { ...result.value, id: 'n' } as Cutout] }).ok).toBe(true)
+  })
+
+  it('s\'adapte à une petite pièce', () => {
+    const result = suggestCutout(shaped(300, 200), 'circle')
+    expect(result.ok).toBe(true)
+  })
+
+  it('explique quand il n\'y a plus de place', () => {
+    const full = shaped(100, 100, {}, [box('a', 98, 98, ['left', 1], ['bottom', 1])])
+    const result = suggestCutout(full, 'rectangle')
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.error.message).toContain('place')
+  })
+})
+
+describe('withCutoutReference', () => {
+  const shape = shaped(8000, 3000)
+
+  it('change de bord sans déplacer la découpe', () => {
+    const cutout = box('a', 500, 300, ['left', 1000], ['bottom', 400])
+    const changed = withCutoutReference(shape, withCutoutReference(shape, cutout, 'u', 'right'), 'v', 'top')
+    expect(changed).toMatchObject({ fromU: { edge: 'right', distance: 6500 }, fromV: { edge: 'top', distance: 2300 } })
+    expect(resolveCutout(shape, changed)).toMatchObject(resolveCutout(shape, cutout))
+  })
+
+  it('compte depuis le centre pour un cercle', () => {
+    const cutout = circle('a', 600, ['left', 1500], ['bottom', 1000])
+    expect(withCutoutReference(shape, cutout, 'u', 'right')).toMatchObject({ fromU: { edge: 'right', distance: 6500 } })
+  })
+
+  it('ne change rien si le bord est déjà le bon', () => {
+    const cutout = circle('a', 600, ['left', 1500], ['bottom', 1000])
+    expect(withCutoutReference(shape, cutout, 'u', 'left')).toBe(cutout)
   })
 })
 

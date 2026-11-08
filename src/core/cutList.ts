@@ -1,4 +1,5 @@
-import { shapeExtent, type Piece, type Project } from './model'
+import { shapeExtent, type Piece, type Project, type ShapedShape } from './model'
+import { canonicalShapeKey } from './shape'
 import type { Tenths } from './units'
 
 export interface CutLine {
@@ -9,6 +10,12 @@ export interface CutLine {
   width: Tenths
   thickness: Tenths
   material: string
+  /** Identique pour deux formes égales à une rotation ou un retournement près ; vide pour un rectangle. */
+  shapeKey: string
+  /** La forme de la première pièce de la ligne, ou `null` pour un rectangle. */
+  shape: ShapedShape | null
+  /** Numéro du plan dans le PDF, ou `null` pour un rectangle. */
+  plan: number | null
 }
 
 export interface CutTotal {
@@ -47,7 +54,8 @@ export function computeCutList(project: Project): CutList {
     const { thickness } = piece
     const material = piece.material.trim()
     const totalKey = `${thickness}|${materialKey(material)}`
-    const lineKey = `${length}|${width}|${totalKey}`
+    const shapeKey = canonicalShapeKey(piece.shape)
+    const lineKey = `${length}|${width}|${totalKey}|${shapeKey}`
 
     const line = lines.get(lineKey)
     if (line) {
@@ -55,7 +63,18 @@ export function computeCutList(project: Project): CutList {
       line.pieceIds.push(piece.id)
       if (!line.names.includes(piece.name)) line.names.push(piece.name)
     } else {
-      lines.set(lineKey, { quantity: 1, pieceIds: [piece.id], names: [piece.name], length, width, thickness, material })
+      lines.set(lineKey, {
+        quantity: 1,
+        pieceIds: [piece.id],
+        names: [piece.name],
+        length,
+        width,
+        thickness,
+        material,
+        shapeKey,
+        shape: piece.shape.kind === 'shaped' ? piece.shape : null,
+        plan: null
+      })
     }
 
     const total = totals.get(totalKey) ?? { material, thickness, pieceCount: 0, area: 0 }
@@ -64,14 +83,21 @@ export function computeCutList(project: Project): CutList {
     totals.set(totalKey, total)
   }
 
+  const sortedLines = [...lines.values()].sort(
+    (a, b) =>
+      compareMaterials(a.material, b.material) ||
+      b.thickness - a.thickness ||
+      b.length - a.length ||
+      b.width - a.width ||
+      a.shapeKey.localeCompare(b.shapeKey)
+  )
+  let plan = 0
+  for (const line of sortedLines) {
+    if (line.shape) line.plan = ++plan
+  }
+
   return {
-    lines: [...lines.values()].sort(
-      (a, b) =>
-        compareMaterials(a.material, b.material) ||
-        b.thickness - a.thickness ||
-        b.length - a.length ||
-        b.width - a.width
-    ),
+    lines: sortedLines,
     totals: [...totals.values()].sort(
       (a, b) => compareMaterials(a.material, b.material) || b.thickness - a.thickness
     )

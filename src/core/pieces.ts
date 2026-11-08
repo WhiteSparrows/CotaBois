@@ -5,15 +5,28 @@ import {
   validatePiece,
   validateProjectName,
   type Axis,
+  type CornerName,
+  type CornerTreatment,
+  type Cutout,
   type Piece,
   type Project,
+  type ShapedShape,
   type SignedAxis,
   type Vector
 } from './model'
 import { err, ok, type Result } from './result'
-import type { Tenths } from './units'
+import { asShaped, cornerSize, CORNER_LABELS, maxCornerSize, normalizeShape, type CutoutInput } from './shape'
+import { formatMm, type Tenths } from './units'
 
 export type PieceInput = Omit<Piece, 'id'>
+
+/** Les champs modifiables d'une découpe, selon son type. */
+export type CutoutChanges = Partial<Pick<Cutout, 'fromU' | 'fromV'>> & {
+  sizeU?: Tenths
+  sizeV?: Tenths
+  cornerRadius?: Tenths
+  diameter?: Tenths
+}
 
 export interface PieceChanges {
   name?: string
@@ -179,6 +192,81 @@ export function rotatePiece(project: Project, pieceId: string, around: Axis): Re
   const validation = validatePiece({ ...rotated, position })
   if (!validation.ok) return validation
   return ok(replacePiece(project, validation.value))
+}
+
+/** Change la forme de plusieurs pièces : si l'une refuse, aucune n'est modifiée. */
+function changeShapes(
+  project: Project,
+  pieceIds: readonly string[],
+  change: (shape: ShapedShape, piece: Piece) => Result<ShapedShape>
+): Result<Project> {
+  const updated = new Map<string, Piece>()
+  for (const pieceId of pieceIds) {
+    const found = findPiece(project, pieceId)
+    if (!found.ok) return found
+
+    const changed = change(asShaped(found.value.shape), found.value)
+    if (!changed.ok) {
+      if (pieceIds.length === 1) return changed
+      return err(changed.error.code, `« ${found.value.name} » : ${changed.error.message}`, changed.error.field)
+    }
+    const validation = validatePiece({ ...found.value, shape: normalizeShape(changed.value) })
+    if (!validation.ok) {
+      if (pieceIds.length === 1) return validation
+      return err(validation.error.code, `« ${found.value.name} » : ${validation.error.message}`, validation.error.field)
+    }
+    if (JSON.stringify(validation.value.shape) !== JSON.stringify(found.value.shape)) updated.set(pieceId, validation.value)
+  }
+  if (updated.size === 0) return ok(project)
+  return ok(withPieces(project, project.pieces.map((piece) => updated.get(piece.id) ?? piece)))
+}
+
+export function setCorner(
+  project: Project,
+  pieceIds: readonly string[],
+  corner: CornerName,
+  treatment: CornerTreatment
+): Result<Project> {
+  return changeShapes(project, pieceIds, (shape) => {
+    const maximum = maxCornerSize(shape, corner)
+    if (cornerSize(treatment) > maximum) {
+      return err(
+        'invalid-shape',
+        `Le coin ${CORNER_LABELS[corner]} ne peut pas dépasser ${formatMm(maximum)} mm.`,
+        `corners.${corner}`
+      )
+    }
+    return ok({ ...shape, corners: { ...shape.corners, [corner]: treatment } })
+  })
+}
+
+export function addCutout(
+  project: Project,
+  pieceIds: readonly string[],
+  input: CutoutInput,
+  nextId: () => string
+): Result<Project> {
+  return changeShapes(project, pieceIds, (shape) =>
+    ok({ ...shape, cutouts: [...shape.cutouts, { ...input, id: nextId() } as Cutout] })
+  )
+}
+
+export function updateCutout(project: Project, pieceId: string, cutoutId: string, changes: CutoutChanges): Result<Project> {
+  return changeShapes(project, [pieceId], (shape) => {
+    if (!shape.cutouts.some((cutout) => cutout.id === cutoutId)) {
+      return err('unknown-cutout', "Cette découpe n'existe plus.")
+    }
+    return ok({
+      ...shape,
+      cutouts: shape.cutouts.map((cutout) => (cutout.id === cutoutId ? ({ ...cutout, ...changes } as Cutout) : cutout))
+    })
+  })
+}
+
+export function removeCutout(project: Project, pieceId: string, cutoutId: string): Result<Project> {
+  return changeShapes(project, [pieceId], (shape) =>
+    ok({ ...shape, cutouts: shape.cutouts.filter((cutout) => cutout.id !== cutoutId) })
+  )
 }
 
 export function renameProject(project: Project, name: string): Result<Project> {

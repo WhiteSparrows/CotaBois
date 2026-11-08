@@ -537,8 +537,151 @@ function outerPath(shape: ShapedShape, notches: Notch[]): OutlinePath {
   return path.build()
 }
 
-function touchesBoundary(shape: ShapedShape, box: CutoutBox): boolean {
+export function touchesBoundary(shape: ShapedShape, box: CutoutBox): boolean {
   return box.minU === 0 || box.minV === 0 || box.maxU === shape.length || box.maxV === shape.width
+}
+
+type PointMap = (point: PlanePoint) => PlanePoint
+
+function cornerToken(treatment: CornerTreatment): string {
+  if (treatment.kind === 'round') return `r${treatment.radius}`
+  return treatment.kind === 'chamfer' ? `c${treatment.size}` : '-'
+}
+
+/** L'écriture d'une forme, vue à travers une symétrie de la pièce. */
+function shapeSignature(shape: ShapedShape, boxes: readonly ResolvedCutout[], map: PointMap, length: number, width: number): string {
+  const corners: Array<[PlanePoint, CornerName]> = [
+    [{ u: 0, v: 0 }, 'bottomLeft'],
+    [{ u: shape.length, v: 0 }, 'bottomRight'],
+    [{ u: shape.length, v: shape.width }, 'topRight'],
+    [{ u: 0, v: shape.width }, 'topLeft']
+  ]
+  const positioned = corners.map(([point, corner]) => ({ point: map(point), token: cornerToken(shape.corners[corner]) }))
+  const tokenAt = (u: number, v: number) => positioned.find(({ point }) => point.u === u && point.v === v)!.token
+  const cornerPart = [tokenAt(0, 0), tokenAt(length, 0), tokenAt(length, width), tokenAt(0, width)].join(',')
+
+  const cutoutPart = boxes.map((box) => {
+    if (box.kind === 'circle') {
+      const center = map({ u: box.centerU, v: box.centerV })
+      return `C${center.u},${center.v},${box.radius}`
+    }
+    const a = map({ u: box.minU, v: box.minV })
+    const b = map({ u: box.maxU, v: box.maxV })
+    return `R${Math.min(a.u, b.u)},${Math.min(a.v, b.v)},${Math.max(a.u, b.u)},${Math.max(a.v, b.v)},${box.cornerRadius}`
+  })
+  return `${cornerPart}|${cutoutPart.sort().join(';')}`
+}
+
+/** Identique pour deux formes égales à une rotation ou un retournement près. Vide pour un rectangle. */
+export function canonicalShapeKey(shape: Shape): string {
+  if (shape.kind === 'rectangle') return ''
+
+  // Tout est ramené à un repère où la longueur est la plus grande dimension.
+  const transposed = shape.length < shape.width
+  const L = Math.max(shape.length, shape.width)
+  const W = Math.min(shape.length, shape.width)
+  const normalize: PointMap = (p) => (transposed ? { u: p.v, v: p.u } : p)
+
+  const symmetries: PointMap[] = [
+    (p) => p,
+    (p) => ({ u: L - p.u, v: p.v }),
+    (p) => ({ u: p.u, v: W - p.v }),
+    (p) => ({ u: L - p.u, v: W - p.v })
+  ]
+  if (L === W) {
+    for (const symmetry of [...symmetries]) symmetries.push((p) => symmetry({ u: p.v, v: p.u }))
+  }
+
+  const boxes = shape.cutouts.map((cutout) => resolveCutout(shape, cutout))
+  const signatures = symmetries.map((symmetry) => shapeSignature(shape, boxes, (p) => symmetry(normalize(p)), L, W))
+  return signatures.sort()[0]!
+}
+
+export type CutoutInput = Omit<Extract<Cutout, { kind: 'rectangle' }>, 'id'> | Omit<Extract<Cutout, { kind: 'circle' }>, 'id'>
+
+export type CutoutPreset = 'notch' | 'rectangle' | 'circle'
+
+const SIZE_ATTEMPTS = [1, 0.5, 0.25, 0.1]
+const POSITION_FRACTIONS = [0.5, 0.25, 0.75]
+
+function toMillimeters(value: number): Tenths {
+  return Math.round(value / 10) * 10
+}
+
+function notchCandidates(shape: ShapedShape, scale: number): CutoutInput[] {
+  const sizeU = Math.max(1, Math.min(toMillimeters(500 * scale), Math.floor(shape.length / 3)))
+  const sizeV = Math.max(1, Math.min(toMillimeters(300 * scale), Math.floor(shape.width / 3)))
+  const middleU = toMillimeters((shape.length - sizeU) / 2)
+  const middleV = toMillimeters((shape.width - sizeV) / 2)
+  const places: Array<[Extract<Cutout, { kind: 'rectangle' }>['fromU'], Extract<Cutout, { kind: 'rectangle' }>['fromV']]> = [
+    [{ edge: 'left', distance: 0 }, { edge: 'bottom', distance: 0 }],
+    [{ edge: 'right', distance: 0 }, { edge: 'bottom', distance: 0 }],
+    [{ edge: 'right', distance: 0 }, { edge: 'top', distance: 0 }],
+    [{ edge: 'left', distance: 0 }, { edge: 'top', distance: 0 }],
+    [{ edge: 'left', distance: middleU }, { edge: 'bottom', distance: 0 }],
+    [{ edge: 'left', distance: middleU }, { edge: 'top', distance: 0 }],
+    [{ edge: 'left', distance: 0 }, { edge: 'bottom', distance: middleV }],
+    [{ edge: 'right', distance: 0 }, { edge: 'bottom', distance: middleV }]
+  ]
+  return places.map(([fromU, fromV]) => ({ kind: 'rectangle', sizeU, sizeV, cornerRadius: 0, fromU, fromV }))
+}
+
+function holeCandidates(shape: ShapedShape, preset: 'rectangle' | 'circle', scale: number): CutoutInput[] {
+  const diameter = Math.max(1, Math.min(toMillimeters(300 * scale), shape.length - 2, shape.width - 2))
+  const sizeU = Math.max(1, Math.min(toMillimeters(1000 * scale), Math.floor(shape.length / 2)))
+  const sizeV = Math.max(1, Math.min(toMillimeters(600 * scale), Math.floor(shape.width / 2)))
+
+  return POSITION_FRACTIONS.flatMap((fractionU) =>
+    POSITION_FRACTIONS.map((fractionV): CutoutInput => {
+      if (preset === 'circle') {
+        return {
+          kind: 'circle',
+          diameter,
+          fromU: { edge: 'left', distance: Math.round(fractionU * shape.length) },
+          fromV: { edge: 'bottom', distance: Math.round(fractionV * shape.width) }
+        }
+      }
+      return {
+        kind: 'rectangle',
+        sizeU,
+        sizeV,
+        cornerRadius: 0,
+        fromU: { edge: 'left', distance: Math.round(fractionU * shape.length - sizeU / 2) },
+        fromV: { edge: 'bottom', distance: Math.round(fractionV * shape.width - sizeV / 2) }
+      }
+    })
+  )
+}
+
+/** Une nouvelle découpe, à un endroit libre et valide, plus petite s'il le faut. */
+export function suggestCutout(shape: ShapedShape, preset: CutoutPreset): Result<CutoutInput> {
+  for (const scale of SIZE_ATTEMPTS) {
+    const candidates = preset === 'notch' ? notchCandidates(shape, scale) : holeCandidates(shape, preset, scale)
+    for (const input of candidates) {
+      const trial = { ...shape, cutouts: [...shape.cutouts, { ...input, id: '__candidat' } as Cutout] }
+      if (validateShape(trial).ok) return ok(input)
+    }
+  }
+  return err('invalid-shape', 'Il ne reste plus de place pour cette découpe sur la pièce.', 'cutouts')
+}
+
+/** Change le bord de référence d'une découpe, sans la déplacer. */
+export function withCutoutReference(shape: ShapedShape, cutout: Cutout, axis: 'u' | 'v', edge: string): Cutout {
+  const box = resolveCutout(shape, cutout)
+  if (axis === 'u') {
+    if (cutout.fromU.edge === edge) return cutout
+    const fromStart = box.kind === 'circle' ? box.centerU : box.minU
+    const fromEnd = box.kind === 'circle' ? shape.length - box.centerU : shape.length - box.maxU
+    return edge === 'left'
+      ? { ...cutout, fromU: { edge: 'left', distance: fromStart } }
+      : { ...cutout, fromU: { edge: 'right', distance: fromEnd } }
+  }
+  if (cutout.fromV.edge === edge) return cutout
+  const fromStart = box.kind === 'circle' ? box.centerV : box.minV
+  const fromEnd = box.kind === 'circle' ? shape.width - box.centerV : shape.width - box.maxV
+  return edge === 'bottom'
+    ? { ...cutout, fromV: { edge: 'bottom', distance: fromStart } }
+    : { ...cutout, fromV: { edge: 'top', distance: fromEnd } }
 }
 
 /** Le contour extérieur et les trous d'une forme valide, en segments et arcs exacts. */

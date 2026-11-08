@@ -3,6 +3,7 @@ import { applyCaisson } from '../../src/core/caisson'
 import { computeCutList } from '../../src/core/cutList'
 import { createEmptyProject, type Piece, type Project } from '../../src/core/model'
 import { REFERENCE_CAISSONS } from '../fixtures/reference-furniture'
+import { box, round, shaped } from '../fixtures/shape-references'
 
 let nextId = 0
 
@@ -22,6 +23,52 @@ function piece(length: number, width: number, thickness: number, changes: Partia
 function project(...pieces: Piece[]): Project {
   return { ...createEmptyProject(), pieces }
 }
+
+describe('computeCutList : pièces de forme', () => {
+  const original = shaped(8000, 3000, { topLeft: round(400) }, [box('a', 500, 300, ['left', 0], ['bottom', 0])])
+  const flipped = shaped(8000, 3000, { topRight: round(400) }, [box('a', 500, 300, ['right', 0], ['bottom', 0])])
+  const other = shaped(8000, 3000, { topLeft: round(500) }, [box('a', 500, 300, ['left', 0], ['bottom', 0])])
+  const withShape = (shape: Piece['shape'], name: string) => piece(8000, 3000, 180, { shape, name })
+
+  it('garde le rectangle de bois nécessaire', () => {
+    expect(computeCutList(project(withShape(original, 'A'))).lines[0]).toMatchObject({ length: 8000, width: 3000, thickness: 180 })
+  })
+
+  it('regroupe des formes identiques, même retournées, avec un seul plan', () => {
+    const { lines } = computeCutList(project(withShape(original, 'A'), withShape(flipped, 'B')))
+    expect(lines).toHaveLength(1)
+    expect(lines[0]).toMatchObject({ quantity: 2, plan: 1 })
+  })
+
+  it('sépare des formes différentes de mêmes dimensions', () => {
+    const { lines } = computeCutList(project(withShape(original, 'A'), withShape(other, 'B')))
+    expect(lines).toHaveLength(2)
+    expect(lines.map((line) => line.plan).sort()).toEqual([1, 2])
+  })
+
+  it('sépare une pièce de forme d\'un rectangle de mêmes dimensions, sans plan pour le rectangle', () => {
+    const { lines } = computeCutList(project(piece(8000, 3000, 180, { name: 'R' }), withShape(original, 'A')))
+    expect(lines).toHaveLength(2)
+    expect(lines[0]).toMatchObject({ names: ['R'], plan: null, shape: null })
+    expect(lines[1]).toMatchObject({ names: ['A'], plan: 1, shape: original })
+  })
+
+  it('numérote les plans dans l\'ordre de la liste', () => {
+    const large = shaped(9000, 3000, { topLeft: round(400) })
+    const { lines } = computeCutList(project(withShape(original, 'A'), piece(9000, 3000, 180, { shape: large, name: 'B' })))
+    expect(lines.map((line) => [line.names[0], line.plan])).toEqual([['B', 1], ['A', 2]])
+  })
+
+  it('compte les totaux sur le rectangle de bois', () => {
+    const { totals } = computeCutList(project(withShape(original, 'A')))
+    expect(totals[0]).toMatchObject({ pieceCount: 1, area: 8000 * 3000 })
+  })
+
+  it('ne change rien à une liste sans forme', () => {
+    const { lines } = computeCutList(project(piece(1000, 500, 180)))
+    expect(lines[0]).toMatchObject({ plan: null, shape: null, shapeKey: '' })
+  })
+})
 
 describe('computeCutList : jeu de référence', () => {
   it.each(REFERENCE_CAISSONS.map((c) => [c.label, c] as const))('%s', (_label, reference) => {
