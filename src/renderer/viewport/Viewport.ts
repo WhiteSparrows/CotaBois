@@ -11,6 +11,8 @@ const VIEW_DIRECTION = new THREE.Vector3(0.65, 0.5, 1).normalize()
 const DEFAULT_TARGET_SIZE = 1000
 const CLICK_TOLERANCE_PX = 4
 const SNAP_DISTANCE_PX = 8
+const CAPTURE_WIDTH = 1600
+const CAPTURE_HEIGHT = 1200
 const AXES: readonly Axis[] = ['x', 'y', 'z']
 
 const BACKGROUND_COLOR = 0xe9e7df
@@ -145,6 +147,52 @@ export class Viewport {
 
   /** Recadre la vue pour montrer tout le meuble. */
   frame(): void {
+    // Une marge large : les poignées d'une pièce en bordure doivent rester à l'écran.
+    this.placeCamera(1.25)
+    this.requestRender()
+  }
+
+  /** Une image du meuble pour le rapport : vue fixe sur fond blanc, sans sélection ni poignées. */
+  captureImage(): string {
+    const canvasSize = this.renderer.getSize(new THREE.Vector2())
+    const pixelRatio = this.renderer.getPixelRatio()
+    const position = this.camera.position.clone()
+    const target = this.controls.target.clone()
+    const { near, far, aspect } = this.camera
+    const background = this.scene.background
+    const handles = this.handles.getHelper()
+
+    for (const { mesh, edges } of this.objects.values()) {
+      mesh.material = this.materials.wood
+      edges.material = this.materials.edge
+    }
+    handles.visible = false
+    this.scene.background = new THREE.Color(0xffffff)
+    this.renderer.setPixelRatio(1)
+    this.renderer.setSize(CAPTURE_WIDTH, CAPTURE_HEIGHT, false)
+    this.camera.aspect = CAPTURE_WIDTH / CAPTURE_HEIGHT
+    this.placeCamera(1.02)
+    this.renderer.render(this.scene, this.camera)
+    // Le tampon de dessin n'est lisible que juste après le rendu.
+    const image = this.renderer.domElement.toDataURL('image/png')
+
+    handles.visible = true
+    this.scene.background = background
+    this.renderer.setPixelRatio(pixelRatio)
+    this.renderer.setSize(canvasSize.x, canvasSize.y, false)
+    this.camera.aspect = aspect
+    this.camera.near = near
+    this.camera.far = far
+    this.camera.updateProjectionMatrix()
+    this.camera.position.copy(position)
+    this.controls.target.copy(target)
+    this.controls.update()
+    this.applyMarks()
+    this.render()
+    return image
+  }
+
+  private placeCamera(margin: number): void {
     const bounds = this.project && projectBounds(this.project)
     const size = bounds
       ? new THREE.Vector3(bounds.size.x, bounds.size.y, bounds.size.z).multiplyScalar(TENTHS_TO_MM)
@@ -160,8 +208,7 @@ export class Viewport {
     const radius = size.length() / 2
     const halfVertical = THREE.MathUtils.degToRad(FIELD_OF_VIEW / 2)
     const halfHorizontal = Math.atan(Math.tan(halfVertical) * this.camera.aspect)
-    // Une marge large : les poignées d'une pièce en bordure doivent rester à l'écran.
-    const distance = (radius / Math.sin(Math.min(halfVertical, halfHorizontal))) * 1.25
+    const distance = (radius / Math.sin(Math.min(halfVertical, halfHorizontal))) * margin
 
     this.camera.near = distance / 100
     this.camera.far = distance * 20
@@ -169,7 +216,6 @@ export class Viewport {
     this.camera.position.copy(center).addScaledVector(VIEW_DIRECTION, distance)
     this.controls.target.copy(center)
     this.controls.update()
-    this.requestRender()
   }
 
   dispose(): void {

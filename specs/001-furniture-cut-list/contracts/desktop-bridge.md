@@ -10,9 +10,9 @@ Chaque opération renvoie `{ status: "ok", ... }`, `{ status: "canceled" }` si l
 
 | Méthode | Comportement | Résultat `ok` |
 |---|---|---|
-| `openProject()` | Dialogue d'ouverture filtré sur `.cotabois`, puis lecture du fichier. Le chemin n'est retenu qu'une fois `projectOpened()` appelé. | `{ text, fileName }` |
+| `openProject()` | Dialogue d'ouverture filtré sur `.cotabois`, puis lecture du fichier. Le chemin n'est retenu qu'une fois `projectOpened()` appelé. | `{ text }` |
 | `projectOpened()` | Confirme que le contenu lu est valide et devient le projet courant. | Sans contenu |
-| `saveProject(text)` | Écrit au chemin courant. S'il n'y en a pas, se comporte comme `saveProjectAs`. | `{ fileName }` |
+| `saveProject(text, suggestedName)` | Écrit au chemin courant. S'il n'y en a pas, se comporte comme `saveProjectAs`. | `{ fileName }` |
 | `saveProjectAs(text, suggestedName)` | Dialogue d'enregistrement, puis écriture et mémorisation du chemin. | `{ fileName }` |
 | `newProject()` | Oublie le chemin courant. | Sans contenu |
 | `exportCsv(text, suggestedName)` | Dialogue d'enregistrement, puis écriture. Le chemin courant ne change pas. | `{ fileName }` |
@@ -24,12 +24,11 @@ Le dossier proposé par défaut est `Documents`, hors du dossier d'installation.
 
 | Méthode ou événement | Sens | Rôle |
 |---|---|---|
-| `setDirty(isDirty)` | Interface → principal | Tient à jour l'indicateur de modifications, et le titre de la fenêtre avec `setTitle`. |
-| `setTitle(projectName)` | Interface → principal | Titre de la fenêtre : `Nom du projet – CotaBois`, précédé de `*` si le projet est modifié. |
+| `setDirty(isDirty)` | Interface → principal | Tient à jour l'indicateur de modifications, consulté à la fermeture. |
 | `onCloseRequested(callback)` | Principal → interface | L'utilisateur ferme la fenêtre alors que le projet est modifié. L'interface pose alors la question de FR-024. |
 | `confirmClose()` | Interface → principal | L'utilisateur a enregistré ou abandonné : la fenêtre se ferme. |
 
-Sans modification, le processus principal ferme directement la fenêtre.
+Sans modification, le processus principal ferme directement la fenêtre. Le titre de la fenêtre (`Nom du projet – CotaBois`, précédé de `*` si le projet est modifié) est porté par le titre de la page, sans passer par ce pont.
 
 ## Menu
 
@@ -45,13 +44,18 @@ Sans modification, le processus principal ferme directement la fenêtre.
 | Fichier | Exporter en CSV… | `file:export-csv` |
 | Édition | Annuler (Ctrl+Z) | `edit:undo` |
 | Édition | Rétablir (Ctrl+Y) | `edit:redo` |
+| Édition | Couper (Ctrl+X) | `edit:cut` |
+| Édition | Copier (Ctrl+C) | `edit:copy` |
+| Édition | Coller (Ctrl+V) | `edit:paste` |
 | Édition | Dupliquer (Ctrl+D) | `edit:duplicate` |
 | Édition | Supprimer (Suppr) | `edit:delete` |
 | Affichage | Recadrer sur le meuble (F) | `view:frame` |
 
 Quitter est géré par le menu standard et passe par le même contrôle de fermeture.
 
-`F` et `Suppr` sont seulement affichés dans le menu : l'interface les gère elle-même et les ignore pendant une saisie dans un champ.
+`F`, `Suppr`, `Ctrl+X`, `Ctrl+C` et `Ctrl+V` sont seulement affichés dans le menu : l'interface les gère elle-même. Dans un champ, le navigateur les traite comme du texte, et le menu passe par `editText(action)`, qui appelle les commandes de la fenêtre. Ailleurs, couper, copier et coller portent sur les pièces, avec un presse-papiers propre au logiciel, conservé d'un projet à l'autre.
+
+Aucune commande ne s'exécute tant qu'une boîte de dialogue est ouverte.
 
 ## Règles de sécurité
 

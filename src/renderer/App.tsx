@@ -1,17 +1,31 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { findOverlaps } from '../core/geometry'
 import { CaissonForm } from './panels/CaissonForm'
+import { CommitField } from './panels/CommitField'
 import { CutListPanel } from './panels/CutListPanel'
 import { PiecePanel } from './panels/PiecePanel'
+import { UnsavedDialog } from './panels/UnsavedDialog'
+import { ReportView } from './report/ReportView'
 import {
   addPanel,
+  copySelection,
+  cutSelection,
   deleteSelection,
+  dismissFileError,
   duplicateSelection,
+  exportCsv,
+  exportPdf,
   movePiece,
+  pasteCopiedPieces,
   redo,
   registerCommand,
+  requestAction,
   runCommand,
+  saveProject,
+  saveProjectAs,
   selectPieces,
+  setProjectName,
+  setReportImageSource,
   undo,
   useEditor
 } from './store'
@@ -30,7 +44,7 @@ function commitActiveField(): void {
 const MAX_LISTED_OVERLAPS = 3
 
 export function App() {
-  const { project, selection, canUndo, canRedo, frameToken } = useEditor()
+  const { project, selection, canUndo, canRedo, dirty, pendingAction, fileError, report, frameToken } = useEditor()
   const containerRef = useRef<HTMLDivElement>(null)
   const viewportRef = useRef<Viewport | null>(null)
   const framedToken = useRef(0)
@@ -49,8 +63,10 @@ export function App() {
       })
       viewportRef.current = viewport
       const unregister = registerCommand('view:frame', () => viewport.frame())
+      setReportImageSource(() => viewport.captureImage())
       return () => {
         unregister()
+        setReportImageSource(null)
         viewport.dispose()
         viewportRef.current = null
       }
@@ -72,33 +88,55 @@ export function App() {
   }, [project, selection, overlappingIds, frameToken])
 
   useEffect(() => {
+    const afterCommit = (action: () => void) => () => {
+      commitActiveField()
+      action()
+    }
+    // Dans un champ, ces commandes portent sur le texte ; ailleurs, sur les pièces.
+    const onPiecesOrText = (textAction: 'cut' | 'copy' | 'paste', onPieces: () => void) => () => {
+      if (isTyping(document.activeElement)) window.cotabois.editText(textAction)
+      else onPieces()
+    }
     const unregister = [
-      registerCommand('edit:undo', () => {
-        commitActiveField()
-        undo()
-      }),
-      registerCommand('edit:redo', () => {
-        commitActiveField()
-        redo()
-      }),
-      registerCommand('edit:duplicate', () => {
-        commitActiveField()
-        duplicateSelection()
-      }),
+      registerCommand('file:new', afterCommit(() => requestAction('new'))),
+      registerCommand('file:open', afterCommit(() => requestAction('open'))),
+      registerCommand('file:save', afterCommit(() => void saveProject())),
+      registerCommand('file:save-as', afterCommit(() => void saveProjectAs())),
+      registerCommand('file:export-pdf', afterCommit(() => void exportPdf())),
+      registerCommand('file:export-csv', afterCommit(() => void exportCsv())),
+      registerCommand('edit:undo', afterCommit(undo)),
+      registerCommand('edit:redo', afterCommit(redo)),
+      registerCommand('edit:cut', onPiecesOrText('cut', cutSelection)),
+      registerCommand('edit:copy', onPiecesOrText('copy', copySelection)),
+      registerCommand('edit:paste', onPiecesOrText('paste', pasteCopiedPieces)),
+      registerCommand('edit:duplicate', afterCommit(duplicateSelection)),
       registerCommand('edit:delete', deleteSelection)
     ]
     return () => unregister.forEach((remove) => remove())
   }, [])
 
   useEffect(() => window.cotabois.onMenuCommand(runCommand), [])
+  useEffect(() => window.cotabois.onCloseRequested(() => requestAction('close')), [])
+
+  useEffect(() => {
+    window.cotabois.setDirty(dirty)
+    document.title = `${dirty ? '* ' : ''}${project.name} – CotaBois`
+  }, [dirty, project.name])
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent): void {
-      if (isTyping(event.target) || event.ctrlKey || event.altKey || event.metaKey) return
+      // Dans un champ, le navigateur gère seul la saisie et le presse-papiers.
+      if (isTyping(event.target) || event.altKey || event.metaKey) return
       const key = event.key.toLowerCase()
+      if (event.ctrlKey) {
+        if (key === 'x') runCommand('edit:cut')
+        if (key === 'c') runCommand('edit:copy')
+        if (key === 'v') runCommand('edit:paste')
+        return
+      }
       if (key === 'f') runCommand('view:frame')
       if (key === 'delete') runCommand('edit:delete')
-      if (key === 'escape') selectPieces([])
+      if (key === 'escape' && !document.querySelector('dialog[open]')) selectPieces([])
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
@@ -107,8 +145,21 @@ export function App() {
   const nameOf = (id: string) => project.pieces.find((piece) => piece.id === id)?.name ?? ''
 
   return (
+    <>
     <div className="app">
-      <aside className="side-panel">{selection.length > 0 ? <PiecePanel /> : <CaissonForm />}</aside>
+      <aside className="side-panel">
+        <div className="panel project-panel">
+          <CommitField
+            label="Nom du projet"
+            value={project.name}
+            onCommit={(text) => {
+              const result = setProjectName(text)
+              return result.ok ? null : result.error
+            }}
+          />
+        </div>
+        {selection.length > 0 ? <PiecePanel /> : <CaissonForm />}
+      </aside>
 
       <main className="viewport-area">
         <div className="viewport" ref={containerRef} data-testid="viewport" data-piece-count="0" />
@@ -128,6 +179,14 @@ export function App() {
           </button>
         </div>
 
+        {fileError && (
+          <div className="file-error" role="alert" data-testid="file-error">
+            <p>{fileError}</p>
+            <button type="button" className="ghost" onClick={dismissFileError}>
+              Fermer
+            </button>
+          </div>
+        )}
         {viewportError && (
           <p className="viewport-message" role="alert">
             La vue 3D n'a pas pu démarrer sur cet ordinateur. La liste de découpe reste utilisable.
@@ -153,6 +212,10 @@ export function App() {
       <aside className="side-panel cut-side">
         <CutListPanel />
       </aside>
+
+      {pendingAction && <UnsavedDialog projectName={project.name} />}
     </div>
+    {report && <ReportView project={project} content={report} />}
+    </>
   )
 }

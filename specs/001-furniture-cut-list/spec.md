@@ -127,7 +127,7 @@ L'utilisateur exporte sa liste de découpe en PDF pour l'imprimer et l'emporter 
 - **FR-006**: Dans cette version, chaque pièce DOIT être un panneau rectangulaire défini par un nom, une longueur, une largeur, une épaisseur, un matériau facultatif, une position et une orientation.
 - **FR-007**: Le logiciel DOIT afficher le meuble en 3D et permettre de tourner autour, de zoomer, de se déplacer et de recadrer la vue sur tout le meuble.
 - **FR-008**: Le logiciel DOIT permettre de sélectionner une pièce dans la vue 3D et dans la liste, et de la voir mise en évidence dans les deux.
-- **FR-009**: Les utilisateurs DOIVENT pouvoir ajouter, dupliquer et supprimer une pièce, et modifier son nom, ses cotes et son matériau.
+- **FR-009**: Les utilisateurs DOIVENT pouvoir ajouter, dupliquer, couper, copier, coller et supprimer une pièce, et modifier son nom, ses cotes et son matériau. Dans un champ de saisie, couper, copier et coller portent sur le texte.
 - **FR-010**: Les utilisateurs DOIVENT pouvoir déplacer une pièce en la faisant glisser dans la vue 3D, ou en saisissant sa position exacte.
 - **FR-011**: Lors d'un déplacement à la souris, la pièce DOIT s'aligner sur les faces et les bords des pièces voisines lorsqu'elle s'en approche.
 - **FR-012**: Les utilisateurs DOIVENT pouvoir faire pivoter une pièce par quarts de tour autour de chaque axe. Les rotations à d'autres angles ne sont pas prises en charge.

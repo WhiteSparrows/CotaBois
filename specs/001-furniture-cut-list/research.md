@@ -127,3 +127,8 @@ La chaîne complète (`test`, `dev`, `pack`, `dist`) a été exécutée le 2026-
 - **Déplacement à la souris** : au millimètre près, sauf quand l'alignement donne une cote exacte. Une cote plus fine se saisit dans le champ de position.
 - **Panneau de gauche** : il montre la pièce sélectionnée à la place du formulaire du caisson, qui revient quand plus rien n'est sélectionné.
 - **Créer un caisson par-dessus des panneaux** : demande la même confirmation qu'un caisson retouché (FR-016), pour ne jamais perdre un travail manuel sans prévenir.
+- **Nom du projet** : un champ dédié en haut du panneau de gauche, annulable comme toute modification. Il propose le nom du fichier à l'enregistrement, mais le fichier peut porter un autre nom : les deux restent indépendants.
+- **Écriture des fichiers** : `src/main/atomicWrite.ts` est séparé de `files.ts` pour être testé sans Electron.
+- **Rapport PDF** : `printBackground` reste désactivé, sinon la couleur de fond de la fenêtre teinte les marges. Les règles d'impression ont une spécificité renforcée, car `styles.css` peut être chargé après elles : ce défaut a fait imprimer l'interface dans le PDF, sans qu'aucun test ne le voie. Un test compte désormais les pages du rapport d'un caisson.
+- **Contrôle des PDF** : les tests vérifient le format et le nombre de pages, mais pas le rendu. Le rendu réel a été contrôlé à l'œil sur un rapport court et un rapport de 3 pages, à reproduire si la mise en page change.
+- **Exports sans pièce** : les boutons sont désactivés avec une explication, et les entrées du menu, toujours actives, affichent la même raison.
