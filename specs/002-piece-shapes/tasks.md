@@ -118,17 +118,17 @@ description: "Liste des tâches pour les pièces de forme : arrondis et découpe
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T034 [P] [US3] Écrire dans `tests/core/shape.test.ts` : `describeShape` donne chaque cote en toutes lettres, avec les bords de référence saisis (FR-019, FR-021, SC-002)
-- [ ] T035 [P] [US3] Écrire dans `tests/core/csv.test.ts` : colonne `Plan` présente si au moins une ligne a une forme, vide pour les rectangles, CSV strictement inchangé sans forme (FR-020, FR-023)
-- [ ] T036 [P] [US3] Compléter `tests/e2e/us5-export.spec.ts` : nombre de pages et de plans attendus, plan non coupé, PDF inchangé sans forme, et `tests/e2e/us6-shapes.spec.ts`, scénario F4 (FR-017, FR-019, FR-023)
+- [X] T034 [P] [US3] Écrire dans `tests/core/shape.test.ts` : `describeShape` donne chaque cote en toutes lettres, avec les bords de référence saisis (FR-019, FR-021, SC-002)
+- [X] T035 [P] [US3] Écrire dans `tests/core/csv.test.ts` : colonne `Plan` présente si au moins une ligne a une forme, vide pour les rectangles, CSV strictement inchangé sans forme (FR-020, FR-023)
+- [X] T036 [P] [US3] Compléter `tests/e2e/us5-export.spec.ts` : nombre de pages et de plans attendus, plan non coupé, PDF inchangé sans forme, et `tests/e2e/us6-shapes.spec.ts`, scénario F4 (FR-017, FR-019, FR-023)
 
 ### Implementation for User Story 3
 
-- [ ] T037 [US3] Implémenter `describeShape` dans `src/core/shape.ts` (FR-019, FR-021)
-- [ ] T038 [US3] Ajouter la colonne `Plan` dans `src/core/csv.ts` (FR-020)
-- [ ] T039 [US3] Créer `src/renderer/report/ShapePlan.tsx` : dessin à l'échelle noir sur blanc, cotes d'ensemble, noms des bords, numéros, tableau, et ses styles d'impression dans `src/renderer/report/report.css`, sans coupure de page (FR-019)
-- [ ] T040 [US3] Ajouter dans `src/renderer/report/ReportView.tsx` la section des plans, seulement s'il y en a, et la mention `Plan n` dans la liste (FR-019, FR-023)
-- [ ] T041 [US3] Produire de vrais PDF, un plan simple et plusieurs plans avec de nombreuses découpes, et les contrôler à l'œil en les consignant dans `specs/002-piece-shapes/checklists/validation.md` (SC-003)
+- [X] T037 [US3] Implémenter `describeShape` dans `src/core/shape.ts` (FR-019, FR-021)
+- [X] T038 [US3] Ajouter la colonne `Plan` dans `src/core/csv.ts` (FR-020)
+- [X] T039 [US3] Créer `src/renderer/report/ShapePlan.tsx` : dessin à l'échelle noir sur blanc, cotes d'ensemble, noms des bords, numéros, tableau, et ses styles d'impression dans `src/renderer/report/report.css`, sans coupure de page (FR-019)
+- [X] T040 [US3] Ajouter dans `src/renderer/report/ReportView.tsx` la section des plans, seulement s'il y en a, et la mention `Plan n` dans la liste (FR-019, FR-023)
+- [X] T041 [US3] Produire de vrais PDF, un plan simple et plusieurs plans avec de nombreuses découpes, et les contrôler à l'œil en les consignant dans `specs/002-piece-shapes/checklists/validation.md` (SC-003)
 
 **Checkpoint**: F4 passe. Une pièce dessinée peut être fabriquée.
 

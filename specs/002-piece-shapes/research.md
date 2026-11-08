@@ -43,12 +43,15 @@ Aucune nouvelle dépendance n'est prévue. Les décisions de la première versio
 - **Decision**: un bouton « Modifier la forme » remplace le panneau de la liste de découpe par l'éditeur le temps de l'édition, ce qui laisse la vue 3D visible. L'éditeur contient l'aperçu SVG à l'échelle et les champs. Un glissement ne touche que l'aperçu et produit une seule action annulable au relâchement, comme les poignées 3D. En glissant, les valeurs sont arrondies au millimètre et bornées à la plage valide.
 - **Rationale**: le panneau de gauche, de 250 pixels, est trop étroit pour un aperçu utile. Les pièces multiples n'ont pas d'aperçu commun manipulable : on y propose seulement les coins et l'ajout d'une découpe (FR-011).
 - **Alternatives considered**: boîte de dialogue modale (masquerait le résultat en 3D).
+- **Précision de la construction** : l'aperçu reste fixe en haut du panneau, sinon il sort de l'écran pendant qu'on édite les découpes situées plus bas.
 
 ## R8. Plans dans le PDF
 
 - **Decision**: chaque forme distincte a un plan à l'échelle, sous la liste : le contour avec les cotes d'ensemble, chaque coin modifié et chaque découpe portant un numéro, et un tableau des numéros avec leurs cotes en toutes lettres (« Trou rond Ø 60, centre à 150 du bord gauche et 150 du bord bas »). Les plans sont numérotés dans l'ordre de la liste, et le plan utilise les bords de référence de la première pièce de sa ligne.
 - **Rationale**: la lisibilité est le critère (SC-003). Des lignes de cote automatiques se croisent dès qu'il y a plusieurs découpes, alors qu'un numéro et un tableau restent lisibles quel que soit le nombre de découpes, en noir et blanc. Un test compte les plans, et le rendu sera contrôlé à l'œil, puisque la première version a montré que les tests ne voient pas la mise en page.
 - **Alternatives considered**: placement automatique de lignes de cote (complexe et fragile pour un gain faible).
+
+**Précisions de la construction** : les tailles du dessin sont réglées en millimètres de papier, pour que le texte garde sa taille quelle que soit l'échelle. Les numéros des petites découpes se placent à côté d'elles, en évitant les autres numéros et découpes.
 
 ## R9. Format de fichier
 
