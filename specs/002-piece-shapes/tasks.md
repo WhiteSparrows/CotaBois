@@ -69,18 +69,18 @@ description: "Liste des tâches pour les pièces de forme : arrondis et découpe
 
 ### Tests for User Story 1 ⚠️
 
-- [ ] T017 [P] [US1] Écrire dans `tests/core/pieces.test.ts` : `setCorner` applique, refuse sans modifier avec le maximum, marque le caisson comme retouché, ramène à un rectangle quand tout redevient droit (FR-001, FR-002, FR-010)
-- [ ] T018 [P] [US1] Écrire dans `tests/core/shape.test.ts` et `tests/core/cutList.test.ts` : `canonicalShapeKey` identique sous rotation et retournement, pour une pièce carrée ou non, et cotée depuis des bords différents ; regroupement par forme, formes différentes séparées, numéros de plan, totaux inchangés, liste identique sans forme (FR-016, FR-017, FR-018, FR-023)
-- [ ] T019 [P] [US1] Écrire `tests/e2e/us6-shapes.spec.ts`, scénario F1 : édition des coins, refus avec maximum, annulation, mention `Plan 1` dans la liste, poignée de coin tirée sur l'aperçu
+- [X] T017 [P] [US1] Écrire dans `tests/core/pieces.test.ts` : `setCorner` applique, refuse sans modifier avec le maximum, marque le caisson comme retouché, ramène à un rectangle quand tout redevient droit (FR-001, FR-002, FR-010)
+- [X] T018 [P] [US1] Écrire dans `tests/core/shape.test.ts` et `tests/core/cutList.test.ts` : `canonicalShapeKey` identique sous rotation et retournement, pour une pièce carrée ou non, et cotée depuis des bords différents ; regroupement par forme, formes différentes séparées, numéros de plan, totaux inchangés, liste identique sans forme (FR-016, FR-017, FR-018, FR-023)
+- [X] T019 [P] [US1] Écrire `tests/e2e/us6-shapes.spec.ts`, scénario F1 : édition des coins, refus avec maximum, annulation, mention `Plan 1` dans la liste, poignée de coin tirée sur l'aperçu
 
 ### Implementation for User Story 1
 
-- [ ] T020 [US1] Implémenter `setCorner` dans `src/core/pieces.ts`, atomique sur une liste de pièces (FR-001, FR-002, FR-010)
-- [ ] T021 [US1] Implémenter `canonicalShapeKey` dans `src/core/shape.ts`, et le regroupement et les numéros de plan dans `src/core/cutList.ts` (FR-016, FR-017, FR-018, FR-023)
-- [ ] T022 [US1] Ajouter dans `src/renderer/store.ts` l'état d'ouverture de l'éditeur et les actions de forme, une action annulable par modification (FR-010)
-- [ ] T023 [US1] Créer `src/renderer/panels/ShapePreview.tsx` : aperçu SVG à l'échelle, noms des bords, poignées de coin au millimètre près, bornées au maximum, une action annulable au relâchement (FR-009)
-- [ ] T024 [US1] Créer `src/renderer/panels/ShapeEditor.tsx` : type et valeur de chaque coin, refus affiché par champ, bouton Terminer (FR-001, FR-002, FR-009)
-- [ ] T025 [US1] Ajouter le bouton Modifier la forme dans `src/renderer/panels/PiecePanel.tsx`, afficher l'éditeur à la place de la liste dans `src/renderer/App.tsx`, et la mention `Plan n` dans `src/renderer/panels/CutListPanel.tsx` (FR-009, FR-016)
+- [X] T020 [US1] Implémenter `setCorner` dans `src/core/pieces.ts`, atomique sur une liste de pièces (FR-001, FR-002, FR-010)
+- [X] T021 [US1] Implémenter `canonicalShapeKey` dans `src/core/shape.ts`, et le regroupement et les numéros de plan dans `src/core/cutList.ts` (FR-016, FR-017, FR-018, FR-023)
+- [X] T022 [US1] Ajouter dans `src/renderer/store.ts` l'état d'ouverture de l'éditeur et les actions de forme, une action annulable par modification (FR-010)
+- [X] T023 [US1] Créer `src/renderer/panels/ShapePreview.tsx` : aperçu SVG à l'échelle, noms des bords, poignées de coin au millimètre près, bornées au maximum, une action annulable au relâchement (FR-009)
+- [X] T024 [US1] Créer `src/renderer/panels/ShapeEditor.tsx` : type et valeur de chaque coin, refus affiché par champ, bouton Terminer (FR-001, FR-002, FR-009)
+- [X] T025 [US1] Ajouter le bouton Modifier la forme dans `src/renderer/panels/PiecePanel.tsx`, afficher l'éditeur à la place de la liste dans `src/renderer/App.tsx`, et la mention `Plan n` dans `src/renderer/panels/CutListPanel.tsx` (FR-009, FR-016)
 
 **Checkpoint**: F1 passe. Une tablette aux coins arrondis se dessine et se retrouve dans la liste.
 
@@ -94,17 +94,17 @@ description: "Liste des tâches pour les pièces de forme : arrondis et découpe
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T026 [P] [US2] Écrire dans `tests/core/pieces.test.ts` : `addCutout`, `updateCutout`, `removeCutout`, refus sans modification, au moins 20 découpes, retour au rectangle après suppression (FR-003, FR-004, FR-005, FR-006, FR-010)
-- [ ] T027 [P] [US2] Écrire dans `tests/core/overlaps.test.ts` : planche logée exactement dans une encoche ou un trou non signalée, vrai recouvrement signalé, pièces parallèles et perpendiculaires, orientations signées, résultat inchangé pour des rectangles (FR-015)
-- [ ] T028 [P] [US2] Compléter `tests/e2e/us6-shapes.spec.ts`, scénarios F2 et F3 : encoche, trou, rayon d'angle, glissement au millimètre borné à la pièce, refus, clic à travers un trou sélectionnant la pièce derrière
+- [X] T026 [P] [US2] Écrire dans `tests/core/pieces.test.ts` : `addCutout`, `updateCutout`, `removeCutout`, refus sans modification, au moins 20 découpes, retour au rectangle après suppression (FR-003, FR-004, FR-005, FR-006, FR-010)
+- [X] T027 [P] [US2] Écrire dans `tests/core/overlaps.test.ts` : planche logée exactement dans une encoche ou un trou non signalée, vrai recouvrement signalé, pièces parallèles et perpendiculaires, orientations signées, résultat inchangé pour des rectangles (FR-015)
+- [X] T028 [P] [US2] Compléter `tests/e2e/us6-shapes.spec.ts`, scénarios F2 et F3 : encoche, trou, rayon d'angle, glissement au millimètre borné à la pièce, refus, clic à travers un trou sélectionnant la pièce derrière
 
 ### Implementation for User Story 2
 
-- [ ] T029 [US2] Implémenter `addCutout`, `updateCutout` et `removeCutout` dans `src/core/pieces.ts` (FR-003, FR-004, FR-005, FR-006, FR-010)
-- [ ] T030 [US2] Étendre `findOverlaps` dans `src/core/geometry.ts` avec la grille de plans critiques de `research.md`, R5, en gardant le filtre par encombrement (FR-015)
-- [ ] T031 [US2] Ajouter dans `src/renderer/panels/ShapePreview.tsx` l'affichage, la sélection et le glissement des découpes, au millimètre près, bornés à la plage valide (FR-009)
-- [ ] T032 [US2] Ajouter dans `src/renderer/panels/ShapeEditor.tsx` les boutons Encoche, Trou rectangulaire et Trou rond, le choix d'un emplacement libre, les champs de cotes, de bords de référence et de rayon d'angle, et la suppression (FR-003, FR-004)
-- [ ] T033 [US2] Vérifier dans `src/renderer/viewport/Viewport.ts` la sélection sur la géométrie réelle, y compris à travers les trous (FR-014)
+- [X] T029 [US2] Implémenter `addCutout`, `updateCutout` et `removeCutout` dans `src/core/pieces.ts` (FR-003, FR-004, FR-005, FR-006, FR-010)
+- [X] T030 [US2] Étendre `findOverlaps` dans `src/core/geometry.ts` avec la grille de plans critiques de `research.md`, R5, en gardant le filtre par encombrement (FR-015)
+- [X] T031 [US2] Ajouter dans `src/renderer/panels/ShapePreview.tsx` l'affichage, la sélection et le glissement des découpes, au millimètre près, bornés à la plage valide (FR-009)
+- [X] T032 [US2] Ajouter dans `src/renderer/panels/ShapeEditor.tsx` les boutons Encoche, Trou rectangulaire et Trou rond, le choix d'un emplacement libre, les champs de cotes, de bords de référence et de rayon d'angle, et la suppression (FR-003, FR-004)
+- [X] T033 [US2] Vérifier dans `src/renderer/viewport/Viewport.ts` la sélection sur la géométrie réelle, y compris à travers les trous (FR-014)
 
 **Checkpoint**: F2 et F3 passent. Une pièce arrondie et découpée se dessine entièrement.
 

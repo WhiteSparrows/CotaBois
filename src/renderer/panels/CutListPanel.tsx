@@ -65,6 +65,7 @@ export function CutListPanel() {
                       <button type="button" className="row-button" aria-pressed={isSelected}>
                         {line.names.join(', ')}
                       </button>
+                      {line.plan !== null && <span className="plan-badge">Plan {line.plan}</span>}
                     </td>
                     <td className="number">{formatMm(line.length)}</td>
                     <td className="number">{formatMm(line.width)}</td>

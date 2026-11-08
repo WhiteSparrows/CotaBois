@@ -4,6 +4,7 @@ import { formatMm, parseMm } from '../../core/units'
 import {
   deleteSelection,
   duplicateSelection,
+  openShapeEditor,
   rotateSelection,
   selectPieces,
   updateSelectedPiece,
@@ -77,6 +78,14 @@ export function PiecePanel() {
           Supprimer
         </button>
       </div>
+
+      {only && (
+        <div className="button-row shape-action">
+          <button type="button" className="secondary" onClick={openShapeEditor}>
+            Modifier la forme
+          </button>
+        </div>
+      )}
 
       <h3>Pivoter d'un quart de tour</h3>
       <div className="button-row panel-actions">
