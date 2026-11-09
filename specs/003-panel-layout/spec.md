@@ -155,7 +155,7 @@ Pour un matériau dont le décor ou le fil a un sens, l'utilisateur demande que 
 ### Measurable Outcomes
 
 - **SC-001**: À partir d'un meuble terminé, un utilisateur obtient le nombre de panneaux à acheter en moins de 1 minute, sans documentation.
-- **SC-002**: Sur un jeu de référence dont le meilleur résultat a été calculé à la main, le logiciel atteint ce nombre de panneaux dans au moins 90 % des cas, et ne le dépasse jamais de plus d'un panneau.
+- **SC-002**: Sur un jeu de meubles réalistes dont le meilleur résultat connu vient d'un calcul à la main ou d'une recherche beaucoup plus longue, le logiciel atteint ce nombre de panneaux dans au moins 90 % des cas, et ne le dépasse jamais de plus d'un panneau.
 - **SC-003**: Sur 100 % des cas du jeu d'essai, chaque pièce apparaît une seule fois, sans chevauchement, dans la surface utile, et à la distance de trait de scie demandée, avec des cotes exactes à 0,1 mm.
 - **SC-004**: Une personne découpe tous les panneaux d'un meuble à partir du seul plan de coupe imprimé, sans revenir au logiciel.
 - **SC-005**: Le calepinage d'un meuble de 200 pièces s'affiche en moins de 2 secondes, sur un portable à carte graphique intégrée, sans bloquer l'interface plus longtemps.
@@ -167,7 +167,7 @@ Pour un matériau dont le décor ou le fil a un sens, l'utilisateur demande que 
 - Un panneau neuf a ses quatre bords exploitables, sauf marge de bord réglée par l'utilisateur.
 - Le fil d'un panneau suit sa longueur, et celui d'une pièce suit la cote saisie comme sa longueur. Pour faire une exception, l'utilisateur inverse la longueur et la largeur de la pièce.
 - Le calepinage porte sur un seul meuble, celui du projet ouvert.
-- Le matériau est reconnu tel qu'il est saisi : deux orthographes différentes forment deux groupes, comme dans les totaux existants.
+- Le matériau est reconnu comme dans les totaux existants, sans tenir compte des majuscules ni des espaces autour : deux orthographes différentes forment deux groupes.
 - Le prix des panneaux, les chants, l'imbrication des contours réels et l'export vers des machines à commande numérique sont hors périmètre, et pourront faire l'objet d'une spécification ultérieure.
 - Le calepinage ne dépend d'aucun service en ligne, comme le reste du logiciel.
 - Les fonctionnalités des versions précédentes, leurs limites de dimensions et leur précision de 0,1 mm restent inchangées.
