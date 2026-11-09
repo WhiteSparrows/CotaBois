@@ -273,6 +273,39 @@ describe('découpes', () => {
   })
 })
 
+describe('modification de plusieurs pièces', () => {
+  const large = () => panel('a', { name: 'Grande', shape: { kind: 'rectangle', length: 8000, width: 3000 } })
+  const small = () => panel('b', { name: 'Petite', shape: { kind: 'rectangle', length: 8000, width: 1000 } })
+  const holeInput = { kind: 'circle', diameter: 600, fromU: { edge: 'left', distance: 4000 }, fromV: { edge: 'bottom', distance: 1500 } } as const
+
+  it('applique un coin à toutes les pièces', () => {
+    const next = value(setCorner(project(large(), small()), ['a', 'b'], 'topLeft', round(200)))
+    expect(next.pieces.map((piece) => piece.shape.kind)).toEqual(['shaped', 'shaped'])
+  })
+
+  it('ne modifie aucune pièce si l\'une refuse, et nomme celle qui pose problème', () => {
+    const start = project(large(), small())
+    const result = setCorner(start, ['a', 'b'], 'topLeft', round(2000))
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.error.message).toContain('Petite')
+    expect(start.pieces.map((piece) => piece.shape.kind)).toEqual(['rectangle', 'rectangle'])
+  })
+
+  it('ajoute une découpe à chacune, avec un identifiant propre', () => {
+    let id = 0
+    const next = value(addCutout(project(large(), panel('c', { name: 'Autre', shape: { kind: 'rectangle', length: 8000, width: 3000 } })), ['a', 'c'], holeInput, () => `h${++id}`))
+    expect(next.pieces.map((piece) => (piece.shape as ShapedShape).cutouts[0]?.id)).toEqual(['h1', 'h2'])
+  })
+
+  it('n\'ajoute la découpe à aucune pièce si elle ne convient pas à l\'une d\'elles', () => {
+    const start = project(large(), small())
+    const result = addCutout(start, ['a', 'b'], holeInput, () => 'x')
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.error.message).toContain('Petite')
+    expect(start.pieces[0]?.shape.kind).toBe('rectangle')
+  })
+})
+
 describe('addCopy', () => {
   it('colle une pièce qui a depuis disparu du projet', () => {
     const original = panel('a', { name: 'Plateau', material: 'Chêne' })

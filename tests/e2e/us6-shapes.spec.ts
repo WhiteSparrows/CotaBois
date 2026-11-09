@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test'
 import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { chooseFile, launchApp } from './helpers'
+import { chooseFile, clickMenu, launchApp } from './helpers'
 
 function field(page: Page, label: string) {
   return page.getByLabel(label, { exact: true })
@@ -268,6 +268,193 @@ test('F4 : le rapport imprimé contient un plan par forme, avec ses cotes', asyn
   await expect(plans).toContainText('Coin haut gauche : arrondi R 40')
   await expect(plans).toContainText('Trou rond Ø 60')
   await expect(page.getByTestId('report')).toHaveCount(0)
+
+  await app.close()
+})
+
+test('F5 : modifier les pièces d\'une ligne en une seule action', async () => {
+  const { app, page } = await launchApp()
+  await field(page, "Nombre d'étagères").fill('3')
+  await page.getByRole('button', { name: 'Créer le caisson' }).click()
+  await expect(cutRows(page)).toHaveCount(3)
+
+  // Dessous, dessus et étagères sont identiques : la ligne les sélectionne toutes
+  await cutRows(page).nth(1).click()
+  await expect(page.getByText('5 pièces sélectionnées')).toBeVisible()
+  await page.getByRole('button', { name: 'Modifier la forme' }).click()
+  await expect(page.getByTestId('shape-preview')).toHaveCount(0)
+  await roundCorner(page, 'haut gauche', '20')
+  await page.getByRole('button', { name: 'Trou rond' }).click()
+  await expect(page.getByRole('group', { name: /^Découpe/ })).toHaveCount(0)
+  await page.getByRole('button', { name: 'Terminer' }).click()
+
+  // Toujours une seule ligne, désormais de forme
+  await expect(cutRows(page)).toHaveCount(3)
+  await expect(cutRows(page).nth(1)).toHaveText(/^5\s*.*Plan 1/)
+
+  // Chaque action compte pour une seule annulation, sur toutes les pièces :
+  // le trou d'abord, puis l'arrondi, et le caisson reste entier
+  await page.getByRole('button', { name: 'Annuler', exact: true }).click()
+  await expect(cutRows(page).nth(1)).toHaveText(/^5\s*.*Plan 1/)
+  await page.getByRole('button', { name: 'Annuler', exact: true }).click()
+  await expect(cutRows(page).nth(1)).not.toContainText('Plan')
+  await expect(cutRows(page)).toHaveCount(3)
+
+  await app.close()
+})
+
+test('F5 : Ctrl+clic choisit des pièces, et un refus ne modifie aucune d\'elles', async () => {
+  const { app, page } = await launchApp()
+  await page.getByRole('button', { name: 'Ajouter un panneau' }).click()
+  await commitField(page, 'Nom', 'Grande')
+  await commitField(page, 'Longueur', '500')
+  await commitField(page, 'Largeur', '400')
+  await page.getByRole('button', { name: 'Ajouter un panneau' }).click()
+  await commitField(page, 'Nom', 'Petite')
+  await commitField(page, 'Longueur', '500')
+  await commitField(page, 'Largeur', '300')
+  await commitField(page, 'X (largeur)', '1000')
+
+  const rowOf = (name: string) => page.getByTestId('cut-list').locator('tbody tr', { hasText: name })
+  const centerOf = async (name: string) => {
+    await rowOf(name).click()
+    await settle(page)
+    const raw = await page.getByTestId('viewport').getAttribute('data-handle-origin')
+    const [x, y] = raw!.split(',').map(Number)
+    return { x: x!, y: y! }
+  }
+
+  await rowOf('Grande').click()
+  await page.getByTestId('cut-list').locator('tr[data-selected="true"] button').focus()
+  await page.keyboard.press('f')
+  await settle(page)
+  const large = await centerOf('Grande')
+  const small = await centerOf('Petite')
+  await page.getByRole('button', { name: 'Fermer' }).click()
+
+  const ctrlClick = async (point: { x: number; y: number }) => {
+    await page.keyboard.down('Control')
+    await page.mouse.click(point.x, point.y)
+    await page.keyboard.up('Control')
+  }
+
+  await page.mouse.click(large.x, large.y)
+  await expect(field(page, 'Nom')).toHaveValue('Grande')
+  await ctrlClick(small)
+  await expect(page.getByText('2 pièces sélectionnées')).toBeVisible()
+
+  // Un second Ctrl+clic retire la pièce de la sélection
+  await ctrlClick(small)
+  await expect(field(page, 'Nom')).toHaveValue('Grande')
+  await ctrlClick(small)
+
+  await page.getByRole('button', { name: 'Modifier la forme' }).click()
+  await field(page, 'Type du coin haut gauche').selectOption('chamfer')
+  await expect(field(page, 'Chanfrein haut gauche')).toHaveValue('20')
+
+  // 350 mm tiennent sur la grande (400), pas sur la petite (300)
+  await field(page, 'Chanfrein haut gauche').fill('350')
+  await field(page, 'Chanfrein haut gauche').press('Enter')
+  await expect(page.getByRole('alert')).toContainText('Petite')
+
+  await page.getByRole('button', { name: 'Terminer' }).click()
+  await rowOf('Grande').click()
+  await openEditor(page)
+  await expect(field(page, 'Chanfrein haut gauche')).toHaveValue('20')
+
+  await app.close()
+})
+
+test('F6 : la forme suit la pièce, et ses cotes restent cohérentes', async () => {
+  const { app, page } = await launchApp()
+  await addTablet(page)
+  await openEditor(page)
+  await page.getByRole('button', { name: 'Trou rond' }).click()
+  await cutout(page, 1).getByLabel('Référence horizontale', { exact: true }).selectOption('right')
+  await commitCutoutField(page, 1, 'Distance horizontale', '100')
+  await page.getByRole('button', { name: 'Terminer' }).click()
+  const initial = await cutRows(page).first().innerText()
+
+  // Un quart de tour ne change pas la forme ni la liste
+  await page.getByRole('button', { name: 'Pivoter autour de Y' }).click()
+  await settle(page)
+  expect(await cutRows(page).first().innerText()).toBe(initial)
+
+  // Copier-coller et dupliquer gardent la même forme : une seule ligne, un seul plan
+  await clickMenu(app, 'Copier')
+  await clickMenu(app, 'Coller')
+  await page.getByRole('button', { name: 'Dupliquer' }).click()
+  await expect(cutRows(page)).toHaveCount(1)
+  await expect(cutRows(page).first()).toHaveText(/^3\s*.*Plan 1/)
+
+  // Un changement de longueur garde la distance au bord de référence
+  await cutRows(page).first().click()
+  await clickMenu(app, 'Supprimer')
+  await addTablet(page)
+  await openEditor(page)
+  await page.getByRole('button', { name: 'Trou rond' }).click()
+  await cutout(page, 1).getByLabel('Référence horizontale', { exact: true }).selectOption('right')
+  await commitCutoutField(page, 1, 'Distance horizontale', '100')
+  await commitField(page, 'Longueur', '1000')
+  await expect(cutout(page, 1).getByLabel('Distance horizontale', { exact: true })).toHaveValue('100')
+
+  // Trop court pour contenir le trou : refusé, sans rien modifier
+  await field(page, 'Longueur').fill('50')
+  await field(page, 'Longueur').press('Enter')
+  await expect(page.getByRole('region', { name: 'Pièce sélectionnée' }).getByRole('alert')).toBeVisible()
+  await page.getByRole('button', { name: 'Terminer' }).click()
+  await expect(cutRows(page).first()).toHaveText(/1000\s*300/)
+
+  await app.close()
+})
+
+test('F7 : un projet de la première version s\'ouvre à l\'identique', async () => {
+  const { app, page } = await launchApp()
+  const dir = mkdtempSync(join(tmpdir(), 'cotabois-compat-'))
+  try {
+    await chooseFile(app, join(__dirname, '../fixtures/projects/valid-v1.cotabois'))
+    await clickMenu(app, 'Ouvrir…')
+    await expect(page).toHaveTitle('Bibliothèque du salon – CotaBois')
+    await expect(cutRows(page)).toHaveCount(2)
+    await expect(page.getByTestId('cut-list')).not.toContainText('Plan')
+
+    // Sans pièce de forme, le CSV garde exactement ses colonnes
+    const csvPath = join(dir, 'liste.csv')
+    await chooseFile(app, csvPath)
+    await page.getByRole('button', { name: 'Exporter en CSV' }).click()
+    await expect.poll(() => existsSync(csvPath)).toBe(true)
+    expect(readFileSync(csvPath, 'utf8').replace('﻿', '').split('\r\n')[0]).toBe(
+      'Quantité;Pièces;Longueur (mm);Largeur (mm);Épaisseur (mm);Matériau'
+    )
+  } finally {
+    await app.close()
+    rmSync(dir, { recursive: true, force: true })
+  }
+})
+
+test('SC-007 : les formes impossibles sont refusées dans l\'éditeur, sans modifier la pièce', async () => {
+  const { app, page } = await launchApp()
+  await addTablet(page)
+  await openEditor(page)
+  await page.getByRole('button', { name: 'Encoche' }).click()
+  await page.getByRole('button', { name: 'Trou rond' }).click()
+
+  const refusals: Array<[number, string, string, string]> = [
+    // Vers le trou : à gauche de 400, il toucherait l'encoche
+    [1, 'Longueur', '800', 'en deux'],
+    [2, 'Diamètre', '400', "à l'intérieur"],
+    [1, "Rayon d'angle", '20', 'ne peut pas dépasser']
+  ]
+  for (const [index, label, value, message] of refusals) {
+    const input = cutout(page, index).getByLabel(label, { exact: true })
+    const before = await input.inputValue()
+    await input.fill(value)
+    await input.press('Enter')
+    await expect(cutout(page, index).getByRole('alert')).toContainText(message)
+    await input.fill(before)
+    await input.press('Enter')
+    await expect(cutout(page, index).getByRole('alert')).toHaveCount(0)
+  }
 
   await app.close()
 })

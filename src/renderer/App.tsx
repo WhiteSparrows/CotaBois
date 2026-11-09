@@ -27,6 +27,7 @@ import {
   selectPieces,
   setProjectName,
   setReportImageSource,
+  togglePieceSelection,
   undo,
   useEditor
 } from './store'
@@ -59,7 +60,13 @@ export function App() {
     if (!container) return
     try {
       const viewport = new Viewport(container, {
-        onPick: (pieceId) => selectPieces(pieceId ? [pieceId] : []),
+        onPick: (pieceId, additive) => {
+          if (additive) {
+            if (pieceId) togglePieceSelection(pieceId)
+          } else {
+            selectPieces(pieceId ? [pieceId] : [])
+          }
+        },
         onMove: movePiece
       })
       viewportRef.current = viewport

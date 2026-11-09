@@ -79,13 +79,11 @@ export function PiecePanel() {
         </button>
       </div>
 
-      {only && (
-        <div className="button-row shape-action">
-          <button type="button" className="secondary" onClick={openShapeEditor}>
-            Modifier la forme
-          </button>
-        </div>
-      )}
+      <div className="button-row shape-action">
+        <button type="button" className="secondary" onClick={openShapeEditor}>
+          Modifier la forme
+        </button>
+      </div>
 
       <h3>Pivoter d'un quart de tour</h3>
       <div className="button-row panel-actions">

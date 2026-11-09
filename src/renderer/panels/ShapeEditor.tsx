@@ -14,7 +14,7 @@ import {
 } from '../../core/shape'
 import { formatMm, parseMm } from '../../core/units'
 import {
-  addCutoutToPiece,
+  addCutoutToSelection,
   closeShapeEditor,
   removeCutoutOfPiece,
   setCornerOfSelection,
@@ -190,9 +190,10 @@ export function ShapeEditor() {
   const piece = project.pieces.find((candidate) => candidate.id === selection[0])
   if (!piece) return null
   const shape = asShaped(piece.shape)
+  const isGroup = selection.length > 1
 
   function addCutout(preset: CutoutPreset): void {
-    const result = addCutoutToPiece(piece!.id, preset)
+    const result = addCutoutToSelection(preset)
     setError(result.ok ? null : result.error.message)
   }
 
@@ -209,19 +210,25 @@ export function ShapeEditor() {
   return (
     <section className="panel shape-editor" aria-label="Forme de la pièce">
       <div className="panel-heading">
-        <h2>Forme : {piece.name}</h2>
+        <h2>Forme : {isGroup ? `${selection.length} pièces` : piece.name}</h2>
         <button type="button" className="secondary" onClick={closeShapeEditor}>
           Terminer
         </button>
       </div>
 
-      <ShapePreview
-        shape={shape}
-        selectedCutoutId={selectedCutoutId}
-        onSelectCutout={setSelectedCutoutId}
-        onCornerCommit={commitCorner}
-        onCutoutCommit={commitCutout}
-      />
+      {isGroup ? (
+        <p className="panel-note">
+          Chaque modification s'applique à toutes les pièces sélectionnées. Pour déplacer une découpe, sélectionnez une seule pièce.
+        </p>
+      ) : (
+        <ShapePreview
+          shape={shape}
+          selectedCutoutId={selectedCutoutId}
+          onSelectCutout={setSelectedCutoutId}
+          onCornerCommit={commitCorner}
+          onCutoutCommit={commitCutout}
+        />
+      )}
 
       {error && (
         <p className="field-error" role="alert">
@@ -249,7 +256,7 @@ export function ShapeEditor() {
         </button>
       </div>
 
-      {shape.cutouts.map((cutout, index) => (
+      {!isGroup && shape.cutouts.map((cutout, index) => (
         <CutoutFields
           key={cutout.id}
           piece={piece}

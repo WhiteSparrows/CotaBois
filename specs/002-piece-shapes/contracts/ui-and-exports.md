@@ -22,7 +22,7 @@ Les champs suivent la règle de la première version : application à la sortie 
 
 ## Éditeur, plusieurs pièces
 
-Pas d'aperçu : uniquement les coins et l'ajout d'une découpe. Si une pièce refuse, rien n'est appliqué, et le message la nomme.
+Pas d'aperçu : uniquement les coins et l'ajout d'une découpe. Si une pièce refuse, rien n'est appliqué, et le message la nomme. Plusieurs pièces se sélectionnent en cliquant une ligne de la liste, ou avec `Ctrl+clic` dans la vue 3D, qui ajoute ou retire une pièce.
 
 ## Liste de découpe
 

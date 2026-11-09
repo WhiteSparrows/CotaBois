@@ -30,9 +30,9 @@ Dupliquer la pièce, retourner la copie, puis exporter en PDF et en CSV. Ajouter
 
 ### F5. Plusieurs pièces (US4)
 
-Sélectionner les 3 étagères d'un caisson et arrondir leurs deux coins `haut` à 20 mm.
+Cliquer sur la ligne des 5 pièces identiques d'un caisson (ou choisir des pièces avec `Ctrl+clic` dans la vue 3D) et arrondir leur coin `haut gauche` à 20 mm.
 
-**Résultat attendu** : une seule action annulable, les étagères restent sur une même ligne, distincte du dessus et du dessous.
+**Résultat attendu** : une seule action annulable, et les pièces modifiées restent regroupées sur une même ligne. Si la modification ne convient pas à l'une d'elles, aucune ne change, et le message la nomme.
 
 ### F6. Modifier une pièce de forme (FR-012, FR-013)
 

@@ -123,6 +123,11 @@ export function selectPieces(pieceIds: readonly string[]): void {
   publish(history, pieceIds)
 }
 
+export function togglePieceSelection(pieceId: string): void {
+  const selected = state.selection.includes(pieceId)
+  publish(history, selected ? state.selection.filter((id) => id !== pieceId) : [...state.selection, pieceId])
+}
+
 export function setProjectName(name: string): Result<Project> {
   const result = renameProject(state.project, name)
   if (result.ok) publish(pushState(history, result.value), state.selection)
@@ -224,12 +229,13 @@ export function setCornerOfSelection(corner: CornerName, treatment: CornerTreatm
   return commitShape(setCorner(state.project, state.selection, corner, treatment))
 }
 
-export function addCutoutToPiece(pieceId: string, preset: CutoutPreset): Result<Project> {
-  const piece = state.project.pieces.find((candidate) => candidate.id === pieceId)
+/** La même découpe sur toutes les pièces sélectionnées, à l'emplacement trouvé sur la première. */
+export function addCutoutToSelection(preset: CutoutPreset): Result<Project> {
+  const piece = state.project.pieces.find((candidate) => candidate.id === state.selection[0])
   if (!piece) return err('unknown-piece', "Cette pièce n'existe plus.")
   const input = suggestCutout(asShaped(piece.shape), preset)
   if (!input.ok) return input
-  return commitShape(addCutout(state.project, [pieceId], input.value, nextId))
+  return commitShape(addCutout(state.project, state.selection, input.value, nextId))
 }
 
 export function updateCutoutOfPiece(pieceId: string, cutoutId: string, changes: CutoutChanges): Result<Project> {

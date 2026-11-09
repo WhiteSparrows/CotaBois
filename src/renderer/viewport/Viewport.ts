@@ -24,8 +24,8 @@ const EDGE_COLOR = 0x5b4326
 const SELECTED_EDGE_COLOR = 0x1d4a34
 
 export interface ViewportCallbacks {
-  /** `null` : un clic dans le vide. */
-  onPick(pieceId: string | null): void
+  /** `null` : un clic dans le vide. `additive` : la touche Ctrl était enfoncée. */
+  onPick(pieceId: string | null, additive: boolean): void
   onMove(pieceId: string, position: Vector): void
 }
 
@@ -352,7 +352,7 @@ export class Viewport {
     this.pointerStart = null
     if (!start || start.onHandle || event.button !== 0) return
     if (Math.hypot(event.clientX - start.x, event.clientY - start.y) > CLICK_TOLERANCE_PX) return
-    this.callbacks.onPick(this.pickAt(event.clientX, event.clientY))
+    this.callbacks.onPick(this.pickAt(event.clientX, event.clientY), event.ctrlKey)
   }
 
   private pickAt(clientX: number, clientY: number): string | null {
