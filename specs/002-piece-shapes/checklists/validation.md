@@ -1,8 +1,8 @@
 # Résultats de validation : Pièces de forme
 
 **Purpose**: Consigner ce qui a réellement été vérifié, comment, et ce qui reste à faire
-**Date**: 2026-11-08
-**Étape**: jalon de la fin de l'US3 (T041) ; l'US4 et les finitions restent à faire
+**Date**: 2026-11-09
+**Étape**: fin des tâches automatisables (T049) ; seuls les contrôles par une personne restent à faire (T050)
 **Machine**: portable de développement, Windows 11 Pro, Intel Iris Xe, écran à 120 Hz
 **Feature**: [spec.md](../spec.md), scénarios de [quickstart.md](../quickstart.md)
 
@@ -14,11 +14,13 @@
 | F2. Découper | Réussi | Scénario automatique : découpes, glissements, limites, clic à travers un trou |
 | F3. Assemblage | Réussi | Scénario automatique, et cas exacts dans les tests du cœur |
 | F4. Regroupement et plan | Réussi, sauf l'impression | Scénarios automatiques, et PDF contrôlés à l'œil |
-| F5. Plusieurs pièces | Pas encore construit | US4, après ce jalon |
-| F6. Modifier une pièce de forme | Réussi côté cœur | Rotation, copie et changement de dimension testés dans le cœur ; scénario complet en phase finale |
-| F7. Compatibilité | Réussi côté cœur | Migration et projets en version 1 testés dans le cœur ; scénario complet en phase finale |
+| F5. Plusieurs pièces | Réussi | Scénarios automatiques : ligne de la liste, `Ctrl+clic` dans la vue 3D, annulation, refus qui ne modifie aucune pièce |
+| F6. Modifier une pièce de forme | Réussi | Scénario automatique : rotation, copier-coller, duplication, longueur, refus |
+| F7. Compatibilité | Réussi | Scénario automatique sur `valid-v1.cotabois`, ouverture et exports |
 | F8. Performances | Réussi | Mesures ci-dessous |
-| F9. Empaqueté | Partiel | Lancement et scénario existant dans la version empaquetée ; F1, F2 et F4 à y rejouer en phase finale |
+| F9. Empaqueté | Partiel | Scénario condensé dans `dist/win-unpacked` : arrondi, encoche, trou, enregistrement, CSV et PDF. Installeur construit (107,7 Mo), mais pas installé |
+
+Bilan automatique sur la version finale : 473 tests du cœur et 46 scénarios réussis, types sans erreur.
 
 ## Mesures
 
@@ -26,8 +28,9 @@ Sur 200 pièces dont 50 de forme, à partir de `200-pieces-shapes.cotabois` :
 
 | Mesure | Résultat | Objectif |
 |---|---|---|
-| Modification d'une cote, jusqu'à l'image suivante | Médiane 15 ms, maximum 23 ms | Moins de 1 s |
+| Modification d'une cote, jusqu'à l'image suivante | Médiane 17 ms, maximum 22 ms | Moins de 1 s |
 | Rotation de la vue | 95 % des images en moins de 9 ms, soit le rythme de l'écran | Fluide |
+| Démarrage de la version empaquetée | Médiane 523 ms, maximum 547 ms | Moins de 5 s |
 
 ## Contrôle visuel des plans (T041)
 
@@ -50,5 +53,6 @@ Ce contrôle a trouvé deux défauts que les tests automatiques ne voyaient pas 
 | SC-001, premier usage chronométré | Utilisateur | Deux arrondis et une découpe, sans documentation |
 | SC-003, fabrication à partir du plan imprimé | Utilisateur | Imprimer un plan et vérifier qu'il suffit |
 | Correspondance entre l'aperçu et la pièce en 3D | Utilisateur | Voir si l'on sait quel coin est lequel |
-| Glissements à la vraie souris | Utilisateur | Testés par des événements souris simulés |
+| Glissements et `Ctrl+clic` à la vraie souris | Utilisateur | Testés par des événements souris simulés |
+| Installation réelle avec la nouvelle version | Utilisateur | Lancer `dist/CotaBois Setup 0.1.0.exe`, puis refaire un arrondi et une découpe |
 | Chevauchements autour des courbes | Personne | Approchés à environ 1 mm, par conception |

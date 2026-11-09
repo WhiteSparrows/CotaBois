@@ -142,13 +142,13 @@ description: "Liste des tâches pour les pièces de forme : arrondis et découpe
 
 ### Tests for User Story 4 ⚠️
 
-- [ ] T042 [P] [US4] Écrire dans `tests/core/pieces.test.ts` : `setCorner` et `addCutout` sur plusieurs pièces, tout ou rien, message nommant la pièce refusée (FR-011)
-- [ ] T043 [P] [US4] Compléter `tests/e2e/us6-shapes.spec.ts`, scénario F5 : une seule annulation, étagères regroupées sur une ligne (FR-011, FR-017)
+- [X] T042 [P] [US4] Écrire dans `tests/core/pieces.test.ts` : `setCorner` et `addCutout` sur plusieurs pièces, tout ou rien, message nommant la pièce refusée (FR-011)
+- [X] T043 [P] [US4] Compléter `tests/e2e/us6-shapes.spec.ts`, scénario F5 : une seule annulation, étagères regroupées sur une ligne (FR-011, FR-017)
 
 ### Implementation for User Story 4
 
-- [ ] T044 [US4] Rendre `addCutout` atomique sur plusieurs pièces dans `src/core/pieces.ts`, et brancher les actions multiples dans `src/renderer/store.ts` (FR-011)
-- [ ] T045 [US4] Dans `src/renderer/panels/ShapeEditor.tsx`, proposer pour plusieurs pièces uniquement les coins et l'ajout d'une découpe, sans aperçu manipulable (FR-011)
+- [X] T044 [US4] Rendre `addCutout` atomique sur plusieurs pièces dans `src/core/pieces.ts`, et brancher les actions multiples dans `src/renderer/store.ts` (FR-011)
+- [X] T045 [US4] Dans `src/renderer/panels/ShapeEditor.tsx`, proposer pour plusieurs pièces uniquement les coins et l'ajout d'une découpe, sans aperçu manipulable (FR-011)
 
 **Checkpoint**: F5 passe. Tous les parcours sont fonctionnels.
 
@@ -158,10 +158,10 @@ description: "Liste des tâches pour les pièces de forme : arrondis et découpe
 
 **Purpose**: Vérifier l'ensemble, y compris ce que les tests automatiques ne prouvent pas.
 
-- [ ] T046 Vérifier la compatibilité dans `tests/e2e/us6-shapes.spec.ts`, scénario F7 : `valid-v1.cotabois` s'ouvre à l'identique et ses exports ne changent pas (FR-022, FR-023, SC-006)
-- [ ] T047 Rejouer F6 et les refus du jeu de formes impossibles dans `tests/e2e/us6-shapes.spec.ts` (FR-012, FR-013, SC-007)
-- [ ] T048 [P] Mettre à jour `README.md` : arrondis et découpes dans la présentation, limites restantes
-- [ ] T049 Mesurer F8 et rejouer F9 dans le logiciel empaqueté, puis construire l'installeur avec `npm run dist`, en consignant les résultats dans `specs/002-piece-shapes/checklists/validation.md` (SC-004, SC-005)
+- [X] T046 Vérifier la compatibilité dans `tests/e2e/us6-shapes.spec.ts`, scénario F7 : `valid-v1.cotabois` s'ouvre à l'identique et ses exports ne changent pas (FR-022, FR-023, SC-006)
+- [X] T047 Rejouer F6 et les refus du jeu de formes impossibles dans `tests/e2e/us6-shapes.spec.ts` (FR-012, FR-013, SC-007)
+- [X] T048 [P] Mettre à jour `README.md` : arrondis et découpes dans la présentation, limites restantes
+- [X] T049 Mesurer F8 et rejouer F9 dans le logiciel empaqueté, puis construire l'installeur avec `npm run dist`, en consignant les résultats dans `specs/002-piece-shapes/checklists/validation.md` (SC-004, SC-005)
 - [ ] T050 Faire chronométrer par l'utilisateur deux arrondis et une découpe au premier usage, et imprimer un plan pour vérifier qu'il suffit à fabriquer la pièce ; consigner dans `specs/002-piece-shapes/checklists/validation.md` (SC-001, SC-003)
 
 ---
