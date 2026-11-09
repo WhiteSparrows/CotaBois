@@ -47,7 +47,7 @@ test('V4 : enregistrer, fermer et rouvrir donne un meuble identique', async () =
   const savedList = await first.page.getByTestId('cut-list').innerText()
   await first.app.close()
 
-  expect(JSON.parse(readFileSync(path, 'utf8')).formatVersion).toBe(1)
+  expect(JSON.parse(readFileSync(path, 'utf8')).formatVersion).toBe(2)
 
   const second = await launchApp()
   await chooseFile(second.app, path)

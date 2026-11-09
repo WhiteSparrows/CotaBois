@@ -3,6 +3,7 @@ import { projectBounds } from '../../core/geometry'
 import type { Project } from '../../core/model'
 import { formatMm, formatSquareMeters } from '../../core/units'
 import type { ReportContent } from '../store'
+import { ShapePlan } from './ShapePlan'
 import './report.css'
 
 const NO_MATERIAL = '—'
@@ -11,6 +12,7 @@ const NO_MATERIAL = '—'
 export function ReportView({ project, content }: { project: Project; content: ReportContent }) {
   const { lines, totals } = computeCutList(project)
   const bounds = projectBounds(project)
+  const planLines = lines.filter((line) => line.plan !== null)
 
   return (
     <article className="report" data-testid="report">
@@ -46,7 +48,10 @@ export function ReportView({ project, content }: { project: Project; content: Re
           {lines.map((line) => (
             <tr key={line.pieceIds[0]}>
               <td className="number strong">{line.quantity}</td>
-              <td>{line.names.join(', ')}</td>
+              <td>
+                {line.names.join(', ')}
+                {line.plan !== null && <strong> · Plan {line.plan}</strong>}
+              </td>
               <td className="number">{formatMm(line.length)}</td>
               <td className="number">{formatMm(line.width)}</td>
               <td className="number">{formatMm(line.thickness)}</td>
@@ -78,6 +83,15 @@ export function ReportView({ project, content }: { project: Project; content: Re
           ))}
         </tbody>
       </table>
+
+      {planLines.length > 0 && (
+        <>
+          <h2 className="report-plans-title">Plans des pièces de forme</h2>
+          {planLines.map((line) => (
+            <ShapePlan key={line.plan} line={line} />
+          ))}
+        </>
+      )}
     </article>
   )
 }

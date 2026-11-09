@@ -1,8 +1,9 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { TransformControls } from 'three/addons/controls/TransformControls.js'
-import { DEFAULT_SNAP_THRESHOLD, pieceSize, projectBounds, snapPosition } from '../../core/geometry'
-import type { Axis, Piece, Project, Vector } from '../../core/model'
+import { DEFAULT_SNAP_THRESHOLD, pieceFrame, pieceSize, projectBounds, snapPosition } from '../../core/geometry'
+import type { Axis, Piece, Project, ShapedShape, Vector } from '../../core/model'
+import { ShapeGeometryCache } from './shapeMesh'
 
 /** La scène est en millimètres ; les dixièmes du cœur ne sont convertis que pour l'affichage. */
 const TENTHS_TO_MM = 0.1
@@ -23,8 +24,8 @@ const EDGE_COLOR = 0x5b4326
 const SELECTED_EDGE_COLOR = 0x1d4a34
 
 export interface ViewportCallbacks {
-  /** `null` : un clic dans le vide. */
-  onPick(pieceId: string | null): void
+  /** `null` : un clic dans le vide. `additive` : la touche Ctrl était enfoncée. */
+  onPick(pieceId: string | null, additive: boolean): void
   onMove(pieceId: string, position: Vector): void
 }
 
@@ -42,6 +43,10 @@ function woodMaterial(color: number): THREE.MeshStandardMaterial {
     polygonOffsetFactor: 1,
     polygonOffsetUnits: 1
   })
+}
+
+function toVector3(vector: Vector): THREE.Vector3 {
+  return new THREE.Vector3(vector.x, vector.y, vector.z)
 }
 
 function pieceCenter(piece: Piece, position: Vector = piece.position): THREE.Vector3 {
@@ -64,6 +69,7 @@ export class Viewport {
   private readonly group = new THREE.Group()
   private readonly boxGeometry = new THREE.BoxGeometry(1, 1, 1)
   private readonly edgeGeometry = new THREE.EdgesGeometry(this.boxGeometry)
+  private readonly shapeGeometries = new ShapeGeometryCache()
   private readonly materials = {
     wood: woodMaterial(WOOD_COLOR),
     selected: woodMaterial(SELECTED_COLOR),
@@ -120,22 +126,48 @@ export class Viewport {
     this.group.clear()
     this.objects.clear()
     for (const piece of project.pieces) {
-      const size = pieceSize(piece)
-      const scale = new THREE.Vector3(size.x, size.y, size.z).multiplyScalar(TENTHS_TO_MM)
-      const center = pieceCenter(piece)
-
-      const mesh = new THREE.Mesh(this.boxGeometry, this.materials.wood)
-      const edges = new THREE.LineSegments(this.edgeGeometry, this.materials.edge)
-      mesh.userData['pieceId'] = piece.id
-      for (const object of [mesh, edges]) {
-        object.scale.copy(scale)
-        object.position.copy(center)
-      }
-      this.group.add(mesh, edges)
-      this.objects.set(piece.id, { piece, mesh, edges })
+      const objects = piece.shape.kind === 'shaped' ? this.createShapedObjects(piece, piece.shape) : this.createBoxObjects(piece)
+      objects.mesh.userData['pieceId'] = piece.id
+      this.placeObjects(objects, piece.position)
+      this.group.add(objects.mesh, objects.edges)
+      this.objects.set(piece.id, objects)
     }
+    this.shapeGeometries.releaseUnused()
     this.container.dataset['pieceCount'] = String(project.pieces.length)
     this.applyMarks()
+  }
+
+  private createBoxObjects(piece: Piece): PieceObjects {
+    const size = pieceSize(piece)
+    const scale = new THREE.Vector3(size.x, size.y, size.z).multiplyScalar(TENTHS_TO_MM)
+    const mesh = new THREE.Mesh(this.boxGeometry, this.materials.wood)
+    const edges = new THREE.LineSegments(this.edgeGeometry, this.materials.edge)
+    mesh.scale.copy(scale)
+    edges.scale.copy(scale)
+    return { piece, mesh, edges }
+  }
+
+  private createShapedObjects(piece: Piece, shape: ShapedShape): PieceObjects {
+    const geometries = this.shapeGeometries.get(shape, piece.thickness)
+    const mesh = new THREE.Mesh(geometries.body, this.materials.wood)
+    const edges = new THREE.LineSegments(geometries.edges, this.materials.edge)
+    return { piece, mesh, edges }
+  }
+
+  private placeObjects({ piece, mesh, edges }: PieceObjects, position: Vector): void {
+    if (piece.shape.kind === 'rectangle') {
+      const center = pieceCenter(piece, position)
+      mesh.position.copy(center)
+      edges.position.copy(center)
+      return
+    }
+    const frame = pieceFrame({ ...piece, position })
+    const origin = new THREE.Vector3(frame.origin.x, frame.origin.y, frame.origin.z).multiplyScalar(TENTHS_TO_MM)
+    const basis = new THREE.Matrix4().makeBasis(toVector3(frame.u), toVector3(frame.v), toVector3(frame.normal))
+    for (const object of [mesh, edges]) {
+      object.position.copy(origin)
+      object.quaternion.setFromRotationMatrix(basis)
+    }
   }
 
   /** Met en évidence la sélection et les chevauchements. */
@@ -228,6 +260,7 @@ export class Viewport {
     this.controls.dispose()
     this.boxGeometry.dispose()
     this.edgeGeometry.dispose()
+    this.shapeGeometries.dispose()
     Object.values(this.materials).forEach((material) => material.dispose())
     this.renderer.dispose()
     this.renderer.domElement.remove()
@@ -297,10 +330,8 @@ export class Viewport {
     for (const axis of moved) position[axis] = snapped[axis]
 
     this.dragPosition = position
-    const center = pieceCenter(only.piece, position)
-    this.handleTarget.position.copy(center)
-    only.mesh.position.copy(center)
-    only.edges.position.copy(center)
+    this.handleTarget.position.copy(pieceCenter(only.piece, position))
+    this.placeObjects(only, position)
     this.requestRender()
   }
 
@@ -321,7 +352,7 @@ export class Viewport {
     this.pointerStart = null
     if (!start || start.onHandle || event.button !== 0) return
     if (Math.hypot(event.clientX - start.x, event.clientY - start.y) > CLICK_TOLERANCE_PX) return
-    this.callbacks.onPick(this.pickAt(event.clientX, event.clientY))
+    this.callbacks.onPick(this.pickAt(event.clientX, event.clientY), event.ctrlKey)
   }
 
   private pickAt(clientX: number, clientY: number): string | null {

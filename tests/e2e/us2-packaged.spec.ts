@@ -100,4 +100,53 @@ test.describe('logiciel empaqueté', () => {
       rmSync(dir, { recursive: true, force: true })
     }
   })
+
+  test('F9 : une pièce de forme se dessine et se retrouve dans les exports', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'cotabois-packaged-'))
+    const app = await electron.launch({ executablePath: EXECUTABLE, env: cleanEnv() })
+    try {
+      const page = await app.firstWindow()
+      await page.waitForLoadState('domcontentloaded')
+      const fill = async (label: string, value: string) => {
+        await page.getByLabel(label, { exact: true }).fill(value)
+        await page.getByLabel(label, { exact: true }).press('Enter')
+      }
+
+      await page.getByRole('button', { name: 'Ajouter un panneau' }).click()
+      await fill('Nom', 'Tablette')
+      await fill('Longueur', '800')
+      await fill('Largeur', '300')
+      await page.getByRole('button', { name: 'Modifier la forme' }).click()
+      await expect(page.getByTestId('shape-preview')).toBeVisible()
+      await page.getByLabel('Type du coin haut gauche', { exact: true }).selectOption('round')
+      await fill('Rayon haut gauche', '40')
+      await page.getByRole('button', { name: 'Encoche' }).click()
+      await page.getByRole('button', { name: 'Trou rond' }).click()
+      await page.getByRole('button', { name: 'Terminer' }).click()
+      await expect(page.getByTestId('cut-list').locator('tbody tr').first()).toHaveText(/Tablette\s*Plan 1\s*800\s*300\s*18/)
+
+      const projectPath = join(dir, 'projet.cotabois')
+      await chooseFile(app, projectPath)
+      await clickMenu(app, 'Enregistrer')
+      await expect.poll(() => existsSync(projectPath)).toBe(true)
+      expect(JSON.parse(readFileSync(projectPath, 'utf8')).pieces[0].shape.kind).toBe('shaped')
+
+      const csvPath = join(dir, 'liste.csv')
+      await chooseFile(app, csvPath)
+      await page.getByRole('button', { name: 'Exporter en CSV' }).click()
+      await expect.poll(() => existsSync(csvPath)).toBe(true)
+      expect(readFileSync(csvPath, 'utf8')).toContain(';Plan\r\n')
+
+      const pdfPath = join(dir, 'liste.pdf')
+      await chooseFile(app, pdfPath)
+      await page.getByRole('button', { name: 'Exporter en PDF' }).click()
+      await expect.poll(() => existsSync(pdfPath), { timeout: 20_000 }).toBe(true)
+      // Le rapport, puis le plan : la section des plans s'ajoute au document
+      expect(readFileSync(pdfPath).toString('latin1').match(/\/Type\s*\/Page\b(?!s)/g)!.length).toBeGreaterThanOrEqual(1)
+    } finally {
+      await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().forEach((w) => w.destroy())).catch(() => undefined)
+      await app.close().catch(() => undefined)
+      rmSync(dir, { recursive: true, force: true })
+    }
+  })
 })

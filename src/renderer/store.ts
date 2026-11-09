@@ -3,20 +3,36 @@ import { applyCaisson } from '../core/caisson'
 import { toCsv } from '../core/csv'
 import { computeCutList } from '../core/cutList'
 import { canRedo, canUndo, createHistory, pushState, redo as redoHistory, undo as undoHistory, type History } from '../core/history'
-import { createEmptyProject, type Axis, type CaissonParams, type Piece, type Project, type Vector } from '../core/model'
+import {
+  createEmptyProject,
+  type Axis,
+  type CaissonParams,
+  type CornerName,
+  type CornerTreatment,
+  type Cutout,
+  type Piece,
+  type Project,
+  type Vector
+} from '../core/model'
 import {
   addCopy,
+  addCutout,
   addPiece,
   duplicatePiece,
   newPanelInput,
+  removeCutout,
   removePieces,
   renameProject,
   rotatePiece,
+  setCorner,
+  updateCutout,
   updatePiece,
+  type CutoutChanges,
   type PieceChanges
 } from '../core/pieces'
 import { parseProject, safeFileName, serializeProject } from '../core/projectFile'
-import type { Result } from '../core/result'
+import { err, type Result } from '../core/result'
+import { asShaped, suggestCutout, withCutoutReference, type CutoutPreset } from '../core/shape'
 import type { MenuCommand } from '../main/menu'
 
 /** Ce qui attend la réponse de l'utilisateur, parce que le projet n'est pas enregistré. */
@@ -38,6 +54,8 @@ export interface EditorState {
   pendingAction: GuardedAction | null
   fileError: string | null
   report: ReportContent | null
+  /** L'éditeur de forme remplace la liste de découpe tant qu'il reste une pièce sélectionnée. */
+  shapeEditorOpen: boolean
   /** Change à chaque fois que la vue doit recadrer le meuble. */
   frameToken: number
 }
@@ -50,14 +68,18 @@ let report: ReportContent | null = null
 let captureReportImage: (() => string) | null = null
 /** Propre au logiciel, et conservé d'un projet à l'autre. Les champs utilisent le presse-papiers de Windows. */
 let copiedPieces: readonly Piece[] = []
+let shapeEditorOpen = false
 let state: EditorState = toState(history, [], 0)
 const listeners = new Set<() => void>()
 
 function toState(current: History, selection: readonly string[], frameToken: number): EditorState {
   const ids = new Set(current.present.pieces.map((piece) => piece.id))
+  const existing = selection.filter((id) => ids.has(id))
+  if (existing.length === 0) shapeEditorOpen = false
   return {
     project: current.present,
-    selection: selection.filter((id) => ids.has(id)),
+    selection: existing,
+    shapeEditorOpen,
     canUndo: canUndo(current),
     canRedo: canRedo(current),
     dirty: current.present !== savedProject,
@@ -99,6 +121,11 @@ export function applyCaissonParams(params: CaissonParams): Result<Project> {
 
 export function selectPieces(pieceIds: readonly string[]): void {
   publish(history, pieceIds)
+}
+
+export function togglePieceSelection(pieceId: string): void {
+  const selected = state.selection.includes(pieceId)
+  publish(history, selected ? state.selection.filter((id) => id !== pieceId) : [...state.selection, pieceId])
 }
 
 export function setProjectName(name: string): Result<Project> {
@@ -181,6 +208,49 @@ export function undo(): void {
 
 export function redo(): void {
   publish(redoHistory(history), state.selection)
+}
+
+export function openShapeEditor(): void {
+  shapeEditorOpen = state.selection.length > 0
+  refresh()
+}
+
+export function closeShapeEditor(): void {
+  shapeEditorOpen = false
+  refresh()
+}
+
+function commitShape(result: Result<Project>): Result<Project> {
+  if (result.ok) publish(pushState(history, result.value), state.selection)
+  return result
+}
+
+export function setCornerOfSelection(corner: CornerName, treatment: CornerTreatment): Result<Project> {
+  return commitShape(setCorner(state.project, state.selection, corner, treatment))
+}
+
+/** La même découpe sur toutes les pièces sélectionnées, à l'emplacement trouvé sur la première. */
+export function addCutoutToSelection(preset: CutoutPreset): Result<Project> {
+  const piece = state.project.pieces.find((candidate) => candidate.id === state.selection[0])
+  if (!piece) return err('unknown-piece', "Cette pièce n'existe plus.")
+  const input = suggestCutout(asShaped(piece.shape), preset)
+  if (!input.ok) return input
+  return commitShape(addCutout(state.project, state.selection, input.value, nextId))
+}
+
+export function updateCutoutOfPiece(pieceId: string, cutoutId: string, changes: CutoutChanges): Result<Project> {
+  return commitShape(updateCutout(state.project, pieceId, cutoutId, changes))
+}
+
+export function setCutoutReference(pieceId: string, cutout: Cutout, axis: 'u' | 'v', edge: string): Result<Project> {
+  const piece = state.project.pieces.find((candidate) => candidate.id === pieceId)
+  if (!piece) return err('unknown-piece', "Cette pièce n'existe plus.")
+  const { fromU, fromV } = withCutoutReference(asShaped(piece.shape), cutout, axis, edge)
+  return updateCutoutOfPiece(pieceId, cutout.id, { fromU, fromV })
+}
+
+export function removeCutoutOfPiece(pieceId: string, cutoutId: string): Result<Project> {
+  return commitShape(removeCutout(state.project, pieceId, cutoutId))
 }
 
 export function dismissFileError(): void {

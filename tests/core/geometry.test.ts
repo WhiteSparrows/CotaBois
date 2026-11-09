@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { pieceBounds, projectBounds } from '../../src/core/geometry'
+import { pieceBounds, pieceFrame, projectBounds } from '../../src/core/geometry'
 import type { Orientation, Piece, Project, SignedAxis } from '../../src/core/model'
 
 const LENGTH = 1000
@@ -25,6 +25,32 @@ function allOrientations(): Orientation[] {
     AXES.filter((v) => v.at(1) !== u.at(1)).map((v) => ({ u, v }))
   )
 }
+
+describe('pieceFrame', () => {
+  it.each(allOrientations())('forme un repère direct dans l\'encombrement pour %j', (orientation) => {
+    const target = piece(orientation)
+    const frame = pieceFrame(target)
+    const bounds = pieceBounds(target)
+    const cross = {
+      x: frame.u.y * frame.v.z - frame.u.z * frame.v.y,
+      y: frame.u.z * frame.v.x - frame.u.x * frame.v.z,
+      z: frame.u.x * frame.v.y - frame.u.y * frame.v.x
+    }
+    expect(frame.normal).toEqual(cross)
+
+    // Les huit coins de la pièce, dans son propre repère, tombent exactement sur ceux de l'encombrement.
+    for (const a of [0, LENGTH]) {
+      for (const b of [0, WIDTH]) {
+        for (const c of [0, THICKNESS]) {
+          for (const axis of ['x', 'y', 'z'] as const) {
+            const value = frame.origin[axis] + a * frame.u[axis] + b * frame.v[axis] + c * frame.normal[axis]
+            expect(value === bounds.min[axis] || value === bounds.max[axis]).toBe(true)
+          }
+        }
+      }
+    }
+  })
+})
 
 describe('pieceBounds', () => {
   it('énumère bien les 24 orientations possibles', () => {

@@ -109,4 +109,61 @@
     width: 70%;
     break-inside: avoid;
   }
+
+  .report-plans-title {
+    margin-top: 22px;
+    padding-top: 10px;
+    border-top: 2px solid #000;
+  }
+
+  /* Un plan n'est jamais coupé entre deux pages : il doit rester d'un seul regard à l'atelier. */
+  .shape-plan {
+    margin-top: 12px;
+    break-inside: avoid;
+  }
+
+  .shape-plan h3 {
+    margin: 0 0 2px;
+    font-size: 11pt;
+    font-weight: 600;
+  }
+
+  .shape-plan-summary {
+    margin: 0 0 4px;
+    font-size: 9.5pt;
+  }
+
+  .shape-plan-drawing {
+    display: block;
+    width: 100%;
+    height: 80mm;
+    margin-bottom: 4px;
+  }
+
+  .shape-plan-drawing text {
+    fill: #000;
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  .shape-plan-body {
+    fill: #fff;
+    stroke: #000;
+    stroke-width: 1.2;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .shape-plan-marker circle {
+    fill: #fff;
+    stroke: #000;
+    stroke-width: 0.8;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .shape-plan-table {
+    font-size: 9.5pt;
+  }
+
+  .shape-plan-table .number {
+    width: 10mm;
+  }
 }

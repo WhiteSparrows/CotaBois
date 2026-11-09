@@ -1,0 +1,145 @@
+{
+  "formatVersion": 2,
+  "name": "Pièces de forme",
+  "template": null,
+  "pieces": [
+    {
+      "id": "p1",
+      "name": "Tablette",
+      "shape": {
+        "kind": "shaped",
+        "length": 8000,
+        "width": 3000,
+        "corners": {
+          "bottomLeft": {
+            "kind": "straight"
+          },
+          "bottomRight": {
+            "kind": "chamfer",
+            "size": 100
+          },
+          "topRight": {
+            "kind": "round",
+            "radius": 400
+          },
+          "topLeft": {
+            "kind": "round",
+            "radius": 400
+          }
+        },
+        "cutouts": [
+          {
+            "id": "c1",
+            "kind": "rectangle",
+            "sizeU": 500,
+            "sizeV": 300,
+            "cornerRadius": 50,
+            "fromU": {
+              "edge": "left",
+              "distance": 0
+            },
+            "fromV": {
+              "edge": "bottom",
+              "distance": 0
+            }
+          },
+          {
+            "id": "c2",
+            "kind": "circle",
+            "diameter": 600,
+            "fromU": {
+              "edge": "left",
+              "distance": 1500
+            },
+            "fromV": {
+              "edge": "bottom",
+              "distance": 1500
+            }
+          }
+        ]
+      },
+      "thickness": 180,
+      "material": "Chêne",
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p2",
+      "name": "Montant",
+      "shape": {
+        "kind": "shaped",
+        "length": 8000,
+        "width": 3000,
+        "corners": {
+          "bottomLeft": {
+            "kind": "round",
+            "radius": 300
+          },
+          "bottomRight": {
+            "kind": "straight"
+          },
+          "topRight": {
+            "kind": "straight"
+          },
+          "topLeft": {
+            "kind": "chamfer",
+            "size": 300
+          }
+        },
+        "cutouts": [
+          {
+            "id": "c1",
+            "kind": "circle",
+            "diameter": 1000,
+            "fromU": {
+              "edge": "right",
+              "distance": 2000
+            },
+            "fromV": {
+              "edge": "top",
+              "distance": 1500
+            }
+          }
+        ]
+      },
+      "thickness": 180,
+      "material": "",
+      "position": {
+        "x": 12000,
+        "y": 0,
+        "z": 0
+      },
+      "orientation": {
+        "u": "-y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p3",
+      "name": "Fond",
+      "shape": {
+        "kind": "rectangle",
+        "length": 8000,
+        "width": 3000
+      },
+      "thickness": 50,
+      "material": "",
+      "position": {
+        "x": 0,
+        "y": 6000,
+        "z": 0
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    }
+  ]
+}

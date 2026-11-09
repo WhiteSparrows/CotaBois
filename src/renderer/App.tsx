@@ -4,6 +4,7 @@ import { CaissonForm } from './panels/CaissonForm'
 import { CommitField } from './panels/CommitField'
 import { CutListPanel } from './panels/CutListPanel'
 import { PiecePanel } from './panels/PiecePanel'
+import { ShapeEditor } from './panels/ShapeEditor'
 import { UnsavedDialog } from './panels/UnsavedDialog'
 import { ReportView } from './report/ReportView'
 import {
@@ -26,6 +27,7 @@ import {
   selectPieces,
   setProjectName,
   setReportImageSource,
+  togglePieceSelection,
   undo,
   useEditor
 } from './store'
@@ -44,7 +46,7 @@ function commitActiveField(): void {
 const MAX_LISTED_OVERLAPS = 3
 
 export function App() {
-  const { project, selection, canUndo, canRedo, dirty, pendingAction, fileError, report, frameToken } = useEditor()
+  const { project, selection, canUndo, canRedo, dirty, pendingAction, fileError, report, shapeEditorOpen, frameToken } = useEditor()
   const containerRef = useRef<HTMLDivElement>(null)
   const viewportRef = useRef<Viewport | null>(null)
   const framedToken = useRef(0)
@@ -58,7 +60,13 @@ export function App() {
     if (!container) return
     try {
       const viewport = new Viewport(container, {
-        onPick: (pieceId) => selectPieces(pieceId ? [pieceId] : []),
+        onPick: (pieceId, additive) => {
+          if (additive) {
+            if (pieceId) togglePieceSelection(pieceId)
+          } else {
+            selectPieces(pieceId ? [pieceId] : [])
+          }
+        },
         onMove: movePiece
       })
       viewportRef.current = viewport
@@ -209,9 +217,7 @@ export function App() {
         )}
       </main>
 
-      <aside className="side-panel cut-side">
-        <CutListPanel />
-      </aside>
+      <aside className="side-panel cut-side">{shapeEditorOpen ? <ShapeEditor /> : <CutListPanel />}</aside>
 
       {pendingAction && <UnsavedDialog projectName={project.name} />}
     </div>

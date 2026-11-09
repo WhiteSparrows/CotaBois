@@ -14,6 +14,9 @@ function textCell(text: string): string {
 
 /** Pour les tableurs en configuration française : BOM, point-virgule, virgule décimale et CRLF. */
 export function toCsv(cutList: CutList): string {
+  // Sans pièce de forme, le format reste strictement celui de la première version.
+  const hasPlans = cutList.lines.some((line) => line.plan !== null)
+  const header = hasPlans ? [...HEADER, 'Plan'] : HEADER
   const rows = cutList.lines.map((line) =>
     [
       String(line.quantity),
@@ -21,8 +24,9 @@ export function toCsv(cutList: CutList): string {
       formatMm(line.length),
       formatMm(line.width),
       formatMm(line.thickness),
-      textCell(line.material)
+      textCell(line.material),
+      ...(hasPlans ? [line.plan === null ? '' : String(line.plan)] : [])
     ].join(SEPARATOR)
   )
-  return BOM + [HEADER.join(SEPARATOR), ...rows].map((row) => row + LINE_END).join('')
+  return BOM + [header.join(SEPARATOR), ...rows].map((row) => row + LINE_END).join('')
 }

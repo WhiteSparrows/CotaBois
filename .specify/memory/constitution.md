@@ -1,10 +1,10 @@
 <!--
 Sync Impact Report
-- Version : 1.0.0 → 1.1.0 (règles ajoutées, aucun principe retiré)
+- Version : 1.1.0 → 1.2.0 (règle élargie, aucun principe retiré)
 - Principes modifiés :
-  - III. Un seul modèle, fait de panneaux : le rectangle devient la forme de cette version,
-    et le modèle doit laisser la place à d'autres formes
-- Sections modifiées : Processus de développement (tester sans réinstaller)
+  - III. Un seul modèle, fait de panneaux : une pièce peut avoir des coins modifiés et des
+    découpes, dans les limites de son rectangle
+- Sections modifiées : aucune
 - Sections ajoutées : aucune
 - Sections supprimées : aucune
 - Éléments reportés : aucun
@@ -40,19 +40,20 @@ travail ne nécessite un serveur.
 
 ### III. Un seul modèle, fait de panneaux
 
-Un meuble DOIT être décrit par un unique ensemble de pièces. Pour l'instant, chaque pièce est un
-panneau rectangulaire défini par sa longueur, sa largeur, son épaisseur et sa position.
+Un meuble DOIT être décrit par un unique ensemble de pièces. Chaque pièce est un panneau plat défini
+par sa longueur, sa largeur, son épaisseur et sa position. Sa forme est ce rectangle, auquel on peut
+retirer des coins arrondis ou chanfreinés et des découpes traversantes, définis par des cotes.
 
 - La vue 3D et la liste de découpe DOIVENT être calculées à partir de ce même modèle ; aucune des deux
   ne stocke sa propre copie des dimensions.
 - Une modification d'une pièce DOIT se répercuter partout, sans action de synchronisation.
-- Ajouter plus tard d'autres modèles de meubles et des pièces non rectangulaires NE DOIT PAS imposer
-  de réécrire le modèle ni rendre illisibles les projets existants. Ces formes ne sont pas construites
-  avant d'avoir leur propre spécification.
+- Ajouter plus tard d'autres modèles de meubles, des contours libres ou des usinages partiels NE DOIT
+  PAS imposer de réécrire le modèle ni rendre illisibles les projets existants. Ces évolutions ne sont
+  pas construites avant d'avoir leur propre spécification.
 
 **Pourquoi** : si ce que l'on voit et ce que l'on découpe peuvent diverger, le logiciel n'est plus
-digne de confiance. Et les formes libres sont une évolution annoncée : le modèle doit pouvoir les
-accueillir, sans les payer dès maintenant.
+digne de confiance. Et le modèle doit pouvoir accueillir les évolutions annoncées, sans les payer dès
+maintenant.
 
 ### IV. Des cotes exactes (NON NÉGOCIABLE)
 
@@ -82,7 +83,7 @@ réécrire le métier.
 
 Chaque fonctionnalité DOIT répondre à un besoin réel et présent.
 
-- Une complexité supplémentaire (formes libres, calepinage, plusieurs systèmes d'exploitation…) NE
+- Une complexité supplémentaire (contours libres, usinages partiels, calepinage, plusieurs systèmes d'exploitation…) NE
   DOIT être ajoutée que par une spécification dédiée.
 - Une dépendance NE DOIT être ajoutée que si elle évite un travail nettement supérieur à son coût
   d'entretien.
@@ -124,4 +125,4 @@ changement de version :
 - **Mineur** : ajout d'un principe ou d'une section, ou élargissement notable d'une règle.
 - **Correctif** : précision ou reformulation sans changement de sens.
 
-**Version**: 1.1.0 | **Ratified**: 2026-11-02 | **Last Amended**: 2026-11-02
+**Version**: 1.2.0 | **Ratified**: 2026-11-02 | **Last Amended**: 2026-11-08

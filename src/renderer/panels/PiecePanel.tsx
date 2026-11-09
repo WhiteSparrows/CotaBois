@@ -4,6 +4,7 @@ import { formatMm, parseMm } from '../../core/units'
 import {
   deleteSelection,
   duplicateSelection,
+  openShapeEditor,
   rotateSelection,
   selectPieces,
   updateSelectedPiece,
@@ -75,6 +76,12 @@ export function PiecePanel() {
         </button>
         <button type="button" className="secondary danger" onClick={deleteSelection}>
           Supprimer
+        </button>
+      </div>
+
+      <div className="button-row shape-action">
+        <button type="button" className="secondary" onClick={openShapeEditor}>
+          Modifier la forme
         </button>
       </div>
 

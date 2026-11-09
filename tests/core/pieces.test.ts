@@ -2,15 +2,21 @@ import { describe, expect, it } from 'vitest'
 import { applyCaisson } from '../../src/core/caisson'
 import { computeCutList } from '../../src/core/cutList'
 import { boundsOverlap, findOverlaps, pieceBounds, pieceSize } from '../../src/core/geometry'
-import { createEmptyProject, type Piece, type Project } from '../../src/core/model'
+import { createEmptyProject, type Piece, type Project, type ShapedShape } from '../../src/core/model'
+import { resolveCutout } from '../../src/core/shape'
+import { box, chamfer, round, shaped, TABLET } from '../fixtures/shape-references'
 import {
   addCopy,
+  addCutout,
   addPiece,
   duplicatePiece,
   newPanelInput,
+  removeCutout,
   removePieces,
   renameProject,
   rotatePiece,
+  setCorner,
+  updateCutout,
   updatePiece
 } from '../../src/core/pieces'
 import type { Result } from '../../src/core/result'
@@ -117,6 +123,186 @@ describe('duplicatePiece', () => {
 
   it('refuse une pièce inconnue', () => {
     expect(duplicatePiece(project(panel('a')), 'zzz', 'b').ok).toBe(false)
+  })
+})
+
+describe('pièces de forme : conservation de la forme', () => {
+  const shapedPanel = (id: string, shape: ShapedShape = TABLET) => panel(id, { shape, name: 'Tablette' })
+
+  it('suit une rotation, sans changer ses cotes', () => {
+    const next = value(rotatePiece(project(shapedPanel('a')), 'a', 'y'))
+    expect(next.pieces[0]?.shape).toEqual(TABLET)
+  })
+
+  it('suit une duplication et un copier-coller', () => {
+    const original = shapedPanel('a')
+    expect(value(duplicatePiece(project(original), 'a', 'b')).pieces[1]?.shape).toEqual(TABLET)
+    expect(value(addCopy(createEmptyProject(), original, 'c')).pieces[0]?.shape).toEqual(TABLET)
+  })
+
+  it('change de longueur en gardant la distance au bord de référence', () => {
+    const shape = shaped(8000, 3000, {}, [box('fixe', 500, 300, ['left', 1000], ['bottom', 500]), box('suit', 500, 300, ['right', 1000], ['bottom', 500])])
+    const next = value(updatePiece(project(shapedPanel('a', shape)), 'a', { length: 9000 })).pieces[0]!.shape
+    expect(next).toMatchObject({ length: 9000 })
+    expect(resolveCutout(next as ShapedShape, shape.cutouts[0]!)).toMatchObject({ minU: 1000, maxU: 1500 })
+    expect(resolveCutout(next as ShapedShape, shape.cutouts[1]!)).toMatchObject({ minU: 7500, maxU: 8000 })
+  })
+
+  it('refuse une dimension qui ne laisse plus tenir la forme, sans modifier le projet', () => {
+    const start = project(shapedPanel('a'))
+    const result = updatePiece(start, 'a', { length: 1500 })
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.error.field).toBe('shape')
+    expect(start.pieces[0]?.shape).toEqual(TABLET)
+  })
+
+  it('refuse une pièce dont la forme est invalide', () => {
+    expect(addPiece(createEmptyProject(), { ...newPanelInput(createEmptyProject()), shape: shaped(8000, 3000, { topLeft: round(0) }) }, 'a').ok).toBe(false)
+  })
+})
+
+describe('setCorner', () => {
+  const tablet = () => panel('a', { name: 'Tablette', shape: { kind: 'rectangle', length: 8000, width: 3000 } })
+
+  it('arrondit un coin et laisse les autres droits', () => {
+    const next = value(setCorner(project(tablet()), ['a'], 'topLeft', round(400))).pieces[0]!.shape
+    expect(next).toMatchObject({ kind: 'shaped', corners: { topLeft: { kind: 'round', radius: 400 }, topRight: { kind: 'straight' } } })
+  })
+
+  it('ne touche pas au rectangle de bois', () => {
+    const next = value(setCorner(project(tablet()), ['a'], 'topLeft', chamfer(100)))
+    expect(computeCutList(next).lines[0]).toMatchObject({ length: 8000, width: 3000 })
+  })
+
+  it('refuse un rayon trop grand, indique le maximum, et ne modifie rien', () => {
+    const start = value(setCorner(project(tablet()), ['a'], 'topLeft', round(400)))
+    const result = setCorner(start, ['a'], 'bottomLeft', round(2700))
+    expect(result.ok).toBe(false)
+    if (!result.ok) {
+      expect(result.error.message).toContain('260')
+      expect(result.error.field).toBe('corners.bottomLeft')
+    }
+    expect(start.pieces[0]?.shape).toMatchObject({ corners: { bottomLeft: { kind: 'straight' } } })
+  })
+
+  it('refuse une taille nulle', () => {
+    expect(setCorner(project(tablet()), ['a'], 'topLeft', round(0)).ok).toBe(false)
+  })
+
+  it('marque le caisson comme retouché', () => {
+    const start = caisson()
+    expect(value(setCorner(start, [start.pieces[0]!.id], 'topLeft', round(100))).template?.customized).toBe(true)
+  })
+
+  it('ramène à un rectangle quand tout redevient droit', () => {
+    const shapedProject = value(setCorner(project(tablet()), ['a'], 'topLeft', round(400)))
+    const next = value(setCorner(shapedProject, ['a'], 'topLeft', { kind: 'straight' }))
+    expect(next.pieces[0]?.shape).toEqual({ kind: 'rectangle', length: 8000, width: 3000 })
+  })
+
+  it('renvoie le même projet si rien ne change', () => {
+    const start = value(setCorner(project(tablet()), ['a'], 'topLeft', round(400)))
+    expect(value(setCorner(start, ['a'], 'topLeft', round(400)))).toBe(start)
+  })
+
+  it('refuse une pièce inconnue', () => {
+    expect(setCorner(project(tablet()), ['zzz'], 'topLeft', round(100)).ok).toBe(false)
+  })
+})
+
+describe('découpes', () => {
+  const tablet = () => panel('a', { name: 'Tablette', shape: { kind: 'rectangle', length: 8000, width: 3000 } })
+  const ids = () => {
+    let next = 0
+    return () => `c${++next}`
+  }
+  const notchInput = { kind: 'rectangle', sizeU: 500, sizeV: 300, cornerRadius: 0, fromU: { edge: 'left', distance: 0 }, fromV: { edge: 'bottom', distance: 0 } } as const
+  const holeInput = { kind: 'circle', diameter: 600, fromU: { edge: 'left', distance: 1500 }, fromV: { edge: 'bottom', distance: 1500 } } as const
+  const withCutouts = () => value(addCutout(value(addCutout(project(tablet()), ['a'], notchInput, ids())), ['a'], holeInput, () => 'c2'))
+  const shapeOf = (p: Project) => p.pieces[0]!.shape as ShapedShape
+
+  it('ajoute une découpe avec un identifiant propre', () => {
+    const next = value(addCutout(project(tablet()), ['a'], notchInput, ids()))
+    expect(shapeOf(next).cutouts).toEqual([{ id: 'c1', ...notchInput }])
+  })
+
+  it('refuse une découpe invalide sans modifier la pièce', () => {
+    const start = project(tablet())
+    expect(addCutout(start, ['a'], { ...notchInput, sizeU: 8000 }, ids()).ok).toBe(false)
+    expect(start.pieces[0]?.shape.kind).toBe('rectangle')
+  })
+
+  it('accepte au moins 20 découpes', () => {
+    let current = project(tablet())
+    for (let i = 0; i < 20; i++) {
+      current = value(addCutout(current, ['a'], { kind: 'circle', diameter: 100, fromU: { edge: 'left', distance: 500 + i * 300 }, fromV: { edge: 'bottom', distance: 1500 } }, () => `c${i}`))
+    }
+    expect(shapeOf(current).cutouts).toHaveLength(20)
+  })
+
+  it('modifie les cotes et la position d\'une découpe', () => {
+    const next = value(updateCutout(withCutouts(), 'a', 'c2', { diameter: 800, fromU: { edge: 'left', distance: 2000 } }))
+    expect(shapeOf(next).cutouts[1]).toMatchObject({ diameter: 800, fromU: { distance: 2000 } })
+  })
+
+  it('refuse un déplacement qui toucherait une autre découpe', () => {
+    const start = withCutouts()
+    // L'angle (130, 130) mm de l'encoche entre dans le cercle de rayon 30 mm centré en (150, 150)
+    expect(updateCutout(start, 'a', 'c1', { sizeU: 1300, sizeV: 1300 }).ok).toBe(false)
+    expect(shapeOf(start).cutouts[0]).toMatchObject({ sizeU: 500 })
+  })
+
+  it('renvoie le même projet si rien ne change', () => {
+    const start = withCutouts()
+    expect(value(updateCutout(start, 'a', 'c2', { diameter: 600 }))).toBe(start)
+  })
+
+  it('refuse une découpe inconnue', () => {
+    expect(updateCutout(withCutouts(), 'a', 'zzz', { diameter: 100 }).ok).toBe(false)
+  })
+
+  it('retire une découpe, et revient au rectangle sans la dernière', () => {
+    const one = value(removeCutout(withCutouts(), 'a', 'c1'))
+    expect(shapeOf(one).cutouts.map((cutout) => cutout.id)).toEqual(['c2'])
+    expect(value(removeCutout(one, 'a', 'c2')).pieces[0]?.shape.kind).toBe('rectangle')
+  })
+
+  it('marque le caisson comme retouché', () => {
+    const start = caisson()
+    expect(value(addCutout(start, [start.pieces[0]!.id], holeInput, ids())).template?.customized).toBe(true)
+  })
+})
+
+describe('modification de plusieurs pièces', () => {
+  const large = () => panel('a', { name: 'Grande', shape: { kind: 'rectangle', length: 8000, width: 3000 } })
+  const small = () => panel('b', { name: 'Petite', shape: { kind: 'rectangle', length: 8000, width: 1000 } })
+  const holeInput = { kind: 'circle', diameter: 600, fromU: { edge: 'left', distance: 4000 }, fromV: { edge: 'bottom', distance: 1500 } } as const
+
+  it('applique un coin à toutes les pièces', () => {
+    const next = value(setCorner(project(large(), small()), ['a', 'b'], 'topLeft', round(200)))
+    expect(next.pieces.map((piece) => piece.shape.kind)).toEqual(['shaped', 'shaped'])
+  })
+
+  it('ne modifie aucune pièce si l\'une refuse, et nomme celle qui pose problème', () => {
+    const start = project(large(), small())
+    const result = setCorner(start, ['a', 'b'], 'topLeft', round(2000))
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.error.message).toContain('Petite')
+    expect(start.pieces.map((piece) => piece.shape.kind)).toEqual(['rectangle', 'rectangle'])
+  })
+
+  it('ajoute une découpe à chacune, avec un identifiant propre', () => {
+    let id = 0
+    const next = value(addCutout(project(large(), panel('c', { name: 'Autre', shape: { kind: 'rectangle', length: 8000, width: 3000 } })), ['a', 'c'], holeInput, () => `h${++id}`))
+    expect(next.pieces.map((piece) => (piece.shape as ShapedShape).cutouts[0]?.id)).toEqual(['h1', 'h2'])
+  })
+
+  it('n\'ajoute la découpe à aucune pièce si elle ne convient pas à l\'une d\'elles', () => {
+    const start = project(large(), small())
+    const result = addCutout(start, ['a', 'b'], holeInput, () => 'x')
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.error.message).toContain('Petite')
+    expect(start.pieces[0]?.shape.kind).toBe('rectangle')
   })
 })
 

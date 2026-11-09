@@ -80,6 +80,9 @@ test('V5 : le PDF est un A4 complet, et le logiciel revient à son état', async
   expect(pdf.toString('latin1').match(/\/Type\s*\/Page\b(?!s)/g)).toHaveLength(1)
   expect(basename((await suggestedPath(app)) ?? '')).toBe('Bibliothèque - découpe.pdf')
 
+  // Sans pièce de forme, aucune section de plans ne s'ajoute au document
+  await expect(page.getByTestId('shape-plan')).toHaveCount(0)
+
   // Le rapport disparaît, et l'application reste utilisable
   await expect(page.getByTestId('report')).toHaveCount(0)
   await expect(page.getByTestId('viewport')).toHaveAttribute('data-piece-count', '8')

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { toCsv } from '../../src/core/csv'
 import { computeCutList, type CutLine } from '../../src/core/cutList'
 import { createEmptyProject, type Piece } from '../../src/core/model'
+import { round, shaped } from '../fixtures/shape-references'
 
 function piece(id: string, name: string, length: number, width: number, thickness: number, material = ''): Piece {
   return {
@@ -24,6 +25,9 @@ function line(changes: Partial<CutLine>): CutLine {
     width: 500,
     thickness: 180,
     material: '',
+    shapeKey: '',
+    shape: null,
+    plan: null,
     ...changes
   }
 }
@@ -33,6 +37,22 @@ function rows(lines: CutLine[]): string[] {
 }
 
 const HEADER = 'Quantité;Pièces;Longueur (mm);Largeur (mm);Épaisseur (mm);Matériau'
+
+describe('toCsv : pièces de forme', () => {
+  const shape = shaped(1000, 500, { topLeft: round(50) })
+
+  it('ajoute une colonne Plan dès qu\'une ligne a une forme, vide pour les rectangles', () => {
+    expect(rows([line({ plan: 2, shape, shapeKey: 'x', names: ['A'] }), line({ names: ['B'] })]).slice(0, 3)).toEqual([
+      `${HEADER};Plan`,
+      '1;A;100;50;18;;2',
+      '1;B;100;50;18;;'
+    ])
+  })
+
+  it('ne change pas le format sans forme', () => {
+    expect(rows([line({ names: ['B'] })]).slice(0, 2)).toEqual([HEADER, '1;B;100;50;18;'])
+  })
+})
 
 describe('toCsv', () => {
   it('reproduit exactement le format prévu', () => {
