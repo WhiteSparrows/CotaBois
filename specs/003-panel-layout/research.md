@@ -44,7 +44,7 @@ Aucune question technique ne restait ouverte après la spécification. Les déci
 
 ## R5. Représentation du résultat
 
-**Decision**: `guillotine.ts` construit un arbre de coupes. `layout.ts` le met à plat en placements, chutes et coupes numérotées, dans l'ordre d'un parcours préfixe. Chaque coupe porte sa distance au bord du morceau en cours, la seule valeur à reporter sur le guide de la scie.
+**Decision**: `guillotine.ts` construit un arbre de coupes et le met à plat en placements, chutes et coupes numérotées, dans l'ordre d'un parcours préfixe. `layout.ts` y ajoute les coupes de délignage et le décalage de la marge. Chaque coupe porte sa distance au bord du morceau en cours, la seule valeur à reporter sur le guide de la scie.
 
 **Rationale**: un dessin seul oblige à calculer des différences à l'atelier. Le test de FR-016 rejoue les coupes une à une, à partir de cette liste seule, et vérifie qu'il obtient exactement les pièces et les chutes annoncées.
 
