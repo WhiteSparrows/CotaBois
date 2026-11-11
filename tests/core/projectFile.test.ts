@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { applyCaisson } from '../../src/core/caisson'
 import { computeCutList } from '../../src/core/cutList'
 import { findOverlaps } from '../../src/core/geometry'
+import { defaultLayoutSettings, setLayoutOptions, setPanelStock } from '../../src/core/layout'
 import { createEmptyProject, type Project } from '../../src/core/model'
 import { addPiece, newPanelInput, rotatePiece } from '../../src/core/pieces'
 import { FORMAT_VERSION, parseProject, safeFileName, serializeProject } from '../../src/core/projectFile'
@@ -73,7 +74,7 @@ describe('parseProject : fichier valide', () => {
 
   it('accepte un projet sans modèle et sans pièce', () => {
     const text = JSON.stringify({ formatVersion: 1, name: 'Vide', template: null, pieces: [] })
-    expect(value(parseProject(text))).toEqual({ name: 'Vide', template: null, pieces: [] })
+    expect(value(parseProject(text))).toEqual({ name: 'Vide', template: null, layout: defaultLayoutSettings(), pieces: [] })
   })
 
   it('accepte un BOM en tête de fichier', () => {
@@ -92,14 +93,14 @@ describe('serializeProject', () => {
     expect(computeCutList(value(parseProject(serializeProject(project))))).toEqual(computeCutList(project))
   })
 
-  it('écrit le format exact de la version 2, lisible et stable', () => {
-    const text = fixture('valid-v2.cotabois')
+  it('écrit le format exact de la version 3, lisible et stable', () => {
+    const text = fixture('valid-v3.cotabois')
     expect(serializeProject(value(parseProject(text)))).toBe(text)
   })
 
   it('indique la version du format', () => {
-    expect(FORMAT_VERSION).toBe(2)
-    expect(JSON.parse(serializeProject(createEmptyProject())).formatVersion).toBe(2)
+    expect(FORMAT_VERSION).toBe(3)
+    expect(JSON.parse(serializeProject(createEmptyProject())).formatVersion).toBe(3)
   })
 })
 
@@ -131,8 +132,8 @@ describe('format version 2 : pièces de forme', () => {
     expect(value(parseProject(text)).pieces[0]?.shape).toEqual({ kind: 'rectangle', length: 8000, width: 3000 })
   })
 
-  it('refuse une version supérieure à 2', () => {
-    expect(errorOf(parseProject(validV2With((d) => (d['formatVersion'] = 3)))).code).toBe('format-too-recent')
+  it('refuse une version supérieure à 3', () => {
+    expect(errorOf(parseProject(validV2With((d) => (d['formatVersion'] = 4)))).code).toBe('format-too-recent')
   })
 
   it.each<[string, (data: Mutable) => void]>([
@@ -148,6 +149,57 @@ describe('format version 2 : pièces de forme', () => {
     const error = errorOf(parseProject(validV2With(change)))
     expect(error.code).toBe('file-corrupted')
     expect(error.message).toContain('Tablette')
+  })
+})
+
+function validV3With(change: (data: Mutable) => void): string {
+  const data = JSON.parse(fixture('valid-v3.cotabois')) as Mutable
+  change(data)
+  return JSON.stringify(data)
+}
+
+describe('format version 3 : réglages du calepinage', () => {
+  it('lit les réglages', () => {
+    expect(value(parseProject(fixture('valid-v3.cotabois'))).layout).toEqual({
+      kerf: 30,
+      edgeMargin: 100,
+      panels: [
+        { material: '', thickness: 50, length: 25000, width: 12500, grain: false },
+        { material: 'Chêne plaqué', thickness: 180, length: 25000, width: 12500, grain: true }
+      ]
+    })
+  })
+
+  it('fait un aller-retour strictement égal des réglages', () => {
+    let project = value(setLayoutOptions(complexProject(), { kerf: 25, edgeMargin: 50 }))
+    project = value(setPanelStock(project, 'Chêne', 180, { length: 25000, width: 12500, grain: true }))
+    expect(value(parseProject(serializeProject(project)))).toEqual(project)
+  })
+
+  it.each(['valid-v1.cotabois', 'valid-v2.cotabois'])('migre %s vers les réglages par défaut, sans rien changer d\'autre', (name) => {
+    const project = value(parseProject(fixture(name)))
+    expect(project.layout).toEqual(defaultLayoutSettings())
+    expect(computeCutList(project)).toEqual(computeCutList(value(parseProject(serializeProject(project)))))
+  })
+
+  it('écrit les réglages entre le modèle et les pièces', () => {
+    expect(Object.keys(JSON.parse(serializeProject(createEmptyProject())))).toEqual(['formatVersion', 'name', 'template', 'layout', 'pieces'])
+  })
+
+  it.each<[string, (data: Mutable) => void]>([
+    ['réglages absents', (d) => delete d['layout']],
+    ['trait de scie hors limites', (d) => (d['layout']['kerf'] = 201)],
+    ['trait de scie non numérique', (d) => (d['layout']['kerf'] = '3')],
+    ['marge négative', (d) => (d['layout']['edgeMargin'] = -1)],
+    ['panneaux qui ne sont pas une liste', (d) => (d['layout']['panels'] = {})],
+    ['longueur de panneau nulle', (d) => (d['layout']['panels'][0]['length'] = 0)],
+    ['sens du fil non booléen', (d) => (d['layout']['panels'][0]['grain'] = 'oui')],
+    ['couple en double', (d) => d['layout']['panels'].push({ ...d['layout']['panels'][1], material: ' chêne plaqué ' })],
+    ['marge trop grande pour un panneau', (d) => (d['layout']['edgeMargin'] = 1000) && (d['layout']['panels'][0]['width'] = 2000)]
+  ])('refuse tout le fichier : %s', (_label, change) => {
+    const error = errorOf(parseProject(validV3With(change)))
+    expect(error.code).toBe('file-corrupted')
+    expect(error.message).toContain('calepinage')
   })
 })
 

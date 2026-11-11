@@ -90,6 +90,7 @@ Deux panneaux sont identiques si leurs placements ont les mêmes positions, cote
 | `from`, `to` | `Tenths` | Étendue de la coupe |
 | `offset` | `Tenths` | Distance au bord du morceau en cours : la cote à reporter sur la scie |
 | `trim` | `boolean` | Vrai pour une coupe de délignage de la marge |
+| `kerfBefore` | `boolean` | Vrai si le trait de scie est avant la ligne : délignage du bord bas ou gauche, dont la matière gardée est après la ligne |
 
 ### UnplacedPiece
 

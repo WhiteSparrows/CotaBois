@@ -107,14 +107,41 @@ export interface CaissonTemplate {
 
 export type Template = CaissonTemplate
 
+/** Le panneau brut d'un matériau et d'une épaisseur. Sa longueur suit le fil. */
+export interface PanelStock {
+  material: string
+  thickness: Tenths
+  length: Tenths
+  width: Tenths
+  grain: boolean
+}
+
+/** Seuls les réglages sont enregistrés : le calepinage lui-même est toujours recalculé. */
+export interface LayoutSettings {
+  kerf: Tenths
+  edgeMargin: Tenths
+  /** Uniquement les panneaux réglés par l'utilisateur ; les autres groupes utilisent le panneau par défaut. */
+  panels: readonly PanelStock[]
+}
+
+export const DEFAULT_KERF = 30
+export const DEFAULT_EDGE_MARGIN = 0
+export const DEFAULT_PANEL_LENGTH = 28_000
+export const DEFAULT_PANEL_WIDTH = 20_700
+
+export function defaultLayoutSettings(): LayoutSettings {
+  return { kerf: DEFAULT_KERF, edgeMargin: DEFAULT_EDGE_MARGIN, panels: [] }
+}
+
 export interface Project {
   name: string
   pieces: readonly Piece[]
   template: Template | null
+  layout: LayoutSettings
 }
 
 export function createEmptyProject(): Project {
-  return { name: 'Nouveau meuble', pieces: [], template: null }
+  return { name: 'Nouveau meuble', pieces: [], template: null, layout: defaultLayoutSettings() }
 }
 
 export function shapeExtent(shape: Shape): { length: Tenths; width: Tenths } {

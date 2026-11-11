@@ -1,0 +1,67 @@
+{
+  "formatVersion": 3,
+  "name": "Bibliothèque",
+  "template": null,
+  "layout": {
+    "kerf": 30,
+    "edgeMargin": 100,
+    "panels": [
+      {
+        "material": "",
+        "thickness": 50,
+        "length": 25000,
+        "width": 12500,
+        "grain": false
+      },
+      {
+        "material": "Chêne plaqué",
+        "thickness": 180,
+        "length": 25000,
+        "width": 12500,
+        "grain": true
+      }
+    ]
+  },
+  "pieces": [
+    {
+      "id": "p1",
+      "name": "Côté",
+      "shape": {
+        "kind": "rectangle",
+        "length": 18000,
+        "width": 3950
+      },
+      "thickness": 180,
+      "material": "Chêne plaqué",
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 50
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+z"
+      }
+    },
+    {
+      "id": "p2",
+      "name": "Fond",
+      "shape": {
+        "kind": "rectangle",
+        "length": 18000,
+        "width": 8000
+      },
+      "thickness": 50,
+      "material": "",
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "orientation": {
+        "u": "+y",
+        "v": "+x"
+      }
+    }
+  ]
+}

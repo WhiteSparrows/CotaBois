@@ -20,7 +20,12 @@ function field(result: ReturnType<typeof validatePiece>): string | undefined {
 
 describe('createEmptyProject', () => {
   it('crée un projet vide, sans modèle', () => {
-    expect(createEmptyProject()).toEqual({ name: 'Nouveau meuble', pieces: [], template: null })
+    expect(createEmptyProject()).toEqual({
+      name: 'Nouveau meuble',
+      pieces: [],
+      template: null,
+      layout: { kerf: 30, edgeMargin: 0, panels: [] }
+    })
   })
 })
 

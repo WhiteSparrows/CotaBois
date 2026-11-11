@@ -6,7 +6,7 @@ Mêmes conventions que les contrats précédents : fonctions pures, résultat `{
 
 | Fonction | Rôle |
 |---|---|
-| `packPanels(items, panel, options)` | Place des rectangles dans des panneaux identiques. `items` : `{ index, sizeX, sizeY }` ; `panel` : `{ sizeX, sizeY }` ; `options` : `{ kerf, rotate, runs }`. Renvoie les panneaux, chacun avec ses placements, ses chutes et ses coupes dans l'ordre, et les index non placés. Ne lève jamais d'exception. |
+| `packPanels(items, panel, options)` | Place des rectangles dans des panneaux identiques. `items` : `{ sizeX, sizeY }`, chaque placement renvoyant la position de la pièce dans cette liste ; `panel` : `{ sizeX, sizeY }` ; `options` : `{ kerf, rotate, runs }`. Renvoie les panneaux, chacun avec ses placements, ses chutes et ses coupes dans l'ordre, et les index non placés. Ne lève jamais d'exception. |
 
 Le résultat ne dépend que des arguments. La marge de bord n'est pas connue de cette fonction : `panel` est la surface utile.
 

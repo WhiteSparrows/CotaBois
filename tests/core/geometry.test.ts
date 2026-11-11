@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { pieceBounds, pieceFrame, projectBounds } from '../../src/core/geometry'
-import type { Orientation, Piece, Project, SignedAxis } from '../../src/core/model'
+import { createEmptyProject, type Orientation, type Piece, type Project, type SignedAxis } from '../../src/core/model'
 
 const LENGTH = 1000
 const WIDTH = 300
@@ -71,7 +71,7 @@ describe('pieceBounds', () => {
 })
 
 describe('projectBounds', () => {
-  const empty: Project = { name: 'Vide', pieces: [], template: null }
+  const empty: Project = { ...createEmptyProject(), name: 'Vide' }
 
   it('vaut null sans pièce', () => {
     expect(projectBounds(empty)).toBeNull()
