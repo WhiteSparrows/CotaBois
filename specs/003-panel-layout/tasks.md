@@ -65,15 +65,15 @@ description: "Liste des tâches pour le calepinage des panneaux"
 
 ### Tests for User Story 1 ⚠️
 
-- [ ] T013 [P] [US1] Écrire dans `tests/core/layout.test.ts` les cas de `computeLayout` : un groupe par couple de la clé des totaux et dans leur ordre, panneau par défaut sans réglage, nombre de panneaux, `formatUsage` arrondi à la décimale inférieure (`100 %`, `87,3 %`), pièces placées sur pièces du groupe, pièce trop grande nommée avec `reason` `too-large` et `complete` faux, marge retirée de la surface utile, projet vide sans groupe, projet inchangé ; tous les résultats passent le vérificateur (FR-001, FR-010, FR-013, FR-019)
-- [ ] T014 [P] [US1] Écrire `tests/e2e/us7-layout.spec.ts`, scénarios L1, L2 et L5 : bascule de vue, réglages, résumé, avertissement, résultat qui suit une modification de pièce, annulation d'un réglage, caisson non retouché d'après le fichier enregistré (FR-004, FR-012, FR-013)
+- [X] T013 [P] [US1] Écrire dans `tests/core/layout.test.ts` les cas de `computeLayout` : un groupe par couple de la clé des totaux et dans leur ordre, panneau par défaut sans réglage, nombre de panneaux, `formatUsage` arrondi à la décimale inférieure (`100 %`, `87,3 %`), pièces placées sur pièces du groupe, pièce trop grande nommée avec `reason` `too-large` et `complete` faux, marge retirée de la surface utile, projet vide sans groupe, projet inchangé ; tous les résultats passent le vérificateur (FR-001, FR-010, FR-013, FR-019)
+- [X] T014 [P] [US1] Écrire `tests/e2e/us7-layout.spec.ts`, scénarios L1, L2 et L5 : bascule de vue, réglages, résumé, avertissement, résultat qui suit une modification de pièce, annulation d'un réglage, caisson non retouché d'après le fichier enregistré (FR-004, FR-012, FR-013)
 
 ### Implementation for User Story 1
 
-- [ ] T015 [US1] Compléter `src/core/layout.ts` : `computeLayout`, regroupement, appel de `packPanels` sur la surface utile, décalage par la marge, pièces non placées, `formatUsage` (FR-001, FR-008, FR-010, FR-013)
-- [ ] T016 [US1] Ajouter dans `src/renderer/store.ts` l'état d'ouverture du calepinage et les actions de réglage, une action annulable par réglage (FR-004)
-- [ ] T017 [US1] Ajouter la commande `view:layout` dans `src/main/menu.ts`, menu Affichage, et la bascule Vue 3D / Calepinage dans la barre d'outils de `src/renderer/App.tsx`, le calepinage recouvrant la vue 3D sans la démonter (FR-012)
-- [ ] T018 [US1] Créer `src/renderer/panels/LayoutView.tsx`, avec ses styles dans `src/renderer/styles.css` : réglages communs, champs du panneau de chaque groupe, résumé, avertissements, mention sur l'absence de minimum garanti, message pour un meuble sans pièce ; résultat calculé avec `useMemo` sur le projet (FR-003, FR-009, FR-010, FR-012, FR-013)
+- [X] T015 [US1] Compléter `src/core/layout.ts` : `computeLayout`, regroupement, appel de `packPanels` sur la surface utile, décalage par la marge, pièces non placées, `formatUsage` (FR-001, FR-008, FR-010, FR-013)
+- [X] T016 [US1] Ajouter dans `src/renderer/store.ts` l'état d'ouverture du calepinage et les actions de réglage, une action annulable par réglage (FR-004)
+- [X] T017 [US1] Ajouter la commande `view:layout` dans `src/main/menu.ts`, menu Affichage, et la bascule Vue 3D / Calepinage dans la barre d'outils de `src/renderer/App.tsx`, le calepinage recouvrant la vue 3D sans la démonter (FR-012)
+- [X] T018 [US1] Créer `src/renderer/panels/LayoutView.tsx`, avec ses styles dans `src/renderer/styles.css` : réglages communs, champs du panneau de chaque groupe, résumé, avertissements, mention sur l'absence de minimum garanti, message pour un meuble sans pièce ; résultat calculé avec `useMemo` sur le projet (FR-003, FR-009, FR-010, FR-012, FR-013)
 
 **Checkpoint**: L1, L2 et L5 passent. On sait combien de panneaux acheter.
 
@@ -87,13 +87,13 @@ description: "Liste des tâches pour le calepinage des panneaux"
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T019 [P] [US2] Écrire dans `tests/core/layout.test.ts` : placements avec noms, identifiants et numéro de plan de forme ; `rotated` ; panneaux identiques regroupés avec leur quantité, même si les noms diffèrent ; chutes hors marge ; pièce de forme sur son rectangle complet (FR-008, FR-014, FR-015)
-- [ ] T020 [P] [US2] Compléter `tests/e2e/us7-layout.spec.ts`, scénario L3 : nombre de pièces dessinées, mention `Plan 1` sur la pièce arrondie, `× 2` sur des panneaux identiques (FR-014, FR-015)
+- [X] T019 [P] [US2] Écrire dans `tests/core/layout.test.ts` : placements avec noms, identifiants et numéro de plan de forme ; `rotated` ; panneaux identiques regroupés avec leur quantité, même si les noms diffèrent ; chutes hors marge ; pièce de forme sur son rectangle complet (FR-008, FR-014, FR-015)
+- [X] T020 [P] [US2] Compléter `tests/e2e/us7-layout.spec.ts`, scénario L3 : nombre de pièces dessinées, mention `Plan 1` sur la pièce arrondie, `× 2` sur des panneaux identiques (FR-014, FR-015)
 
 ### Implementation for User Story 2
 
-- [ ] T021 [US2] Compléter `src/core/layout.ts` : placements avec noms, identifiants et numéros de plan repris de `computeCutList`, chutes, regroupement des panneaux identiques (FR-008, FR-014, FR-015)
-- [ ] T022 [US2] Créer `src/renderer/panels/LayoutDrawing.tsx` : SVG à l'échelle, texte en millimètres de papier, nom et cotes ou numéro renvoyant à une légende, `↻`, `Plan n`, chutes et marge hachurées, selon `contracts/ui-and-exports.md` ; l'afficher dans `LayoutView.tsx` (FR-014, FR-015)
+- [X] T021 [US2] Compléter `src/core/layout.ts` : placements avec noms, identifiants et numéros de plan repris de `computeCutList`, chutes, regroupement des panneaux identiques (FR-008, FR-014, FR-015)
+- [X] T022 [US2] Créer `src/renderer/panels/LayoutDrawing.tsx` : SVG à l'échelle, texte en millimètres de papier, nom et cotes ou numéro renvoyant à une légende, `↻`, `Plan n`, chutes et marge hachurées, selon `contracts/ui-and-exports.md` ; l'afficher dans `LayoutView.tsx` (FR-014, FR-015)
 
 **Checkpoint**: L3 passe. Le dessin montre comment obtenir le résultat.
 
@@ -107,13 +107,13 @@ description: "Liste des tâches pour le calepinage des panneaux"
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T023 [P] [US3] Écrire dans `tests/e2e/us7-layout.spec.ts`, scénario L6 : nom proposé `<projet> - plan de coupe.pdf`, un bloc par panneau distinct, avertissements présents si le résultat est incomplet, export désactivé sans pièce ; et vérifier dans `tests/e2e/us5-export.spec.ts` que le PDF et le CSV de la liste de découpe restent inchangés (FR-017, FR-018)
+- [X] T023 [P] [US3] Écrire dans `tests/e2e/us7-layout.spec.ts`, scénario L6 : nom proposé `<projet> - plan de coupe.pdf`, un bloc par panneau distinct, avertissements présents si le résultat est incomplet, export désactivé sans pièce ; et vérifier dans `tests/e2e/us5-export.spec.ts` que le PDF et le CSV de la liste de découpe restent inchangés (FR-017, FR-018)
 
 ### Implementation for User Story 3
 
-- [ ] T024 [US3] Ajouter l'export du plan de coupe : commande `file:export-cutting-plan` dans `src/main/menu.ts`, titre de la fenêtre d'enregistrement selon le document dans `src/main/pdf.ts` et `src/preload/index.ts`, variante de `ReportContent` et action `exportCuttingPlan` dans `src/renderer/store.ts` (FR-017)
-- [ ] T025 [US3] Créer `src/renderer/report/CuttingPlanReport.tsx`, avec ses styles d'impression dans `src/renderer/report/report.css`, sans bloc coupé entre deux pages, et l'afficher selon la variante dans `src/renderer/App.tsx` (FR-017, FR-019)
-- [ ] T026 [US3] Produire de vrais PDF, un meuble simple et un meuble de plusieurs matériaux avec des petites pièces, et les contrôler à l'œil en les consignant dans `specs/003-panel-layout/checklists/validation.md` (SC-004)
+- [X] T024 [US3] Ajouter l'export du plan de coupe : commande `file:export-cutting-plan` dans `src/main/menu.ts`, titre de la fenêtre d'enregistrement selon le document dans `src/main/pdf.ts` et `src/preload/index.ts`, variante de `ReportContent` et action `exportCuttingPlan` dans `src/renderer/store.ts` (FR-017)
+- [X] T025 [US3] Créer `src/renderer/report/CuttingPlanReport.tsx`, avec ses styles d'impression dans `src/renderer/report/report.css`, sans bloc coupé entre deux pages, et l'afficher selon la variante dans `src/renderer/App.tsx` (FR-017, FR-019)
+- [X] T026 [US3] Produire de vrais PDF, un meuble simple et un meuble de plusieurs matériaux avec des petites pièces, et les contrôler à l'œil en les consignant dans `specs/003-panel-layout/checklists/validation.md` (SC-004)
 
 **Checkpoint**: L6 passe. Le plan de coupe peut partir à l'atelier.
 
@@ -127,12 +127,12 @@ description: "Liste des tâches pour le calepinage des panneaux"
 
 ### Tests for User Story 4 ⚠️
 
-- [ ] T027 [P] [US4] Écrire dans `tests/core/layout.test.ts` : coupes numérotées à partir de 1 sur chaque panneau, distance au bord du morceau, quatre coupes de délignage en tête avec une marge, et aucune sans marge ; le vérificateur rejoue les coupes de tous les cas de référence (FR-016)
+- [X] T027 [P] [US4] Écrire dans `tests/core/layout.test.ts` : coupes numérotées à partir de 1 sur chaque panneau, distance au bord du morceau, quatre coupes de délignage en tête avec une marge, et aucune sans marge ; le vérificateur rejoue les coupes de tous les cas de référence (FR-016)
 - [ ] T028 [P] [US4] Compléter `tests/e2e/us7-layout.spec.ts`, première partie de L7 : numéros sur le dessin et tableau des coupes dans le plan imprimé (FR-016)
 
 ### Implementation for User Story 4
 
-- [ ] T029 [US4] Compléter `src/core/layout.ts` : coupes de délignage et passage des coupes au repère du panneau complet (FR-016)
+- [X] T029 [US4] Compléter `src/core/layout.ts` : coupes de délignage et passage des coupes au repère du panneau complet (FR-016)
 - [ ] T030 [US4] Ajouter les numéros de coupe, sans recouvrement, dans `src/renderer/panels/LayoutDrawing.tsx`, et le tableau des coupes dans `src/renderer/report/CuttingPlanReport.tsx` (FR-016)
 
 **Checkpoint**: L7, première partie, passe. On sait dans quel ordre couper.
@@ -147,12 +147,12 @@ description: "Liste des tâches pour le calepinage des panneaux"
 
 ### Tests for User Story 5 ⚠️
 
-- [ ] T031 [P] [US5] Écrire dans `tests/core/layout.test.ts` : avec le sens du fil, aucune rotation, `shape.length` suit la longueur du panneau même si elle est plus courte que la largeur, pièce qui ne rentrerait que tournée signalée avec `reason` `grain` ; sans le fil, rotation permise (FR-006)
+- [X] T031 [P] [US5] Écrire dans `tests/core/layout.test.ts` : avec le sens du fil, aucune rotation, `shape.length` suit la longueur du panneau même si elle est plus courte que la largeur, pièce qui ne rentrerait que tournée signalée avec `reason` `grain` ; sans le fil, rotation permise (FR-006)
 - [ ] T032 [P] [US5] Compléter `tests/e2e/us7-layout.spec.ts`, seconde partie de L7 : case `Respecter le sens du fil`, 2 puis 4 panneaux, avertissement qui propose d'inverser longueur et largeur (FR-006)
 
 ### Implementation for User Story 5
 
-- [ ] T033 [US5] Compléter `src/core/layout.ts` : rotation selon le réglage du groupe, sur les cotes saisies de la pièce, et raison `grain` (FR-006, FR-010)
+- [X] T033 [US5] Compléter `src/core/layout.ts` : rotation selon le réglage du groupe, sur les cotes saisies de la pièce, et raison `grain` (FR-006, FR-010)
 - [ ] T034 [US5] Ajouter la case `Respecter le sens du fil` et le texte de l'avertissement dans `src/renderer/panels/LayoutView.tsx`, et la mention du sens du fil dans `src/renderer/report/CuttingPlanReport.tsx` (FR-006)
 
 **Checkpoint**: L7 passe entièrement. Tous les parcours sont fonctionnels.
