@@ -3,20 +3,25 @@ import { findOverlaps } from '../core/geometry'
 import { CaissonForm } from './panels/CaissonForm'
 import { CommitField } from './panels/CommitField'
 import { CutListPanel } from './panels/CutListPanel'
+import { LayoutView } from './panels/LayoutView'
 import { PiecePanel } from './panels/PiecePanel'
 import { ShapeEditor } from './panels/ShapeEditor'
 import { UnsavedDialog } from './panels/UnsavedDialog'
+import { CuttingPlanReport } from './report/CuttingPlanReport'
 import { ReportView } from './report/ReportView'
 import {
   addPanel,
+  closeLayout,
   copySelection,
   cutSelection,
   deleteSelection,
   dismissFileError,
   duplicateSelection,
   exportCsv,
+  exportCuttingPlan,
   exportPdf,
   movePiece,
+  openLayout,
   pasteCopiedPieces,
   redo,
   registerCommand,
@@ -46,7 +51,8 @@ function commitActiveField(): void {
 const MAX_LISTED_OVERLAPS = 3
 
 export function App() {
-  const { project, selection, canUndo, canRedo, dirty, pendingAction, fileError, report, shapeEditorOpen, frameToken } = useEditor()
+  const { project, selection, canUndo, canRedo, dirty, pendingAction, fileError, report, shapeEditorOpen, layoutOpen, frameToken } =
+    useEditor()
   const containerRef = useRef<HTMLDivElement>(null)
   const viewportRef = useRef<Viewport | null>(null)
   const framedToken = useRef(0)
@@ -112,6 +118,9 @@ export function App() {
       registerCommand('file:save-as', afterCommit(() => void saveProjectAs())),
       registerCommand('file:export-pdf', afterCommit(() => void exportPdf())),
       registerCommand('file:export-csv', afterCommit(() => void exportCsv())),
+      registerCommand('file:export-cutting-plan', afterCommit(() => void exportCuttingPlan())),
+      registerCommand('view:3d', afterCommit(closeLayout)),
+      registerCommand('view:layout', afterCommit(openLayout)),
       registerCommand('edit:undo', afterCommit(undo)),
       registerCommand('edit:redo', afterCommit(redo)),
       registerCommand('edit:cut', onPiecesOrText('cut', cutSelection)),
@@ -171,8 +180,17 @@ export function App() {
 
       <main className="viewport-area">
         <div className="viewport" ref={containerRef} data-testid="viewport" data-piece-count="0" />
+        {layoutOpen && <LayoutView />}
 
         <div className="toolbar">
+          <div className="view-switch" role="group" aria-label="Vue">
+            <button type="button" className="secondary" aria-pressed={!layoutOpen} onClick={() => runCommand('view:3d')}>
+              Vue 3D
+            </button>
+            <button type="button" className="secondary" aria-pressed={layoutOpen} onClick={() => runCommand('view:layout')}>
+              Calepinage
+            </button>
+          </div>
           <button type="button" className="secondary" onClick={addPanel}>
             Ajouter un panneau
           </button>
@@ -200,12 +218,12 @@ export function App() {
             La vue 3D n'a pas pu démarrer sur cet ordinateur. La liste de découpe reste utilisable.
           </p>
         )}
-        {!viewportError && project.pieces.length === 0 && (
+        {!viewportError && !layoutOpen && project.pieces.length === 0 && (
           <p className="viewport-message">
             Saisissez les dimensions à gauche pour créer un caisson, ou ajoutez un panneau pour dessiner librement.
           </p>
         )}
-        {overlaps.length > 0 && (
+        {!layoutOpen && overlaps.length > 0 && (
           <p className="overlap-warning" role="status" data-testid="overlap-warning">
             Pièces qui se chevauchent :{' '}
             {overlaps
@@ -221,7 +239,8 @@ export function App() {
 
       {pendingAction && <UnsavedDialog projectName={project.name} />}
     </div>
-    {report && <ReportView project={project} content={report} />}
+    {report?.kind === 'cut-list' && <ReportView project={project} content={report} />}
+    {report?.kind === 'cutting-plan' && <CuttingPlanReport project={project} content={report} />}
     </>
   )
 }

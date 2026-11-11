@@ -7,6 +7,7 @@ export type MenuCommand =
   | 'file:save-as'
   | 'file:export-pdf'
   | 'file:export-csv'
+  | 'file:export-cutting-plan'
   | 'edit:undo'
   | 'edit:redo'
   | 'edit:cut'
@@ -15,6 +16,8 @@ export type MenuCommand =
   | 'edit:duplicate'
   | 'edit:delete'
   | 'view:frame'
+  | 'view:3d'
+  | 'view:layout'
 
 export const MENU_COMMAND_CHANNEL = 'menu:command'
 
@@ -26,6 +29,7 @@ const IMPLEMENTED_COMMANDS: ReadonlySet<MenuCommand> = new Set([
   'file:save-as',
   'file:export-pdf',
   'file:export-csv',
+  'file:export-cutting-plan',
   'edit:undo',
   'edit:redo',
   'edit:cut',
@@ -33,7 +37,9 @@ const IMPLEMENTED_COMMANDS: ReadonlySet<MenuCommand> = new Set([
   'edit:paste',
   'edit:duplicate',
   'edit:delete',
-  'view:frame'
+  'view:frame',
+  'view:3d',
+  'view:layout'
 ])
 
 interface CommandOptions {
@@ -63,6 +69,7 @@ export function installMenu(window: BrowserWindow): void {
         { type: 'separator' },
         command('Exporter en PDF…', 'file:export-pdf'),
         command('Exporter en CSV…', 'file:export-csv'),
+        command('Exporter le plan de coupe en PDF…', 'file:export-cutting-plan'),
         { type: 'separator' },
         { label: 'Quitter', role: 'quit' }
       ]
@@ -84,6 +91,9 @@ export function installMenu(window: BrowserWindow): void {
     {
       label: '&Affichage',
       submenu: [
+        command('Vue 3D', 'view:3d'),
+        command('Calepinage', 'view:layout'),
+        { type: 'separator' },
         command('Recadrer sur le meuble', 'view:frame', { accelerator: 'F', displayOnly: true }),
         ...(app.isPackaged
           ? []

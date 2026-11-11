@@ -166,4 +166,73 @@
   .shape-plan-table .number {
     width: 10mm;
   }
+
+  /* Plan de coupe : un panneau n'est jamais coupé entre deux pages. */
+  .report-settings {
+    margin: 8px 0 0;
+  }
+
+  .report-warning {
+    margin: 12px 0;
+    padding: 6px 10px;
+    border: 1.5px solid #000;
+    break-inside: avoid;
+  }
+
+  .report-warning h2 {
+    margin-top: 0;
+  }
+
+  .report-warning ul {
+    margin: 0;
+    padding-left: 18px;
+  }
+
+  .cutting-panel {
+    margin-top: 10px;
+    break-inside: avoid;
+  }
+
+  .cutting-panel h3 {
+    margin: 0 0 4px;
+    font-size: 11pt;
+    font-weight: 600;
+  }
+
+  .report .layout-drawing {
+    width: 100%;
+    height: auto;
+    max-height: 118mm;
+  }
+
+  .report .layout-drawing text {
+    fill: #000;
+  }
+
+  .report .layout-board {
+    fill: #fff;
+    stroke: #000;
+  }
+
+  .report .layout-piece rect {
+    fill: #fff;
+    stroke: #000;
+  }
+
+  .report .layout-offcut rect,
+  .report .layout-margin {
+    stroke: #000;
+    stroke-width: 0.5;
+  }
+
+  .report .layout-hatch-line {
+    stroke: #000;
+    stroke-width: 0.35;
+  }
+
+  .report .layout-legend {
+    margin-top: 4px;
+    font-size: 9pt;
+  }
 }
+

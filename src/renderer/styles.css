@@ -536,3 +536,147 @@ button.ghost:hover {
   border: 0;
   cursor: pointer;
 }
+
+/* Calepinage */
+
+.view-switch {
+  display: inline-flex;
+  pointer-events: auto;
+}
+
+.view-switch button:first-child {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.view-switch button:last-child {
+  margin-left: -1px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.view-switch button.secondary[aria-pressed='true'],
+.view-switch button.secondary[aria-pressed='true']:hover:not(:disabled) {
+  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.layout-view {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  padding: 60px 24px 24px;
+  background: var(--surface-sunken);
+}
+
+.layout-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.layout-heading button {
+  height: 32px;
+  padding: 0 14px;
+}
+
+.layout-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 16px;
+  max-width: 520px;
+}
+
+.layout-fields .field {
+  flex: 1 1 180px;
+}
+
+.layout-group {
+  margin-top: 18px;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.layout-group h3 {
+  margin-top: 0;
+}
+
+.layout-summary {
+  margin: 0 0 12px;
+  line-height: 1.4;
+}
+
+.layout-warning {
+  margin: 0 0 12px;
+  padding: 8px 12px;
+  color: var(--error);
+  line-height: 1.4;
+  background: var(--error-surface);
+  border: 1px solid var(--error);
+  border-radius: 6px;
+}
+
+.layout-warning ul {
+  margin: 4px 0 0;
+  padding-left: 18px;
+}
+
+.layout-panel {
+  margin: 16px 0 0;
+}
+
+.layout-panel figcaption {
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.layout-drawing {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 70vh;
+}
+
+.layout-drawing text {
+  fill: var(--text);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.layout-board {
+  fill: #fff;
+  stroke: var(--text);
+  stroke-width: 1.2;
+  vector-effect: non-scaling-stroke;
+}
+
+.layout-piece rect {
+  fill: #e4ede7;
+  stroke: var(--accent);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.layout-piece-name {
+  font-weight: 600;
+}
+
+.layout-offcut rect,
+.layout-margin {
+  stroke: var(--border);
+  stroke-width: 0.8;
+  vector-effect: non-scaling-stroke;
+}
+
+.layout-hatch-line {
+  stroke: #cfc9b8;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.layout-legend {
+  margin-top: 8px;
+}

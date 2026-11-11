@@ -21,8 +21,8 @@ const api = {
   newProject: (): Promise<void> => ipcRenderer.invoke('file:new'),
   exportCsv: (text: string, suggestedName: string): Promise<FileResult<{ fileName: string }>> =>
     ipcRenderer.invoke('file:export-csv', text, suggestedName),
-  exportPdf: (suggestedName: string): Promise<FileResult<{ fileName: string }>> =>
-    ipcRenderer.invoke('file:export-pdf', suggestedName),
+  exportPdf: (suggestedName: string, title?: string): Promise<FileResult<{ fileName: string }>> =>
+    ipcRenderer.invoke('file:export-pdf', suggestedName, title),
 
   editText: (action: 'cut' | 'copy' | 'paste'): void => ipcRenderer.send('window:edit-text', action),
   setDirty: (isDirty: boolean): void => ipcRenderer.send('window:set-dirty', isDirty),

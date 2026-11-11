@@ -30,7 +30,9 @@ import {
   type CutoutChanges,
   type PieceChanges
 } from '../core/pieces'
+import { setLayoutOptions, setPanelStock, type LayoutOptionChanges, type PanelStockChanges } from '../core/layout'
 import { parseProject, safeFileName, serializeProject } from '../core/projectFile'
+import type { Tenths } from '../core/units'
 import { err, type Result } from '../core/result'
 import { asShaped, suggestCutout, withCutoutReference, type CutoutPreset } from '../core/shape'
 import type { MenuCommand } from '../main/menu'
@@ -40,6 +42,7 @@ export type GuardedAction = 'new' | 'open' | 'close'
 
 /** Le contenu de la vue d'impression, pour le temps de l'export en PDF. */
 export interface ReportContent {
+  kind: 'cut-list' | 'cutting-plan'
   imageUrl: string | null
   date: string
 }
@@ -56,6 +59,8 @@ export interface EditorState {
   report: ReportContent | null
   /** L'éditeur de forme remplace la liste de découpe tant qu'il reste une pièce sélectionnée. */
   shapeEditorOpen: boolean
+  /** Le calepinage recouvre la vue 3D, sans la démonter. */
+  layoutOpen: boolean
   /** Change à chaque fois que la vue doit recadrer le meuble. */
   frameToken: number
 }
@@ -69,6 +74,7 @@ let captureReportImage: (() => string) | null = null
 /** Propre au logiciel, et conservé d'un projet à l'autre. Les champs utilisent le presse-papiers de Windows. */
 let copiedPieces: readonly Piece[] = []
 let shapeEditorOpen = false
+let layoutOpen = false
 let state: EditorState = toState(history, [], 0)
 const listeners = new Set<() => void>()
 
@@ -80,6 +86,7 @@ function toState(current: History, selection: readonly string[], frameToken: num
     project: current.present,
     selection: existing,
     shapeEditorOpen,
+    layoutOpen,
     canUndo: canUndo(current),
     canRedo: canRedo(current),
     dirty: current.present !== savedProject,
@@ -253,6 +260,29 @@ export function removeCutoutOfPiece(pieceId: string, cutoutId: string): Result<P
   return commitShape(removeCutout(state.project, pieceId, cutoutId))
 }
 
+export function openLayout(): void {
+  layoutOpen = true
+  refresh()
+}
+
+export function closeLayout(): void {
+  layoutOpen = false
+  refresh()
+}
+
+/** Une action annulable par réglage ; un caisson généré n'est pas marqué comme retouché. */
+export function changeLayoutOptions(changes: LayoutOptionChanges): Result<Project> {
+  const result = setLayoutOptions(state.project, changes)
+  if (result.ok) publish(pushState(history, result.value), state.selection)
+  return result
+}
+
+export function changePanelStock(material: string, thickness: Tenths, changes: PanelStockChanges): Result<Project> {
+  const result = setPanelStock(state.project, material, thickness, changes)
+  if (result.ok) publish(pushState(history, result.value), state.selection)
+  return result
+}
+
 export function dismissFileError(): void {
   fileError = null
   refresh()
@@ -345,14 +375,14 @@ export function setReportImageSource(capture: (() => string) | null): void {
   captureReportImage = capture
 }
 
-function exportFileName(): string {
-  return `${safeFileName(state.project.name)} - découpe`
+function exportFileName(suffix = 'découpe'): string {
+  return `${safeFileName(state.project.name)} - ${suffix}`
 }
 
 /** Les menus restent actifs : sans pièce, on explique pourquoi rien ne se passe. */
-function canExport(): boolean {
+function canExport(document = 'la liste de découpe'): boolean {
   if (state.project.pieces.length > 0) return true
-  fileError = 'Ajoutez une pièce pour pouvoir exporter la liste de découpe.'
+  fileError = `Ajoutez une pièce pour pouvoir exporter ${document}.`
   refresh()
   return false
 }
@@ -384,11 +414,28 @@ export async function exportPdf(): Promise<void> {
     image.src = imageUrl
     await image.decode()
   }
-  report = { imageUrl, date: new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long' }).format(new Date()) }
+  report = { kind: 'cut-list', imageUrl, date: todayText() }
   refresh()
   await nextFrames()
 
   const result = await window.cotabois.exportPdf(exportFileName())
+  report = null
+  if (result.status === 'error') showExportResult('error', result.message)
+  else showExportResult(result.status)
+}
+
+function todayText(): string {
+  return new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long' }).format(new Date())
+}
+
+/** Un document séparé : la liste de découpe exportée reste celle d'avant. */
+export async function exportCuttingPlan(): Promise<void> {
+  if (report || !canExport('le plan de coupe')) return
+  report = { kind: 'cutting-plan', imageUrl: null, date: todayText() }
+  refresh()
+  await nextFrames()
+
+  const result = await window.cotabois.exportPdf(exportFileName('plan de coupe'), 'Exporter le plan de coupe en PDF')
   report = null
   if (result.status === 'error') showExportResult('error', result.message)
   else showExportResult(result.status)
