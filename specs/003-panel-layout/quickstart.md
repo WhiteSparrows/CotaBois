@@ -38,7 +38,7 @@ Le calepinage ouvert, changer une étagère de longueur, puis régler le trait d
 
 Exporter le plan de coupe d'un meuble avec plusieurs panneaux. Exporter aussi la liste de découpe.
 
-**Résultat attendu** : un document avec les panneaux à acheter, un dessin coté et un tableau des coupes par panneau, sans bloc coupé entre deux pages. La liste de découpe est identique à celle d'avant. Contrôler le PDF à l'œil, puis découper ou simuler la découpe à partir du seul plan imprimé (SC-004).
+**Résultat attendu** : un document avec les panneaux à acheter, un dessin coté et un tableau des coupes par panneau, sans dessin coupé entre deux pages. La liste de découpe est identique à celle d'avant. Contrôler le PDF à l'œil, puis découper ou simuler la découpe à partir du seul plan imprimé (SC-004).
 
 ### L7. Ordre des coupes et sens du fil (US4, US5)
 

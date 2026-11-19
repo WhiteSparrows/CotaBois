@@ -128,12 +128,12 @@ description: "Liste des tâches pour le calepinage des panneaux"
 ### Tests for User Story 4 ⚠️
 
 - [X] T027 [P] [US4] Écrire dans `tests/core/layout.test.ts` : coupes numérotées à partir de 1 sur chaque panneau, distance au bord du morceau, quatre coupes de délignage en tête avec une marge, et aucune sans marge ; le vérificateur rejoue les coupes de tous les cas de référence (FR-016)
-- [ ] T028 [P] [US4] Compléter `tests/e2e/us7-layout.spec.ts`, première partie de L7 : numéros sur le dessin et tableau des coupes dans le plan imprimé (FR-016)
+- [X] T028 [P] [US4] Compléter `tests/e2e/us7-layout.spec.ts`, première partie de L7 : numéros sur le dessin et tableau des coupes dans le plan imprimé (FR-016)
 
 ### Implementation for User Story 4
 
 - [X] T029 [US4] Compléter `src/core/layout.ts` : coupes de délignage et passage des coupes au repère du panneau complet (FR-016)
-- [ ] T030 [US4] Ajouter les numéros de coupe, sans recouvrement, dans `src/renderer/panels/LayoutDrawing.tsx`, et le tableau des coupes dans `src/renderer/report/CuttingPlanReport.tsx` (FR-016)
+- [X] T030 [US4] Ajouter les numéros de coupe, sans recouvrement, dans `src/renderer/panels/LayoutDrawing.tsx`, et le tableau des coupes dans `src/renderer/report/CuttingPlanReport.tsx` (FR-016)
 
 **Checkpoint**: L7, première partie, passe. On sait dans quel ordre couper.
 
@@ -148,12 +148,12 @@ description: "Liste des tâches pour le calepinage des panneaux"
 ### Tests for User Story 5 ⚠️
 
 - [X] T031 [P] [US5] Écrire dans `tests/core/layout.test.ts` : avec le sens du fil, aucune rotation, `shape.length` suit la longueur du panneau même si elle est plus courte que la largeur, pièce qui ne rentrerait que tournée signalée avec `reason` `grain` ; sans le fil, rotation permise (FR-006)
-- [ ] T032 [P] [US5] Compléter `tests/e2e/us7-layout.spec.ts`, seconde partie de L7 : case `Respecter le sens du fil`, 2 puis 4 panneaux, avertissement qui propose d'inverser longueur et largeur (FR-006)
+- [X] T032 [P] [US5] Compléter `tests/e2e/us7-layout.spec.ts`, seconde partie de L7 : case `Respecter le sens du fil`, 2 puis 4 panneaux, avertissement qui propose d'inverser longueur et largeur (FR-006)
 
 ### Implementation for User Story 5
 
 - [X] T033 [US5] Compléter `src/core/layout.ts` : rotation selon le réglage du groupe, sur les cotes saisies de la pièce, et raison `grain` (FR-006, FR-010)
-- [ ] T034 [US5] Ajouter la case `Respecter le sens du fil` et le texte de l'avertissement dans `src/renderer/panels/LayoutView.tsx`, et la mention du sens du fil dans `src/renderer/report/CuttingPlanReport.tsx` (FR-006)
+- [X] T034 [US5] Ajouter la case `Respecter le sens du fil` et le texte de l'avertissement dans `src/renderer/panels/LayoutView.tsx`, et la mention du sens du fil dans `src/renderer/report/CuttingPlanReport.tsx` (FR-006)
 
 **Checkpoint**: L7 passe entièrement. Tous les parcours sont fonctionnels.
 
@@ -163,10 +163,10 @@ description: "Liste des tâches pour le calepinage des panneaux"
 
 **Purpose**: Vérifier l'ensemble, y compris ce que les tests automatiques ne prouvent pas.
 
-- [ ] T035 Compléter `tests/e2e/us7-layout.spec.ts`, scénario L8 : `valid-v1.cotabois`, `valid-v2.cotabois` et `valid-v3.cotabois` s'ouvrent à l'identique, les deux premiers avec les réglages par défaut, et la liste de découpe ne change pas (FR-020, SC-006)
-- [ ] T036 Étendre `tests/e2e/v6-performance.spec.ts` : ouvrir `200-pieces-shapes.cotabois`, puis mesurer l'ouverture du calepinage jusqu'à l'image affichée, en moins de 2 s ; les mesures existantes restent dans leurs seuils (SC-005)
-- [ ] T037 [P] Mettre à jour `README.md` : le calepinage dans la présentation, ses limites (une taille de panneau par matériau, coupes traversantes, minimum non garanti)
-- [ ] T038 Compléter `tests/e2e/us2-packaged.spec.ts` avec L1 et L6 dans le logiciel empaqueté, exécuter `npm run pack` puis toute la suite, construire l'installeur avec `npm run dist`, et consigner les résultats dans `specs/003-panel-layout/checklists/validation.md` (L9)
+- [X] T035 Compléter `tests/e2e/us7-layout.spec.ts`, scénario L8 : `valid-v1.cotabois`, `valid-v2.cotabois` et `valid-v3.cotabois` s'ouvrent à l'identique, les deux premiers avec les réglages par défaut, et la liste de découpe ne change pas (FR-020, SC-006)
+- [X] T036 Étendre `tests/e2e/v6-performance.spec.ts` : ouvrir `200-pieces-shapes.cotabois`, puis mesurer l'ouverture du calepinage jusqu'à l'image affichée, en moins de 2 s ; les mesures existantes restent dans leurs seuils (SC-005)
+- [X] T037 [P] Mettre à jour `README.md` : le calepinage dans la présentation, ses limites (une taille de panneau par matériau, coupes traversantes, minimum non garanti)
+- [X] T038 Compléter `tests/e2e/us2-packaged.spec.ts` avec L1 et L6 dans le logiciel empaqueté, exécuter `npm run pack` puis toute la suite, construire l'installeur avec `npm run dist`, et consigner les résultats dans `specs/003-panel-layout/checklists/validation.md` (L9)
 - [ ] T039 Faire chronométrer par l'utilisateur l'obtention du nombre de panneaux au premier usage, et découper un meuble à partir du seul plan imprimé ; consigner dans `specs/003-panel-layout/checklists/validation.md` (SC-001, SC-004)
 
 ---

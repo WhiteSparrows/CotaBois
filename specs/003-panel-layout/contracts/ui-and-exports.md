@@ -24,7 +24,7 @@ Une mention permanente indique : `Le logiciel cherche le plus petit nombre de pa
 |---|---|
 | Panneau | Contour à l'échelle, longueur à l'horizontale, avec ses cotes d'ensemble |
 | Marge de bord | Bande hachurée |
-| Pièce | Rectangle plein avec son nom et ses cotes, ou un numéro renvoyant à la légende si la place manque |
+| Pièce | Rectangle plein avec son nom et ses cotes, écrits à la verticale pour une pièce étroite et haute, ou une lettre renvoyant à la légende si la place manque ; les numéros sont réservés aux coupes |
 | Pièce tournée | Mention `↻` à côté des cotes |
 | Pièce de forme | Mention `Plan n` ; elle occupe son rectangle complet |
 | Chute | Rectangle hachuré, avec ses cotes si la place le permet |
@@ -48,4 +48,4 @@ Un document séparé, en A4, nommé par défaut `<projet> - plan de coupe.pdf` :
 | 1 | En long | 395 mm | 2800 mm |
 | 2 | En travers | 1800 mm | 395 mm |
 
-Un bloc n'est jamais coupé entre deux pages. La mention sur l'absence de garantie du minimum figure dans le document. L'export existant en PDF et en CSV de la liste de découpe ne change pas.
+Un dessin n'est jamais coupé entre deux pages. La légende et le tableau des coupes d'un panneau peuvent se poursuivre sur la page suivante, avec leurs en-têtes répétés : un panneau de 60 coupes ne tient pas sur une seule page avec son dessin. À l'écran, le tableau des coupes se déplie sous chaque dessin. La mention sur l'absence de garantie du minimum figure dans le document. L'export existant en PDF et en CSV de la liste de découpe ne change pas.
