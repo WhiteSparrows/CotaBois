@@ -105,6 +105,27 @@ for (const [label, projectPath] of LARGE_PROJECTS) test(`SC-004 et SC-005 : flui
   await app.close()
 })
 
+test('SC-005 : le calepinage de 200 pièces s\'affiche en moins de 2 secondes', async () => {
+  const { app, page } = await launchApp()
+  await chooseFile(app, LARGE_SHAPES_PROJECT)
+  await clickMenu(app, 'Ouvrir…')
+  await expect(page.getByTestId('viewport')).toHaveAttribute('data-piece-count', '200')
+
+  const durations: number[] = []
+  for (let run = 0; run < 3; run++) {
+    const start = Date.now()
+    await page.getByRole('button', { name: 'Calepinage', exact: true }).click()
+    await page.getByTestId('layout-panel').first().waitFor()
+    await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))))
+    durations.push(Date.now() - start)
+    await page.getByRole('button', { name: 'Vue 3D' }).click()
+    await expect(page.getByTestId('layout-view')).toHaveCount(0)
+  }
+  console.log(`Calepinage (200 pièces dont 50 de forme) : médiane ${median(durations)} ms, max ${Math.max(...durations)} ms`)
+  expect(Math.max(...durations)).toBeLessThan(2000)
+  await app.close()
+})
+
 test.describe('démarrage', () => {
   test.skip(!existsSync(EXECUTABLE), 'Exécuter `npm run pack` avant ce test')
 

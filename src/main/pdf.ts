@@ -14,9 +14,9 @@ const FOOTER_TEMPLATE = `
 export function registerPdfHandler(window: BrowserWindow): void {
   ipcMain.handle(
     'file:export-pdf',
-    async (_event, suggestedName: string): Promise<FileResult<{ fileName: string }>> => {
+    async (_event, suggestedName: string, title?: string): Promise<FileResult<{ fileName: string }>> => {
       const { canceled, filePath } = await dialog.showSaveDialog(window, {
-        title: 'Exporter la liste de découpe en PDF',
+        title: typeof title === 'string' ? title : 'Exporter la liste de découpe en PDF',
         defaultPath: join(app.getPath('documents'), `${suggestedName}.pdf`),
         filters: [{ name: 'Document PDF', extensions: ['pdf'] }]
       })

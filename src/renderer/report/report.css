@@ -166,4 +166,97 @@
   .shape-plan-table .number {
     width: 10mm;
   }
+
+  /* Plan de coupe : un panneau n'est jamais coupé entre deux pages. */
+  .report-settings {
+    margin: 8px 0 0;
+  }
+
+  .report-warning {
+    margin: 12px 0;
+    padding: 6px 10px;
+    border: 1.5px solid #000;
+    break-inside: avoid;
+  }
+
+  .report-warning h2 {
+    margin-top: 0;
+  }
+
+  .report-warning ul {
+    margin: 0;
+    padding-left: 18px;
+  }
+
+  /* Le dessin d'un panneau reste entier ; ses tableaux peuvent continuer sur la page suivante, avec leurs en-têtes. */
+  .cutting-panel {
+    margin-top: 10px;
+  }
+
+  .cutting-panel h3 {
+    margin: 0 0 4px;
+    font-size: 11pt;
+    font-weight: 600;
+    break-after: avoid;
+  }
+
+  .report .layout-drawing {
+    width: 100%;
+    height: auto;
+    max-height: 118mm;
+    break-inside: avoid;
+  }
+
+  .report .layout-legend th,
+  .report .layout-legend td,
+  .report .layout-cuts-table th,
+  .report .layout-cuts-table td {
+    padding: 1.5px 6px;
+  }
+
+  .report .layout-drawing text {
+    fill: #000;
+  }
+
+  .report .layout-board {
+    fill: #fff;
+    stroke: #000;
+  }
+
+  .report .layout-piece rect {
+    fill: #fff;
+    stroke: #000;
+  }
+
+  .report .layout-offcut rect,
+  .report .layout-margin {
+    stroke: #000;
+    stroke-width: 0.5;
+  }
+
+  .report .layout-hatch-line {
+    stroke: #000;
+    stroke-width: 0.35;
+  }
+
+  .report .layout-legend {
+    margin-top: 4px;
+    font-size: 9pt;
+  }
+
+  .report .layout-cut circle {
+    fill: #fff;
+    stroke: #000;
+    stroke-width: 0.6;
+  }
+
+  .report .layout-cuts-table {
+    margin-top: 4px;
+    font-size: 9pt;
+  }
+
+  .report .layout-cuts-note {
+    margin: 2px 0 0;
+    font-size: 8.5pt;
+  }
 }

@@ -101,6 +101,41 @@ test.describe('logiciel empaqueté', () => {
     }
   })
 
+  test('L9 : le calepinage donne le nombre de panneaux et exporte le plan de coupe', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'cotabois-packaged-'))
+    const app = await electron.launch({ executablePath: EXECUTABLE, env: cleanEnv() })
+    try {
+      const page = await app.firstWindow()
+      await page.waitForLoadState('domcontentloaded')
+      const fill = async (label: string, value: string) => {
+        await page.getByLabel(label, { exact: true }).fill(value)
+        await page.getByLabel(label, { exact: true }).press('Enter')
+      }
+
+      await page.getByRole('button', { name: 'Ajouter un panneau' }).click()
+      await fill('Longueur', '1000')
+      await fill('Largeur', '500')
+      for (let copy = 0; copy < 3; copy++) await page.getByRole('button', { name: 'Dupliquer' }).click()
+      await page.getByRole('button', { name: 'Calepinage', exact: true }).click()
+      await fill('Longueur du panneau', '2000')
+      await fill('Largeur du panneau', '1000')
+      await fill('Trait de scie', '0')
+      await expect(page.getByTestId('layout-summary')).toContainText('1 panneau de 2000 × 1000 mm')
+      await fill('Trait de scie', '3')
+      await expect(page.getByTestId('layout-summary')).toContainText('2 panneaux de 2000 × 1000 mm')
+
+      const pdfPath = join(dir, 'plan.pdf')
+      await chooseFile(app, pdfPath)
+      await page.getByRole('button', { name: 'Exporter le plan de coupe' }).click()
+      await expect.poll(() => existsSync(pdfPath), { timeout: 20_000 }).toBe(true)
+      expect(readFileSync(pdfPath).toString('latin1').startsWith('%PDF-')).toBe(true)
+    } finally {
+      await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().forEach((w) => w.destroy())).catch(() => undefined)
+      await app.close().catch(() => undefined)
+      rmSync(dir, { recursive: true, force: true })
+    }
+  })
+
   test('F9 : une pièce de forme se dessine et se retrouve dans les exports', async () => {
     const dir = mkdtempSync(join(tmpdir(), 'cotabois-packaged-'))
     const app = await electron.launch({ executablePath: EXECUTABLE, env: cleanEnv() })

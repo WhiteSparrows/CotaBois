@@ -12,8 +12,9 @@ Logiciel de bureau pour Windows, en français : on conçoit un meuble en 3D et o
 - Lire la liste de découpe : pièces identiques regroupées, cotes exactes à 0,1 mm, totaux de surface par matériau et épaisseur.
 - Enregistrer les projets dans des fichiers `.cotabois`.
 - Exporter la liste en PDF pour l'atelier, avec un plan coté pour chaque pièce de forme, ou en CSV pour un tableur.
+- Calepiner : savoir combien de panneaux acheter pour chaque matériau et épaisseur, voir chaque panneau dessiné avec ses pièces, ses chutes et l'ordre des coupes, et imprimer le plan de coupe. Le trait de scie, la marge de bord et le sens du fil sont pris en compte.
 
-Les formes traversent toute l'épaisseur et se définissent par des cotes, et le seul modèle de départ est le caisson. D'autres meubles, les contours libres, les usinages partiels et le calepinage sont prévus plus tard.
+Les formes traversent toute l'épaisseur et se définissent par des cotes, et le seul modèle de départ est le caisson. Le calepinage utilise une seule taille de panneau par matériau et épaisseur, uniquement des coupes traversantes, et les pièces de forme y occupent leur rectangle complet. Il cherche le plus petit nombre de panneaux, sans garantir que ce soit le minimum. D'autres meubles, les contours libres, les usinages partiels, la réutilisation des chutes et le prix des panneaux sont prévus plus tard.
 
 ## Installer
 

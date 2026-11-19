@@ -1,6 +1,10 @@
 import { validateCaissonParams } from './caisson'
+import { validateLayoutSettings } from './layout'
 import {
   axisOf,
+  defaultLayoutSettings,
+  type LayoutSettings,
+  type PanelStock,
   validatePiece,
   validateProjectName,
   type CaissonParams,
@@ -19,7 +23,7 @@ import {
 import { err, ok, type Result } from './result'
 import { CORNER_NAMES, normalizeShape } from './shape'
 
-export const FORMAT_VERSION = 2
+export const FORMAT_VERSION = 3
 
 /**
  * Migrations successives, indexées par la version de départ. Toute évolution incompatible du format
@@ -27,7 +31,9 @@ export const FORMAT_VERSION = 2
  */
 const MIGRATIONS: Record<number, (data: Record<string, unknown>) => Record<string, unknown>> = {
   // La version 2 ajoute les pièces de forme : un fichier en version 1 est déjà valide.
-  1: (data) => data
+  1: (data) => data,
+  // La version 3 ajoute les réglages du calepinage.
+  2: (data) => ({ ...data, layout: serializeLayout(defaultLayoutSettings()) })
 }
 
 const SIGNED_AXES: ReadonlySet<string> = new Set(['+x', '-x', '+y', '-y', '+z', '-z'])
@@ -77,6 +83,21 @@ function serializeShape(shape: Shape): Record<string, unknown> {
   }
 }
 
+function serializeLayout(layout: LayoutSettings): Record<string, unknown> {
+  const panels = validateLayoutSettings(layout)
+  return {
+    kerf: layout.kerf,
+    edgeMargin: layout.edgeMargin,
+    panels: (panels.ok ? panels.value.panels : layout.panels).map((panel) => ({
+      material: panel.material,
+      thickness: panel.thickness,
+      length: panel.length,
+      width: panel.width,
+      grain: panel.grain
+    }))
+  }
+}
+
 export function serializeProject(project: Project): string {
   const template = project.template && {
     kind: project.template.kind,
@@ -99,7 +120,8 @@ export function serializeProject(project: Project): string {
     position: { x: piece.position.x, y: piece.position.y, z: piece.position.z },
     orientation: { u: piece.orientation.u, v: piece.orientation.v }
   }))
-  return `${JSON.stringify({ formatVersion: FORMAT_VERSION, name: project.name, template, pieces }, null, 2)}\n`
+  const layout = serializeLayout(project.layout)
+  return `${JSON.stringify({ formatVersion: FORMAT_VERSION, name: project.name, template, layout, pieces }, null, 2)}\n`
 }
 
 export function parseProject(text: string): Result<Project> {
@@ -133,6 +155,9 @@ function readProject(data: Record<string, unknown>): Result<Project> {
   const template = readTemplate(data['template'])
   if (!template.ok) return template
 
+  const layout = readLayout(data['layout'])
+  if (!layout.ok) return layout
+
   const rawPieces = data['pieces']
   if (!Array.isArray(rawPieces)) return corrupted('La liste des pièces est absente ou invalide.')
 
@@ -150,7 +175,31 @@ function readProject(data: Record<string, unknown>): Result<Project> {
     pieces.push(piece.value)
   }
 
-  return ok({ name: name.value, template: template.value, pieces })
+  return ok({ name: name.value, template: template.value, layout: layout.value, pieces })
+}
+
+function readLayout(raw: unknown): Result<LayoutSettings> {
+  const invalid = 'Les réglages du calepinage sont invalides'
+  if (!isRecord(raw) || typeof raw['kerf'] !== 'number' || typeof raw['edgeMargin'] !== 'number' || !Array.isArray(raw['panels'])) {
+    return corrupted(`${invalid}.`)
+  }
+  const panels: PanelStock[] = []
+  for (const panel of raw['panels']) {
+    if (
+      !isRecord(panel) ||
+      typeof panel['material'] !== 'string' ||
+      typeof panel['thickness'] !== 'number' ||
+      typeof panel['length'] !== 'number' ||
+      typeof panel['width'] !== 'number' ||
+      typeof panel['grain'] !== 'boolean'
+    ) {
+      return corrupted(`${invalid}.`)
+    }
+    const { material, thickness, length, width, grain } = panel
+    panels.push({ material, thickness, length, width, grain })
+  }
+  const validated = validateLayoutSettings({ kerf: raw['kerf'], edgeMargin: raw['edgeMargin'], panels })
+  return validated.ok ? validated : corrupted(`${invalid} : ${validated.error.message}`)
 }
 
 function readTemplate(raw: unknown): Result<Template | null> {

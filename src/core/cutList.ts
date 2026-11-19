@@ -31,7 +31,8 @@ export interface CutList {
   totals: CutTotal[]
 }
 
-function materialKey(material: string): string {
+/** Deux matériaux qui ne diffèrent que par les majuscules ou les espaces autour sont le même. */
+export function materialKey(material: string): string {
   return material.trim().toLocaleLowerCase('fr')
 }
 
