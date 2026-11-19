@@ -218,6 +218,78 @@ test('L6 : le plan de coupe contient les achats, les réglages, chaque panneau e
   await app.close()
 })
 
+test('L7 : les coupes sont numérotées sur le dessin, et leurs distances données dans le plan imprimé', async () => {
+  const { app, page } = await launchApp()
+  await createCaisson(page)
+  await openLayout(page)
+  const panel = group(page, 'sans matériau, 18 mm').getByTestId('layout-panel').first()
+  const markers = panel.getByTestId('layout-cut')
+  expect(await markers.count()).toBeGreaterThan(3)
+  await expect(markers.first()).toHaveText('1')
+  await expect(page.getByTestId('layout-view').getByText('Ordre des coupes').first()).toBeVisible()
+
+  await captureCuttingPlan(app)
+  await chooseFile(app, join(dir, 'plan.pdf'))
+  await page.getByRole('button', { name: 'Exporter le plan de coupe' }).click()
+  await expect.poll(() => printedText(app)).toBeTruthy()
+  const text = (await printedText(app))!
+  expect(text).toContain('Distance au bord du morceau')
+  expect(text).toMatch(/En (long|travers)/)
+  await app.close()
+})
+
+test('L7 : avec le sens du fil, aucune pièce n\'est tournée', async () => {
+  const { app, page } = await launchApp()
+  await addPiece(page, 'Tablette', '1000', '500', 'Chêne')
+  for (let copy = 0; copy < 3; copy++) await page.getByRole('button', { name: 'Dupliquer' }).click()
+  await openLayout(page)
+  const chene = '« Chêne », 18 mm'
+  await commitInGroup(page, chene, 'Longueur du panneau', '2000')
+  await commitInGroup(page, chene, 'Largeur du panneau', '1000')
+  const summary = group(page, chene).getByTestId('layout-summary')
+  await expect(summary).toContainText('2 panneaux')
+  await expect(group(page, chene)).toContainText('↻')
+
+  const grain = group(page, chene).getByLabel('Respecter le sens du fil', { exact: true })
+  await expect(grain).not.toBeChecked()
+  await grain.check()
+  await expect(summary).toContainText('4 panneaux')
+  await expect(group(page, chene)).not.toContainText('↻')
+
+  // Une pièce qui ne rentrerait que tournée : le logiciel dit comment faire
+  await addPiece(page, 'Montant', '500', '1500', 'Chêne')
+  await expect(group(page, chene).getByTestId('layout-warning')).toContainText('inversez sa longueur et sa largeur')
+
+  // Le montant compte 5 actions (ajout, nom, longueur, largeur, matériau) ; la sixième annulation rend la rotation possible
+  for (let step = 0; step < 6; step++) await page.getByRole('button', { name: 'Annuler', exact: true }).click()
+  await expect(grain).not.toBeChecked()
+  await expect(summary).toContainText('2 panneaux')
+  await app.close()
+})
+
+test('L8 : les projets des versions précédentes s\'ouvrent avec les réglages par défaut', async () => {
+  const { app, page } = await launchApp()
+  const fixtures = join(__dirname, '../fixtures/projects')
+  for (const [name, rows] of [['valid-v1.cotabois', 2], ['valid-v2.cotabois', 3]] as const) {
+    await chooseFile(app, join(fixtures, name))
+    await clickMenu(app, 'Ouvrir…')
+    await expect(page.getByTestId('cut-list').locator('tbody tr')).toHaveCount(rows)
+    await openLayout(page)
+    await expect(field(page, 'Trait de scie')).toHaveValue('3')
+    await expect(field(page, 'Marge de bord')).toHaveValue('0')
+    await expect(page.getByTestId('file-error')).toHaveCount(0)
+  }
+
+  await chooseFile(app, join(fixtures, 'valid-v3.cotabois'))
+  await clickMenu(app, 'Ouvrir…')
+  await expect(page).toHaveTitle('Bibliothèque – CotaBois')
+  await expect(field(page, 'Marge de bord')).toHaveValue('10')
+  const oak = group(page, '« Chêne plaqué », 18 mm')
+  await expect(oak.getByLabel('Longueur du panneau', { exact: true })).toHaveValue('2500')
+  await expect(oak.getByLabel('Respecter le sens du fil', { exact: true })).toBeChecked()
+  await app.close()
+})
+
 test('L6 : sans pièce, le plan de coupe est indisponible et le logiciel dit pourquoi', async () => {
   const { app, page } = await launchApp()
   await openLayout(page)

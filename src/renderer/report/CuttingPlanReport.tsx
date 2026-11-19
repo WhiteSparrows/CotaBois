@@ -29,6 +29,7 @@ export function CuttingPlanReport({ project, content }: { project: Project; cont
             <th scope="col" className="number">Quantité</th>
             <th scope="col" className="number">Panneau (mm)</th>
             <th scope="col" className="number">Utilisation</th>
+            <th scope="col">Sens du fil</th>
           </tr>
         </thead>
         <tbody>
@@ -39,6 +40,7 @@ export function CuttingPlanReport({ project, content }: { project: Project; cont
               <td className="number strong">{group.panelCount}</td>
               <td className="number">{stockSize(group)}</td>
               <td className="number">{formatUsage(group.usedArea, group.panelArea)}</td>
+              <td>{group.stock.grain ? 'Respecté' : 'Libre'}</td>
             </tr>
           ))}
         </tbody>
@@ -87,6 +89,7 @@ export function CuttingPlanReport({ project, content }: { project: Project; cont
                     margin={edgeMargin}
                     label={`${groupTitle(group)}, ${title}`}
                     tableClassName="report-table"
+                    foldCuts={false}
                   />
                 </section>
               )

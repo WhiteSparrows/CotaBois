@@ -1,5 +1,5 @@
 import { useId } from 'react'
-import type { LaidOutPanel } from '../../core/layout'
+import type { LaidOutPanel, LayoutCut } from '../../core/layout'
 import { formatMm, type Tenths } from '../../core/units'
 import { placementDetail } from '../layoutText'
 
@@ -17,10 +17,21 @@ function textWidth(text: string, fontSize: number): number {
 }
 
 interface LegendEntry {
-  number: number
+  letter: string
   names: string
   detail: string
 }
+
+/** Les pièces de la légende prennent des lettres : les numéros sont réservés aux coupes. */
+function legendLetter(index: number): string {
+  let letters = ''
+  for (let rest = index + 1; rest > 0; rest = Math.floor((rest - 1) / 26)) {
+    letters = String.fromCharCode(65 + ((rest - 1) % 26)) + letters
+  }
+  return letters
+}
+
+const PAPER_CUT_MARKER_MM = 1.9
 
 interface LayoutDrawingProps {
   panel: LaidOutPanel
@@ -29,10 +40,72 @@ interface LayoutDrawingProps {
   margin: Tenths
   label: string
   tableClassName: string
+  /** À l'écran, le tableau des coupes se déplie ; sur papier, il est toujours visible. */
+  foldCuts: boolean
+}
+
+function cutName(cut: LayoutCut): string {
+  const direction = cut.direction === 'along' ? 'en long' : 'en travers'
+  return cut.trim ? `Délignage ${direction}` : direction === 'en long' ? 'En long' : 'En travers'
+}
+
+/** Les distances, dans l'ordre : la cote de chaque coupe se mesure depuis le bord du morceau en cours. */
+function CutsTable({ cuts, className }: { cuts: readonly LayoutCut[]; className: string }) {
+  return (
+    <>
+      <table className={`${className} layout-cuts-table`}>
+        <thead>
+          <tr>
+            <th scope="col" className="number">N°</th>
+            <th scope="col">Coupe</th>
+            <th scope="col" className="number">Distance au bord du morceau</th>
+            <th scope="col" className="number">Longueur</th>
+          </tr>
+        </thead>
+        <tbody>
+          {cuts.map((cut) => (
+            <tr key={cut.order}>
+              <td className="number strong">{cut.order}</td>
+              <td>{cutName(cut)}</td>
+              <td className="number">{formatMm(cut.offset)} mm</td>
+              <td className="number">{formatMm(cut.to - cut.from)} mm</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p className="layout-cuts-note">
+        Distance mesurée depuis le bord bas du morceau pour une coupe en long, depuis son bord gauche pour une coupe en travers,
+        le panneau étant orienté comme sur le dessin.
+      </p>
+    </>
+  )
+}
+
+/** Les numéros sont posés sur leur ligne de coupe, près de son début, sans se recouvrir. */
+function placeCutMarkers(cuts: readonly LayoutCut[], widthMm: number, radius: number) {
+  const placed: Array<{ order: number; cx: number; cy: number }> = []
+  const isFree = (cx: number, cy: number) => placed.every((other) => Math.hypot(other.cx - cx, other.cy - cy) > radius * 2.1)
+  for (const cut of cuts) {
+    const start = cut.from * TO_MM + radius * 1.4
+    const end = cut.to * TO_MM - radius * 1.4
+    const line = cut.at * TO_MM
+    const point = (along: number) =>
+      cut.direction === 'along' ? { cx: along, cy: widthMm - line } : { cx: line, cy: widthMm - along }
+    let chosen = point((start + end) / 2)
+    for (let along = start; along <= end; along += radius * 2.3) {
+      const candidate = point(along)
+      if (isFree(candidate.cx, candidate.cy)) {
+        chosen = candidate
+        break
+      }
+    }
+    placed.push({ order: cut.order, ...chosen })
+  }
+  return placed
 }
 
 /** Un panneau à l'échelle, longueur à l'horizontale : pièces, chutes et marge. */
-export function LayoutDrawing({ panel, length, width, margin, label, tableClassName }: LayoutDrawingProps) {
+export function LayoutDrawing({ panel, length, width, margin, label, tableClassName, foldCuts }: LayoutDrawingProps) {
   const id = useId().replace(/[^a-zA-Z0-9_-]/g, '')
   const lengthMm = length * TO_MM
   const widthMm = width * TO_MM
@@ -40,6 +113,8 @@ export function LayoutDrawing({ panel, length, width, margin, label, tableClassN
   const pad = PAPER_MARGIN_MM / scale
   const font = PAPER_FONT_MM / scale
   const hatch = `url(#${id}-hatch)`
+  const markerRadius = PAPER_CUT_MARKER_MM / scale
+  const markers = placeCutMarkers(panel.cuts, widthMm, markerRadius)
 
   const box = (rect: { x: Tenths; y: Tenths; sizeX: Tenths; sizeY: Tenths }) => ({
     x: rect.x * TO_MM,
@@ -75,12 +150,12 @@ export function LayoutDrawing({ panel, length, width, margin, label, tableClassN
       // Une pièce étroite et haute, comme un côté de caisson : le texte se lit de bas en haut.
       content = <g transform={`translate(${centerX} ${centerY}) rotate(-90)`}>{label}</g>
     } else {
-      const number = legend.length + 1
-      legend.push({ number, names, detail })
-      const size = Math.min(font, area.width * 0.6, area.height * 0.7)
+      const letter = legendLetter(legend.length)
+      legend.push({ letter, names, detail })
+      const size = Math.min(font, (area.width * 0.9) / letter.length, area.height * 0.7)
       content = (
         <text x={centerX} y={centerY} fontSize={size} textAnchor="middle" dominantBaseline="central" className="layout-piece-name">
-          {number}
+          {letter}
         </text>
       )
     }
@@ -132,6 +207,15 @@ export function LayoutDrawing({ panel, length, width, margin, label, tableClassN
 
         {pieces}
 
+        {markers.map((marker) => (
+          <g key={marker.order} className="layout-cut" data-testid="layout-cut">
+            <circle cx={marker.cx} cy={marker.cy} r={markerRadius} />
+            <text x={marker.cx} y={marker.cy} fontSize={markerRadius * 1.15} textAnchor="middle" dominantBaseline="central">
+              {marker.order}
+            </text>
+          </g>
+        ))}
+
         <text x={lengthMm / 2} y={widthMm + pad * 0.72} fontSize={font} textAnchor="middle">
           {formatMm(length)} mm
         </text>
@@ -144,15 +228,15 @@ export function LayoutDrawing({ panel, length, width, margin, label, tableClassN
         <table className={`${tableClassName} layout-legend`}>
           <thead>
             <tr>
-              <th scope="col" className="number">N°</th>
+              <th scope="col" className="number">Repère</th>
               <th scope="col">Pièces</th>
               <th scope="col">Cotes (mm)</th>
             </tr>
           </thead>
           <tbody>
             {legend.map((entry) => (
-              <tr key={entry.number}>
-                <td className="number strong">{entry.number}</td>
+              <tr key={entry.letter}>
+                <td className="number strong">{entry.letter}</td>
                 <td>{entry.names}</td>
                 <td>{entry.detail}</td>
               </tr>
@@ -160,6 +244,18 @@ export function LayoutDrawing({ panel, length, width, margin, label, tableClassN
           </tbody>
         </table>
       )}
+
+      {panel.cuts.length > 0 &&
+        (foldCuts ? (
+          <details className="layout-cuts">
+            <summary>Ordre des coupes ({panel.cuts.length})</summary>
+            <CutsTable cuts={panel.cuts} className={tableClassName} />
+          </details>
+        ) : (
+          <div className="layout-cuts">
+            <CutsTable cuts={panel.cuts} className={tableClassName} />
+          </div>
+        ))}
     </div>
   )
 }

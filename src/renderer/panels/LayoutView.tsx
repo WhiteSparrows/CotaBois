@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { computeLayout, groupLabel, type LayoutGroup } from '../../core/layout'
 import type { CoreError, Result } from '../../core/result'
 import { formatMm, parseMm } from '../../core/units'
@@ -13,6 +13,7 @@ function failure(result: Result<unknown>): CoreError | null {
 
 function GroupView({ group, margin }: { group: LayoutGroup; margin: number }) {
   const summary = groupSummary(group)
+  const [grainError, setGrainError] = useState<CoreError | null>(null)
 
   function commitStock(field: 'length' | 'width') {
     return (text: string): CoreError | null => {
@@ -29,6 +30,19 @@ function GroupView({ group, margin }: { group: LayoutGroup; margin: number }) {
         <CommitField label="Longueur du panneau" unit="mm" value={formatMm(group.stock.length)} onCommit={commitStock('length')} />
         <CommitField label="Largeur du panneau" unit="mm" value={formatMm(group.stock.width)} onCommit={commitStock('width')} />
       </div>
+      <label className="check-field">
+        <input
+          type="checkbox"
+          checked={group.stock.grain}
+          onChange={(event) => setGrainError(failure(changePanelStock(group.material, group.thickness, { grain: event.target.checked })))}
+        />
+        Respecter le sens du fil
+      </label>
+      {grainError && (
+        <p className="field-error" role="alert">
+          {grainError.message}
+        </p>
+      )}
       {group.stock.isDefault && (
         <p className="panel-note">Panneau proposé par défaut : remplacez ses cotes par celles de votre fournisseur.</p>
       )}
@@ -61,6 +75,7 @@ function GroupView({ group, margin }: { group: LayoutGroup; margin: number }) {
               margin={margin}
               label={`${groupTitle(group)}, ${title}`}
               tableClassName="data-table"
+              foldCuts
             />
           </figure>
         )

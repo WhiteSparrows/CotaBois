@@ -680,3 +680,42 @@ button.ghost:hover {
 .layout-legend {
   margin-top: 8px;
 }
+
+.check-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: -4px 0 12px;
+  cursor: pointer;
+}
+
+.check-field input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.layout-cut circle {
+  fill: #fff;
+  stroke: var(--text);
+  stroke-width: 0.8;
+  vector-effect: non-scaling-stroke;
+}
+
+.layout-cuts {
+  margin-top: 8px;
+}
+
+.layout-cuts summary {
+  cursor: pointer;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.layout-cuts-note {
+  margin: 4px 0 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
