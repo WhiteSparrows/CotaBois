@@ -1,4 +1,5 @@
 import { validateCaissonParams } from './caisson'
+import { validateDrawerParams } from './drawers'
 import { checkCutSizes } from './edges'
 import { validateLayoutSettings } from './layout'
 import {
@@ -15,6 +16,7 @@ import {
   type CornerName,
   type CornerTreatment,
   type Cutout,
+  type DrawerParams,
   type EdgeDistance,
   type Orientation,
   type Piece,
@@ -27,7 +29,7 @@ import {
 import { err, ok, type Result } from './result'
 import { CORNER_NAMES, normalizeShape } from './shape'
 
-export const FORMAT_VERSION = 4
+export const FORMAT_VERSION = 5
 
 /**
  * Migrations successives, indexées par la version de départ. Toute évolution incompatible du format
@@ -60,7 +62,9 @@ const MIGRATIONS: Record<number, (data: Record<string, unknown>) => Record<strin
           : template,
       pieces: Array.isArray(pieces) ? pieces.map((piece) => (isRecord(piece) ? { edges: [], ...piece } : piece)) : pieces
     }
-  }
+  },
+  // La version 5 ajoute le meuble à tiroirs : un fichier en version 4 est déjà valide.
+  4: (data) => data
 }
 
 const SIGNED_AXES: ReadonlySet<string> = new Set(['+x', '-x', '+y', '-y', '+z', '-z'])
@@ -129,20 +133,45 @@ function serializeLayout(layout: LayoutSettings): Record<string, unknown> {
   }
 }
 
-export function serializeProject(project: Project): string {
-  const template = project.template && {
-    kind: project.template.kind,
-    params: {
-      width: project.template.params.width,
-      height: project.template.params.height,
-      depth: project.template.params.depth,
-      boardThickness: project.template.params.boardThickness,
-      backThickness: project.template.params.backThickness,
-      shelfCount: project.template.params.shelfCount,
-      frontEdges: project.template.params.frontEdges === true
-    },
-    customized: project.template.customized
+function serializeTemplate(template: Template): Record<string, unknown> {
+  if (template.kind === 'caisson') {
+    const params = template.params
+    return {
+      kind: template.kind,
+      params: {
+        width: params.width,
+        height: params.height,
+        depth: params.depth,
+        boardThickness: params.boardThickness,
+        backThickness: params.backThickness,
+        shelfCount: params.shelfCount,
+        frontEdges: params.frontEdges === true
+      },
+      customized: template.customized
+    }
   }
+  const params = template.params
+  return {
+    kind: template.kind,
+    params: {
+      width: params.width,
+      height: params.height,
+      depth: params.depth,
+      boardThickness: params.boardThickness,
+      backThickness: params.backThickness,
+      drawerCount: params.drawerCount,
+      frontGap: params.frontGap,
+      slideGap: params.slideGap,
+      drawerThickness: params.drawerThickness,
+      drawerBottomThickness: params.drawerBottomThickness,
+      frontEdges: params.frontEdges === true
+    },
+    customized: template.customized
+  }
+}
+
+export function serializeProject(project: Project): string {
+  const template = project.template && serializeTemplate(project.template)
   const pieces = project.pieces.map((piece) => ({
     id: piece.id,
     name: piece.name,
@@ -250,11 +279,12 @@ function readLayout(raw: unknown): Result<LayoutSettings> {
 function readTemplate(raw: unknown): Result<Template | null> {
   if (raw === null) return ok(null)
   const invalid = 'Le modèle de meuble est invalide'
-  if (!isRecord(raw) || raw['kind'] !== 'caisson' || typeof raw['customized'] !== 'boolean') {
+  if (!isRecord(raw) || (raw['kind'] !== 'caisson' && raw['kind'] !== 'drawers') || typeof raw['customized'] !== 'boolean') {
     return corrupted(`${invalid}.`)
   }
   const params = raw['params']
   if (!isRecord(params)) return corrupted(`${invalid}.`)
+  if (raw['kind'] === 'drawers') return readDrawerTemplate(params, raw['customized'])
 
   const fields = ['width', 'height', 'depth', 'boardThickness', 'backThickness', 'shelfCount'] as const
   if (fields.some((field) => typeof params[field] !== 'number')) return corrupted(`${invalid}.`)
@@ -270,6 +300,30 @@ function readTemplate(raw: unknown): Result<Template | null> {
   } satisfies CaissonParams)
   if (!validated.ok) return corrupted(`${invalid} : ${validated.error.message}`)
   return ok({ kind: 'caisson', params: validated.value, customized: raw['customized'] })
+}
+
+const DRAWER_FIELDS = [
+  'width',
+  'height',
+  'depth',
+  'boardThickness',
+  'backThickness',
+  'drawerCount',
+  'frontGap',
+  'slideGap',
+  'drawerThickness',
+  'drawerBottomThickness'
+] as const
+
+function readDrawerTemplate(params: Record<string, unknown>, customized: boolean): Result<Template | null> {
+  const invalid = 'Le modèle de meuble est invalide'
+  if (DRAWER_FIELDS.some((field) => typeof params[field] !== 'number') || typeof params['frontEdges'] !== 'boolean') {
+    return corrupted(`${invalid}.`)
+  }
+  const values = Object.fromEntries(DRAWER_FIELDS.map((field) => [field, params[field] as number])) as Omit<DrawerParams, 'frontEdges'>
+  const validated = validateDrawerParams(params['frontEdges'] ? { ...values, frontEdges: true } : values)
+  if (!validated.ok) return corrupted(`${invalid} : ${validated.error.message}`)
+  return ok({ kind: 'drawers', params: validated.value, customized })
 }
 
 function readVector(raw: unknown): Vector | null {

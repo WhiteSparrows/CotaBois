@@ -570,6 +570,32 @@ button.ghost:hover {
   background: var(--surface-sunken);
 }
 
+/* Au calepinage, la barre d'outils prend sa place au-dessus du contenu : repliée sur deux lignes, elle ne le recouvre plus. */
+.viewport-area.layout-mode {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-sunken);
+}
+
+.layout-mode .toolbar {
+  position: relative;
+  inset: auto;
+  /* `order` change aussi l'ordre de peinture : sans cela, la vue 3D passerait devant. */
+  z-index: 1;
+  order: -1;
+  flex: none;
+  padding: 12px 12px 0;
+  background: var(--surface-sunken);
+}
+
+.layout-mode .layout-view {
+  position: relative;
+  inset: auto;
+  flex: 1;
+  min-height: 0;
+  padding-top: 12px;
+}
+
 .layout-heading {
   display: flex;
   align-items: baseline;
@@ -708,6 +734,17 @@ button.ghost:hover {
 }
 
 .layout-cuts summary {
+  cursor: pointer;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.advanced-fields {
+  margin: 4px 0 12px;
+}
+
+.advanced-fields summary {
+  margin-bottom: 10px;
   cursor: pointer;
   color: var(--accent);
   font-weight: 600;

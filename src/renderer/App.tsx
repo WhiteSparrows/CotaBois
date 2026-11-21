@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { findOverlaps } from '../core/geometry'
-import { CaissonForm } from './panels/CaissonForm'
+import { FurnitureForm } from './panels/FurnitureForm'
 import { CommitField } from './panels/CommitField'
 import { CutListPanel } from './panels/CutListPanel'
 import { LayoutView } from './panels/LayoutView'
@@ -175,10 +175,10 @@ export function App() {
             }}
           />
         </div>
-        {selection.length > 0 ? <PiecePanel /> : <CaissonForm />}
+        {selection.length > 0 ? <PiecePanel /> : <FurnitureForm />}
       </aside>
 
-      <main className="viewport-area">
+      <main className={layoutOpen ? "viewport-area layout-mode" : "viewport-area"}>
         <div className="viewport" ref={containerRef} data-testid="viewport" data-piece-count="0" />
         {layoutOpen && <LayoutView />}
 
@@ -220,7 +220,7 @@ export function App() {
         )}
         {!viewportError && !layoutOpen && project.pieces.length === 0 && (
           <p className="viewport-message">
-            Saisissez les dimensions à gauche pour créer un caisson, ou ajoutez un panneau pour dessiner librement.
+            Saisissez les dimensions à gauche pour créer un meuble, ou ajoutez un panneau pour dessiner librement.
           </p>
         )}
         {!layoutOpen && overlaps.length > 0 && (

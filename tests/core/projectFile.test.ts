@@ -9,6 +9,7 @@ import { createEmptyProject, type Project } from '../../src/core/model'
 import { addPiece, newPanelInput, rotatePiece, setEdges } from '../../src/core/pieces'
 import { FORMAT_VERSION, parseProject, safeFileName, serializeProject } from '../../src/core/projectFile'
 import type { Result } from '../../src/core/result'
+import { REFERENCE_DRAWERS } from '../fixtures/drawer-references'
 import { shaped, TABLET } from '../fixtures/shape-references'
 
 function fixture(name: string): string {
@@ -93,14 +94,14 @@ describe('serializeProject', () => {
     expect(computeCutList(value(parseProject(serializeProject(project))))).toEqual(computeCutList(project))
   })
 
-  it('écrit le format exact de la version 4, lisible et stable', () => {
-    const text = fixture('valid-v4.cotabois')
+  it('écrit le format exact de la version 5, lisible et stable', () => {
+    const text = fixture('valid-v5.cotabois')
     expect(serializeProject(value(parseProject(text)))).toBe(text)
   })
 
   it('indique la version du format', () => {
-    expect(FORMAT_VERSION).toBe(4)
-    expect(JSON.parse(serializeProject(createEmptyProject())).formatVersion).toBe(4)
+    expect(FORMAT_VERSION).toBe(5)
+    expect(JSON.parse(serializeProject(createEmptyProject())).formatVersion).toBe(5)
   })
 })
 
@@ -132,8 +133,8 @@ describe('format version 2 : pièces de forme', () => {
     expect(value(parseProject(text)).pieces[0]?.shape).toEqual({ kind: 'rectangle', length: 8000, width: 3000 })
   })
 
-  it('refuse une version supérieure à 4', () => {
-    expect(errorOf(parseProject(validV2With((d) => (d['formatVersion'] = 5)))).code).toBe('format-too-recent')
+  it('refuse une version supérieure à 5', () => {
+    expect(errorOf(parseProject(validV2With((d) => (d['formatVersion'] = 6)))).code).toBe('format-too-recent')
   })
 
   it.each<[string, (data: Mutable) => void]>([
@@ -272,6 +273,45 @@ describe('format version 4 : chants et prix', () => {
     const error = errorOf(parseProject(validV4With(change)))
     expect(error.code).toBe('file-corrupted')
     expect(error.message).toContain(cause)
+  })
+})
+
+function validV5With(change: (data: Mutable) => void): string {
+  const data = JSON.parse(fixture('valid-v5.cotabois')) as Mutable
+  change(data)
+  return JSON.stringify(data)
+}
+
+describe('format version 5 : meuble à tiroirs', () => {
+  it('lit le modèle et ses réglages', () => {
+    const project = value(parseProject(fixture('valid-v5.cotabois')))
+    expect(project.template).toEqual({ kind: 'drawers', params: REFERENCE_DRAWERS, customized: true })
+  })
+
+  it('fait un aller-retour strictement égal, option des chants comprise', () => {
+    const project: Project = {
+      ...createEmptyProject(),
+      template: { kind: 'drawers', params: { ...REFERENCE_DRAWERS, frontEdges: true }, customized: false }
+    }
+    expect(value(parseProject(serializeProject(project)))).toEqual(project)
+  })
+
+  it.each(['valid-v1.cotabois', 'valid-v4.cotabois'])('lit encore %s avec son caisson', (name) => {
+    expect(value(parseProject(fixture(name))).template?.kind).toBe('caisson')
+  })
+
+  it.each<[string, (data: Mutable) => void]>([
+    ['modèle inconnu', (d) => (d['template']['kind'] = 'table')],
+    ['nombre de tiroirs hors limites', (d) => (d['template']['params']['drawerCount'] = 11)],
+    ['jeu entre façades hors limites', (d) => (d['template']['params']['frontGap'] = 101)],
+    ['jeu des coulisses hors limites', (d) => (d['template']['params']['slideGap'] = 501)],
+    ['réglage absent', (d) => delete d['template']['params']['drawerThickness']],
+    ['option des chants non booléenne', (d) => (d['template']['params']['frontEdges'] = 'oui')],
+    ['meuble impossible', (d) => (d['template']['params']['depth'] = 2500)]
+  ])('refuse tout le fichier : %s', (_label, change) => {
+    const error = errorOf(parseProject(validV5With(change)))
+    expect(error.code).toBe('file-corrupted')
+    expect(error.message).toContain('modèle')
   })
 })
 
