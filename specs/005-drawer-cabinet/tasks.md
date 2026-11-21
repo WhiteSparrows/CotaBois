@@ -24,8 +24,8 @@ description: "Liste des tâches pour le meuble à tiroirs"
 
 **Purpose**: Les meubles de référence, calculés à la main, dont dépendent tous les tests.
 
-- [ ] T001 [P] Créer `tests/fixtures/drawer-references.ts` : le meuble de référence (600 × 720 × 560, bois de 18, fond de 5, 3 tiroirs, réglages par défaut) avec ses 7 lignes de liste attendues et ses 23 pièces ; la variante de 721 mm (façades de 2373, 2373 et 2374 dixièmes, côtés de tiroir de 1973) ; les positions clés (façade du bas à `y` = 15, fond du tiroir du bas à `y` = 190, haut du tiroir du haut à `y` = 7010, tiroirs à `x` = 305) ; et les refus avec leur limite (10 tiroirs : 7 au maximum ; profondeur de 250 mm : 265 mm au minimum ; largeur de 80 mm ; bois de 25 mm qui fait toucher le dessous)
-- [ ] T002 [P] Créer `tests/fixtures/projects/valid-v5.cotabois` selon `contracts/project-file-v5.md` : un meuble à tiroirs et quelques-unes de ses pièces
+- [X] T001 [P] Créer `tests/fixtures/drawer-references.ts` : le meuble de référence (600 × 720 × 560, bois de 18, fond de 5, 3 tiroirs, réglages par défaut) avec ses 7 lignes de liste attendues et ses 23 pièces ; la variante de 721 mm (façades de 2373, 2373 et 2374 dixièmes, côtés de tiroir de 1973) ; les positions clés (façade du bas à `y` = 15, fond du tiroir du bas à `y` = 190, haut du tiroir du haut à `y` = 7010, tiroirs à `x` = 305) ; et les refus avec leur limite (10 tiroirs : 7 au maximum ; profondeur de 250 mm : 265 mm au minimum ; largeur de 80 mm ; bois de 25 mm qui fait toucher le dessous)
+- [X] T002 [P] Créer `tests/fixtures/projects/valid-v5.cotabois` selon `contracts/project-file-v5.md` : un meuble à tiroirs et quelques-unes de ses pièces
 
 ---
 
@@ -39,14 +39,14 @@ description: "Liste des tâches pour le meuble à tiroirs"
 
 > **NOTE: Écrire ces tests d'abord et vérifier qu'ils échouent avant d'implémenter.**
 
-- [ ] T003 [P] Écrire dans `tests/core/projectFile.test.ts` : aller-retour strictement égal d'un meuble à tiroirs ; caisson et fichiers en versions 1 à 4 lus à l'identique ; format exact de `valid-v5.cotabois` ; refus avec `file-corrupted` d'un modèle inconnu et de réglages invalides ; refus d'une version supérieure à 5. Adapter les tests qui attendent la version 4, y compris `tests/e2e/us4-project.spec.ts` (FR-014, FR-015)
-- [ ] T004 [P] Écrire `tests/core/drawers.test.ts`, partie validation : `drawerCount` « Entier de 1 à 10 », `frontGap` « Entier de 0 à 100 (10 mm) », `slideGap` « Entier de 0 à 500 (50 mm), de chaque côté », `backThickness` « 0 ou dimension valide, inférieure à la profondeur », dimensions et épaisseurs valides ; puis les refus de `research.md`, R7, dans l'ordre, avec `field` et la limite donnée par le message (7 tiroirs au maximum, 265 mm au minimum) ; `maxDrawerCount` (FR-004, FR-009)
+- [X] T003 [P] Écrire dans `tests/core/projectFile.test.ts` : aller-retour strictement égal d'un meuble à tiroirs ; caisson et fichiers en versions 1 à 4 lus à l'identique ; format exact de `valid-v5.cotabois` ; refus avec `file-corrupted` d'un modèle inconnu et de réglages invalides ; refus d'une version supérieure à 5. Adapter les tests qui attendent la version 4, y compris `tests/e2e/us4-project.spec.ts` (FR-014, FR-015)
+- [X] T004 [P] Écrire `tests/core/drawers.test.ts`, partie validation : `drawerCount` « Entier de 1 à 10 », `frontGap` « Entier de 0 à 100 (10 mm) », `slideGap` « Entier de 0 à 500 (50 mm), de chaque côté », `backThickness` « 0 ou dimension valide, inférieure à la profondeur », dimensions et épaisseurs valides ; puis les refus de `research.md`, R7, dans l'ordre, avec `field` et la limite donnée par le message (7 tiroirs au maximum, 265 mm au minimum) ; `maxDrawerCount` (FR-004, FR-009)
 
 ### Implementation
 
-- [ ] T005 Étendre `src/core/model.ts` : `DrawerParams`, `DrawerCabinetTemplate`, `Template` en union par `kind` ; adapter les lectures de `template.params` qui supposent un caisson, dans `src/core/projectFile.ts` et `src/renderer/panels/CaissonForm.tsx`
-- [ ] T006 Créer `src/core/drawers.ts`, partie réglages : `DEFAULT_DRAWER_PARAMS`, `validateDrawerParams` et `maxDrawerCount`, selon `data-model.md` et `research.md`, R7 (FR-004, FR-009)
-- [ ] T007 Passer `src/core/projectFile.ts` en version 5 : lecture, validation et écriture du modèle `drawers`, migration identique depuis la version 4 (FR-014, FR-015)
+- [X] T005 Étendre `src/core/model.ts` : `DrawerParams`, `DrawerCabinetTemplate`, `Template` en union par `kind` ; adapter les lectures de `template.params` qui supposent un caisson, dans `src/core/projectFile.ts` et `src/renderer/panels/CaissonForm.tsx`
+- [X] T006 Créer `src/core/drawers.ts`, partie réglages : `DEFAULT_DRAWER_PARAMS`, `validateDrawerParams` et `maxDrawerCount`, selon `data-model.md` et `research.md`, R7 (FR-004, FR-009)
+- [X] T007 Passer `src/core/projectFile.ts` en version 5 : lecture, validation et écriture du modèle `drawers`, migration identique depuis la version 4 (FR-014, FR-015)
 
 **Checkpoint**: Un projet sait enregistrer un meuble à tiroirs et le relire, et le caisson est inchangé.
 

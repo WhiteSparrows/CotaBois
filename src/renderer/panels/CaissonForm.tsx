@@ -67,7 +67,7 @@ function sameParams(a: CaissonParams, b: CaissonParams): boolean {
 
 export function CaissonForm() {
   const { project } = useEditor()
-  const template = project.template
+  const template = project.template?.kind === 'caisson' ? project.template : null
   const [drafts, setDrafts] = useState<Drafts>(() => (template ? toDrafts(template.params) : DEFAULT_DRAFTS))
   const [error, setError] = useState<CoreError | null>(null)
   const [pendingParams, setPendingParams] = useState<CaissonParams | null>(null)

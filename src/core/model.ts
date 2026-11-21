@@ -107,7 +107,6 @@ export interface CaissonParams {
   frontEdges?: true
 }
 
-/** Seule variante pour l'instant : d'autres modèles s'ajouteront ici. */
 export interface CaissonTemplate {
   kind: 'caisson'
   params: CaissonParams
@@ -115,7 +114,34 @@ export interface CaissonTemplate {
   customized: boolean
 }
 
-export type Template = CaissonTemplate
+/** Un caisson sans étagère, fermé par des façades en applique, avec une boîte sur coulisses derrière chacune. */
+export interface DrawerParams {
+  width: Tenths
+  height: Tenths
+  depth: Tenths
+  boardThickness: Tenths
+  /** 0 si le meuble n'a pas de fond. */
+  backThickness: Tenths
+  drawerCount: number
+  /** Entre deux façades, et partagé entre le haut et le bas du meuble. */
+  frontGap: Tenths
+  /** De chaque côté de la boîte, pour les coulisses. */
+  slideGap: Tenths
+  /** Bois des côtés, de l'avant et de l'arrière des tiroirs. */
+  drawerThickness: Tenths
+  drawerBottomThickness: Tenths
+  /** Chant sur les bords avant de la carcasse et sur les 4 bords des façades. Absent : pas de chant. */
+  frontEdges?: true
+}
+
+export interface DrawerCabinetTemplate {
+  kind: 'drawers'
+  params: DrawerParams
+  customized: boolean
+}
+
+/** Chaque modèle de meuble est une variante ; le reste du logiciel ne lit que `customized`. */
+export type Template = CaissonTemplate | DrawerCabinetTemplate
 
 /** Le panneau brut d'un matériau et d'une épaisseur. Sa longueur suit le fil. */
 export interface PanelStock {

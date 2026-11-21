@@ -1,0 +1,71 @@
+{
+  "formatVersion": 5,
+  "name": "Commode",
+  "template": {
+    "kind": "drawers",
+    "params": {
+      "width": 6000,
+      "height": 7200,
+      "depth": 5600,
+      "boardThickness": 180,
+      "backThickness": 50,
+      "drawerCount": 3,
+      "frontGap": 30,
+      "slideGap": 125,
+      "drawerThickness": 150,
+      "drawerBottomThickness": 50,
+      "frontEdges": false
+    },
+    "customized": true
+  },
+  "layout": {
+    "kerf": 30,
+    "edgeMargin": 0,
+    "edgeOverhang": 200,
+    "panels": []
+  },
+  "pieces": [
+    {
+      "id": "p1",
+      "name": "Façade 1",
+      "shape": {
+        "kind": "rectangle",
+        "length": 5970,
+        "width": 2370
+      },
+      "edges": [],
+      "thickness": 180,
+      "material": "",
+      "position": {
+        "x": 15,
+        "y": 4815,
+        "z": 5600
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+y"
+      }
+    },
+    {
+      "id": "p2",
+      "name": "Tiroir 1 fond",
+      "shape": {
+        "kind": "rectangle",
+        "length": 5390,
+        "width": 5000
+      },
+      "edges": [],
+      "thickness": 50,
+      "material": "",
+      "position": {
+        "x": 305,
+        "y": 4990,
+        "z": 600
+      },
+      "orientation": {
+        "u": "+x",
+        "v": "+z"
+      }
+    }
+  ]
+}
