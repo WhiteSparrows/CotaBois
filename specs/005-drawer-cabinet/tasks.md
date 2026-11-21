@@ -103,11 +103,11 @@ description: "Liste des tâches pour le meuble à tiroirs"
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T018 [P] [US3] Compléter `tests/e2e/us9-drawers.spec.ts`, scénarios T5 et T7 : confirmation avant de remplacer le caisson ; caisson identique à aujourd'hui ; modèle et réglages retrouvés après réouverture ; fichiers en versions 1 à 4 affichés avec `Caisson` (FR-002, FR-003, FR-014, FR-015, SC-004)
+- [X] T018 [P] [US3] Compléter `tests/e2e/us9-drawers.spec.ts`, scénarios T5 et T7 : confirmation avant de remplacer le caisson ; caisson identique à aujourd'hui ; modèle et réglages retrouvés après réouverture ; fichiers en versions 1 à 4 affichés avec `Caisson` (FR-002, FR-003, FR-014, FR-015, SC-004)
 
 ### Implementation for User Story 3
 
-- [ ] T019 [US3] Dans `src/renderer/panels/FurnitureForm.tsx`, afficher le modèle du projet ouvert, et demander confirmation avant de remplacer un meuble par un autre modèle (FR-003)
+- [X] T019 [US3] Dans `src/renderer/panels/FurnitureForm.tsx`, afficher le modèle du projet ouvert, et demander confirmation avant de remplacer un meuble par un autre modèle (FR-003)
 
 **Checkpoint**: T5 et T7 passent. Tous les parcours P1 et P2 sont fonctionnels.
 
@@ -121,12 +121,12 @@ description: "Liste des tâches pour le meuble à tiroirs"
 
 ### Tests for User Story 4 ⚠️
 
-- [ ] T020 [P] [US4] Compléter `tests/core/drawers.test.ts` : avec `frontEdges`, bord `top` des côtés, du dessus et du dessous, et 4 bords de chaque façade ; aucun chant sur les tiroirs ni sur le fond (FR-011)
-- [ ] T021 [P] [US4] Compléter `tests/e2e/us9-drawers.spec.ts`, scénario T6 : chants et trois groupes de calepinage, 18, 15 et 5 mm (FR-011, FR-012)
+- [X] T020 [P] [US4] Compléter `tests/core/drawers.test.ts` : avec `frontEdges`, bord `top` des côtés, du dessus et du dessous, et 4 bords de chaque façade ; aucun chant sur les tiroirs ni sur le fond (FR-011)
+- [X] T021 [P] [US4] Compléter `tests/e2e/us9-drawers.spec.ts`, scénario T6 : chants et trois groupes de calepinage, 18, 15 et 5 mm (FR-011, FR-012)
 
 ### Implementation for User Story 4
 
-- [ ] T022 [US4] Appliquer `frontEdges` dans `src/core/drawers.ts`, et proposer la case dans `src/renderer/panels/DrawerFields.tsx` (FR-011)
+- [X] T022 [US4] Appliquer `frontEdges` dans `src/core/drawers.ts`, et proposer la case dans `src/renderer/panels/DrawerFields.tsx` (FR-011)
 
 **Checkpoint**: T6 passe. Tous les parcours sont fonctionnels.
 

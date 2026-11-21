@@ -173,6 +173,33 @@ describe('applyDrawerCabinet', () => {
   })
 })
 
+describe('applyDrawerCabinet : chants sur les bords avant (US4)', () => {
+  it('chante le bord avant de la carcasse et les 4 bords des façades, rien sur les tiroirs ni le fond', () => {
+    const project = generate({ ...REFERENCE_DRAWERS, frontEdges: true })
+    const edges = Object.fromEntries(project.pieces.map((piece) => [piece.name, piece.edges]))
+    for (const name of ['Côté gauche', 'Côté droit', 'Dessous', 'Dessus']) expect(edges[name]).toEqual(['top'])
+    for (const k of [1, 2, 3]) expect(edges[`Façade ${k}`]).toEqual(['bottom', 'top', 'left', 'right'])
+    expect(edges['Fond']).toBeUndefined()
+    const drawerPieces = project.pieces.filter((piece) => piece.name.startsWith('Tiroir'))
+    expect(drawerPieces).toHaveLength(15)
+    expect(drawerPieces.every((piece) => piece.edges === undefined)).toBe(true)
+    expect(project.template).toEqual({ kind: 'drawers', params: { ...REFERENCE_DRAWERS, frontEdges: true }, customized: false })
+  })
+
+  it("le bord haut chanté de la carcasse est bien à l'avant", () => {
+    const project = generate({ ...REFERENCE_DRAWERS, frontEdges: true })
+    for (const name of ['Côté gauche', 'Côté droit', 'Dessous', 'Dessus']) {
+      const piece = byName(project, name)
+      expect(piece.orientation.v).toBe('+z')
+      expect(piece.position.z + piece.shape.width).toBe(REFERENCE_DRAWERS.depth)
+    }
+  })
+
+  it("sans l'option, le meuble est le même qu'avec l'option absente", () => {
+    expect(generate({ ...REFERENCE_DRAWERS, frontEdges: undefined })).toEqual(generate())
+  })
+})
+
 describe('applyDrawerCabinet : ajuster après coup (US2)', () => {
   it('remplace toutes les pièces et remet le modèle à non retouché', () => {
     const first = generate()
