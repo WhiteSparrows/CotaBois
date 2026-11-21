@@ -1,3 +1,4 @@
+import { checkCutSizes, withEdges } from './edges'
 import { boundsOverlap, pieceBounds, pieceSize, projectBounds } from './geometry'
 import {
   axisOf,
@@ -8,6 +9,7 @@ import {
   type CornerName,
   type CornerTreatment,
   type Cutout,
+  type EdgeName,
   type Piece,
   type Project,
   type ShapedShape,
@@ -153,7 +155,29 @@ export function updatePiece(project: Project, pieceId: string, changes: PieceCha
     updated.position.x === piece.position.x &&
     updated.position.y === piece.position.y &&
     updated.position.z === piece.position.z
-  return ok(unchanged ? project : replacePiece(project, updated))
+  if (unchanged) return ok(project)
+
+  // Dimension, matériau ou épaisseur changent la cote à couper : elle doit rester positive.
+  const next = replacePiece(project, updated)
+  const cuts = checkCutSizes(next, [pieceId])
+  return cuts.ok ? ok(next) : cuts
+}
+
+/** Pose ou retire un chant sur plusieurs pièces, en une action : si l'une refuse, aucune ne change. */
+export function setEdges(project: Project, pieceIds: readonly string[], edge: EdgeName, banded: boolean): Result<Project> {
+  const updated = new Map<string, Piece>()
+  for (const pieceId of pieceIds) {
+    const found = findPiece(project, pieceId)
+    if (!found.ok) return found
+    const current = found.value.edges ?? []
+    if (current.includes(edge) === banded) continue
+    updated.set(pieceId, withEdges(found.value, banded ? [...current, edge] : current.filter((name) => name !== edge)))
+  }
+  if (updated.size === 0) return ok(project)
+
+  const next = withPieces(project, project.pieces.map((piece) => updated.get(piece.id) ?? piece))
+  const cuts = checkCutSizes(next, [...updated.keys()])
+  return cuts.ok ? ok(next) : cuts
 }
 
 /** Quart de tour dans le sens direct : ce que devient chaque axe. */

@@ -1,5 +1,61 @@
 import { describe, expect, it } from 'vitest'
-import { formatMm, formatSquareMeters, parseMm } from '../../src/core/units'
+import { formatEuros, formatMeters, formatMm, formatSquareMeters, parseEuros, parseMm } from '../../src/core/units'
+
+const NBSP = ' '
+
+describe('parseEuros', () => {
+  it.each([
+    ['45,90', 4590],
+    ['45.9', 4590],
+    ['45', 4500],
+    ['0', 0],
+    ['0,85', 85],
+    ['1 234,50', 123_450],
+    [`1${NBSP}234,50`, 123_450],
+    ['12 €', 1200],
+    ['  7,5€ ', 750],
+    ['100 000', 10_000_000]
+  ])('lit %j comme %i centimes', (text, cents) => {
+    expect(parseEuros(text)).toEqual({ ok: true, value: cents })
+  })
+
+  it.each([
+    ['-3', 'négatif'],
+    ['12,345', 'centime'],
+    ['abc', 'par exemple'],
+    ['', 'par exemple'],
+    ['100 000,01', '100 000']
+  ])('refuse %j avec une explication', (text, word) => {
+    const result = parseEuros(text)
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.error.message.replaceAll(NBSP, ' ')).toContain(word)
+  })
+})
+
+describe('formatEuros', () => {
+  it.each([
+    [4590, `45,90${NBSP}€`],
+    [0, `0,00${NBSP}€`],
+    [5, `0,05${NBSP}€`],
+    [9823, `98,23${NBSP}€`],
+    [123_450, `1${NBSP}234,50${NBSP}€`],
+    [10_000_000, `100${NBSP}000,00${NBSP}€`]
+  ])('affiche %i centimes comme %j', (cents, text) => {
+    expect(formatEuros(cents)).toBe(text)
+  })
+})
+
+describe('formatMeters', () => {
+  it.each([
+    [74_200, '7,42 m'],
+    [75_600, '7,56 m'],
+    [74_201, '7,43 m'],
+    [99, '0,01 m'],
+    [0, '0,00 m']
+  ])('affiche %i dixièmes comme %j, au centimètre supérieur', (tenths, text) => {
+    expect(formatMeters(tenths)).toBe(text)
+  })
+})
 
 describe('parseMm', () => {
   it.each([

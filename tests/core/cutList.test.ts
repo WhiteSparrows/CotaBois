@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { applyCaisson } from '../../src/core/caisson'
 import { computeCutList } from '../../src/core/cutList'
-import { createEmptyProject, type Piece, type Project } from '../../src/core/model'
+import { setLayoutOptions, setPanelStock } from '../../src/core/layout'
+import { createEmptyProject, type EdgeName, type Piece, type Project } from '../../src/core/model'
+import { setEdges } from '../../src/core/pieces'
+import type { Result } from '../../src/core/result'
+import { FRONT_EDGES, REFERENCE_PARAMS, SHELF } from '../fixtures/edge-references'
 import { REFERENCE_CAISSONS } from '../fixtures/reference-furniture'
 import { box, round, shaped } from '../fixtures/shape-references'
 
@@ -203,9 +207,9 @@ describe('computeCutList : totaux', () => {
       )
     )
     expect(totals).toEqual([
-      { material: 'Chêne', thickness: 180, pieceCount: 3, area: 102_000_000 },
-      { material: 'Chêne', thickness: 50, pieceCount: 1, area: 2_000_000 },
-      { material: 'Hêtre', thickness: 180, pieceCount: 1, area: 2_000_000 }
+      { material: 'Chêne', thickness: 180, pieceCount: 3, area: 102_000_000, edgeCount: 0, edgeLength: 0 },
+      { material: 'Chêne', thickness: 50, pieceCount: 1, area: 2_000_000, edgeCount: 0, edgeLength: 0 },
+      { material: 'Hêtre', thickness: 180, pieceCount: 1, area: 2_000_000, edgeCount: 0, edgeLength: 0 }
     ])
   })
 
@@ -216,8 +220,77 @@ describe('computeCutList : totaux', () => {
     if (!result.ok) throw new Error(result.error.message)
     expect(computeCutList(result.value).totals).toEqual([
       // 2 × 18000 × 3950 + 5 × 7640 × 3950 = 142 200 000 + 150 890 000
-      { material: '', thickness: 180, pieceCount: 7, area: 293_090_000 },
-      { material: '', thickness: 50, pieceCount: 1, area: 144_000_000 }
+      { material: '', thickness: 180, pieceCount: 7, area: 293_090_000, edgeCount: 0, edgeLength: 0 },
+      { material: '', thickness: 50, pieceCount: 1, area: 144_000_000, edgeCount: 0, edgeLength: 0 }
     ])
+  })
+})
+
+function value<T>(result: Result<T>): T {
+  if (!result.ok) throw new Error(result.error.message)
+  return result.value
+}
+
+/** Le caisson de référence, bords avant chantés : tout sauf le fond. */
+function frontEdgedCaisson(): Project {
+  let id = 0
+  const project = value(applyCaisson(createEmptyProject(), REFERENCE_PARAMS, () => `c${++id}`))
+  const front = project.pieces.filter((item) => item.name !== 'Fond').map((item) => item.id)
+  return value(setEdges(project, front, 'top', true))
+}
+
+function edged(edges: EdgeName[], changes: Partial<Piece> = {}): Piece {
+  return piece(SHELF.length, SHELF.width, 180, { ...(edges.length > 0 ? { edges } : {}), ...changes })
+}
+
+describe('computeCutList : chants et cote à couper (US1)', () => {
+  it('donne la cote à couper, la cote finie et le résumé des chants', () => {
+    const project = value(setPanelStock(frontEdgedCaisson(), '', 180, { edgeThickness: SHELF.edgeThickness }))
+    const [sides, shelves, back] = computeCutList(project).lines
+    expect(sides).toMatchObject({ length: 18000, width: 3930, finishedLength: 18000, finishedWidth: 3950, edges: '1 long' })
+    expect(shelves).toMatchObject({ quantity: 5, length: 7640, width: 3930, finishedLength: 7640, finishedWidth: 3950, edges: '1 long' })
+    expect(back).toMatchObject({ length: 18000, width: 8000, finishedLength: 18000, finishedWidth: 8000, edges: '' })
+  })
+
+  it("garde la cote finie avec un chant d'épaisseur nulle", () => {
+    const [sides] = computeCutList(frontEdgedCaisson()).lines
+    expect(sides).toMatchObject({ length: 18000, width: 3950, finishedLength: 18000, finishedWidth: 3950 })
+  })
+
+  it('sépare des pièces aux chants différents', () => {
+    expect(computeCutList(project(edged(['top']), edged(['left']))).lines).toHaveLength(2)
+    expect(computeCutList(project(edged(['top']), edged([]))).lines).toHaveLength(2)
+  })
+
+  it("regroupe des pièces chantées sur le même bord physique, l'une tournée d'un demi-tour", () => {
+    const { lines } = computeCutList(project(edged(['top'], { name: 'A' }), edged(['bottom'], { name: 'B', orientation: { u: '-x', v: '-y' } })))
+    expect(lines).toHaveLength(1)
+    expect(lines[0]).toMatchObject({ quantity: 2, edges: '1 long' })
+  })
+
+  it('compte la surface des totaux sur la cote à couper', () => {
+    const project = value(setPanelStock(frontEdgedCaisson(), '', 180, { edgeThickness: SHELF.edgeThickness }))
+    // 2 × 18000 × 3930 + 5 × 7640 × 3930
+    expect(computeCutList(project).totals[0]?.area).toBe(2 * 18000 * 3930 + 5 * 7640 * 3930)
+  })
+
+  it('ne change rien à une liste sans chant', () => {
+    const { lines } = computeCutList(project(piece(1000, 500, 180)))
+    expect(lines[0]).toMatchObject({ length: 1000, width: 500, finishedLength: 1000, finishedWidth: 500, edges: '', edgeLength: 0 })
+  })
+})
+
+describe('computeCutList : métrage (US2)', () => {
+  it('donne 7 bords et 7,42 m sans surlongueur', () => {
+    const project = value(setLayoutOptions(frontEdgedCaisson(), { edgeOverhang: 0 }))
+    expect(computeCutList(project).totals[0]).toMatchObject({ edgeCount: FRONT_EDGES.edgeCount, edgeLength: FRONT_EDGES.length })
+  })
+
+  it('donne 7,56 m avec la surlongueur par défaut de 20 mm, réparti sur les lignes', () => {
+    const { lines, totals } = computeCutList(frontEdgedCaisson())
+    expect(totals[0]).toMatchObject({ edgeCount: 7, edgeLength: FRONT_EDGES.lengthWithOverhang })
+    // 2 × (18000 + 200) et 5 × (7640 + 200)
+    expect(lines.map((line) => line.edgeLength)).toEqual([36_400, 39_200, 0])
+    expect(totals[1]).toMatchObject({ edgeCount: 0, edgeLength: 0 })
   })
 })

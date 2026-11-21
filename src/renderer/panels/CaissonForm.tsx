@@ -6,7 +6,8 @@ import { formatMm, parseMm } from '../../core/units'
 import { applyCaissonParams, useEditor } from '../store'
 import { ConfirmDialog } from './ConfirmDialog'
 
-type Field = keyof CaissonParams
+/** Les champs à saisir ; l'option des chants est une case à cocher. */
+type Field = Exclude<keyof CaissonParams, 'frontEdges'>
 type Drafts = Record<Field, string>
 
 const FIELDS: ReadonlyArray<{ field: Field; label: string; unit?: string }> = [
@@ -56,8 +57,12 @@ function parseDrafts(drafts: Drafts): Result<CaissonParams> {
   return ok(params)
 }
 
+function withOption(params: Result<CaissonParams>, frontEdges: boolean): Result<CaissonParams> {
+  return params.ok && frontEdges ? ok({ ...params.value, frontEdges: true }) : params
+}
+
 function sameParams(a: CaissonParams, b: CaissonParams): boolean {
-  return FIELDS.every(({ field }) => a[field] === b[field])
+  return FIELDS.every(({ field }) => a[field] === b[field]) && Boolean(a.frontEdges) === Boolean(b.frontEdges)
 }
 
 export function CaissonForm() {
@@ -66,18 +71,20 @@ export function CaissonForm() {
   const [drafts, setDrafts] = useState<Drafts>(() => (template ? toDrafts(template.params) : DEFAULT_DRAFTS))
   const [error, setError] = useState<CoreError | null>(null)
   const [pendingParams, setPendingParams] = useState<CaissonParams | null>(null)
+  const [frontEdges, setFrontEdges] = useState(Boolean(template?.params.frontEdges))
 
   useEffect(() => {
     setDrafts(template ? toDrafts(template.params) : DEFAULT_DRAFTS)
+    setFrontEdges(Boolean(template?.params.frontEdges))
     setError(null)
   }, [template?.params])
 
   // Générer un caisson remplace toutes les pièces : on ne perd pas un travail manuel sans prévenir.
   const wouldLoseWork = template ? template.customized : project.pieces.length > 0
 
-  function commit(): void {
+  function commit(withFrontEdges = frontEdges): void {
     if (pendingParams) return
-    const parsed = parseDrafts(drafts)
+    const parsed = withOption(parseDrafts(drafts), withFrontEdges)
     const validated = parsed.ok ? validateCaissonParams(parsed.value) : parsed
     if (!validated.ok) {
       setError(validated.error)
@@ -97,6 +104,12 @@ export function CaissonForm() {
     commit()
   }
 
+  function toggleFrontEdges(checked: boolean): void {
+    setFrontEdges(checked)
+    // Un caisson déjà créé est régénéré aussitôt ; sinon, l'option attend « Créer le caisson ».
+    if (template) commit(checked)
+  }
+
   function confirmReplace(): void {
     if (pendingParams) applyCaissonParams(pendingParams)
     setPendingParams(null)
@@ -105,6 +118,7 @@ export function CaissonForm() {
   function keepWork(): void {
     setPendingParams(null)
     setDrafts(template ? toDrafts(template.params) : DEFAULT_DRAFTS)
+    setFrontEdges(Boolean(template?.params.frontEdges))
   }
 
   return (
@@ -126,7 +140,7 @@ export function CaissonForm() {
               aria-invalid={error?.field === field}
               aria-describedby={error?.field === field ? 'caisson-error' : undefined}
               onChange={(event) => setDrafts({ ...drafts, [field]: event.target.value })}
-              onBlur={template ? commit : undefined}
+              onBlur={template ? () => commit() : undefined}
             />
             {unit && <span className="unit">{unit}</span>}
           </div>
@@ -137,6 +151,10 @@ export function CaissonForm() {
           )}
         </div>
       ))}
+      <label className="check-field">
+        <input type="checkbox" checked={frontEdges} onChange={(event) => toggleFrontEdges(event.target.checked)} />
+        Chants sur les bords avant
+      </label>
       {template ? (
         <button type="submit" className="visually-hidden" tabIndex={-1}>
           Appliquer

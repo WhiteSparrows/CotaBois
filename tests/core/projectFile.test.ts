@@ -6,7 +6,7 @@ import { computeCutList } from '../../src/core/cutList'
 import { findOverlaps } from '../../src/core/geometry'
 import { defaultLayoutSettings, setLayoutOptions, setPanelStock } from '../../src/core/layout'
 import { createEmptyProject, type Project } from '../../src/core/model'
-import { addPiece, newPanelInput, rotatePiece } from '../../src/core/pieces'
+import { addPiece, newPanelInput, rotatePiece, setEdges } from '../../src/core/pieces'
 import { FORMAT_VERSION, parseProject, safeFileName, serializeProject } from '../../src/core/projectFile'
 import type { Result } from '../../src/core/result'
 import { shaped, TABLET } from '../fixtures/shape-references'
@@ -93,14 +93,14 @@ describe('serializeProject', () => {
     expect(computeCutList(value(parseProject(serializeProject(project))))).toEqual(computeCutList(project))
   })
 
-  it('écrit le format exact de la version 3, lisible et stable', () => {
-    const text = fixture('valid-v3.cotabois')
+  it('écrit le format exact de la version 4, lisible et stable', () => {
+    const text = fixture('valid-v4.cotabois')
     expect(serializeProject(value(parseProject(text)))).toBe(text)
   })
 
   it('indique la version du format', () => {
-    expect(FORMAT_VERSION).toBe(3)
-    expect(JSON.parse(serializeProject(createEmptyProject())).formatVersion).toBe(3)
+    expect(FORMAT_VERSION).toBe(4)
+    expect(JSON.parse(serializeProject(createEmptyProject())).formatVersion).toBe(4)
   })
 })
 
@@ -132,8 +132,8 @@ describe('format version 2 : pièces de forme', () => {
     expect(value(parseProject(text)).pieces[0]?.shape).toEqual({ kind: 'rectangle', length: 8000, width: 3000 })
   })
 
-  it('refuse une version supérieure à 3', () => {
-    expect(errorOf(parseProject(validV2With((d) => (d['formatVersion'] = 4)))).code).toBe('format-too-recent')
+  it('refuse une version supérieure à 4', () => {
+    expect(errorOf(parseProject(validV2With((d) => (d['formatVersion'] = 5)))).code).toBe('format-too-recent')
   })
 
   it.each<[string, (data: Mutable) => void]>([
@@ -160,12 +160,15 @@ function validV3With(change: (data: Mutable) => void): string {
 
 describe('format version 3 : réglages du calepinage', () => {
   it('lit les réglages', () => {
+    // La version 4 ajoute aux réglages des valeurs neutres : surlongueur par défaut, chant nul, prix absents.
+    const neutral = { edgeThickness: 0, panelPrice: null, edgePrice: null }
     expect(value(parseProject(fixture('valid-v3.cotabois'))).layout).toEqual({
       kerf: 30,
       edgeMargin: 100,
+      edgeOverhang: 200,
       panels: [
-        { material: '', thickness: 50, length: 25000, width: 12500, grain: false },
-        { material: 'Chêne plaqué', thickness: 180, length: 25000, width: 12500, grain: true }
+        { material: '', thickness: 50, length: 25000, width: 12500, grain: false, ...neutral },
+        { material: 'Chêne plaqué', thickness: 180, length: 25000, width: 12500, grain: true, ...neutral }
       ]
     })
   })
@@ -200,6 +203,75 @@ describe('format version 3 : réglages du calepinage', () => {
     const error = errorOf(parseProject(validV3With(change)))
     expect(error.code).toBe('file-corrupted')
     expect(error.message).toContain('calepinage')
+  })
+})
+
+function validV4With(change: (data: Mutable) => void): string {
+  const data = JSON.parse(fixture('valid-v4.cotabois')) as Mutable
+  change(data)
+  return JSON.stringify(data)
+}
+
+describe('format version 4 : chants et prix', () => {
+  it('lit les chants, les réglages et l\'option du caisson', () => {
+    const project = value(parseProject(fixture('valid-v4.cotabois')))
+    expect(project.pieces.map((piece) => piece.edges)).toEqual([['top'], ['bottom', 'top', 'left'], undefined])
+    expect(project.template?.params.frontEdges).toBe(true)
+    expect(project.layout.edgeOverhang).toBe(200)
+    expect(project.layout.panels[0]).toEqual({
+      material: '',
+      thickness: 180,
+      length: 28000,
+      width: 20700,
+      grain: false,
+      edgeThickness: 20,
+      panelPrice: 4590,
+      edgePrice: 85
+    })
+  })
+
+  it('fait un aller-retour strictement égal des chants et des prix', () => {
+    let project = complexProject()
+    project = value(setEdges(project, [project.pieces[2]!.id, project.pieces[3]!.id], 'top', true))
+    project = value(setEdges(project, [project.pieces[3]!.id], 'left', true))
+    project = value(setLayoutOptions(project, { edgeOverhang: 150 }))
+    project = value(setPanelStock(project, '', 185, { edgeThickness: 8, panelPrice: 4590, edgePrice: 85 }))
+    expect(value(parseProject(serializeProject(project)))).toEqual(project)
+  })
+
+  it.each(['valid-v1.cotabois', 'valid-v2.cotabois', 'valid-v3.cotabois'])('migre %s sans chant, sans prix ni option', (name) => {
+    const project = value(parseProject(fixture(name)))
+    expect(project.pieces.every((piece) => piece.edges === undefined)).toBe(true)
+    expect(project.template?.params.frontEdges).toBeUndefined()
+    expect(project.layout.edgeOverhang).toBe(200)
+    expect(project.layout.panels.every((panel) => panel.edgeThickness === 0 && panel.panelPrice === null && panel.edgePrice === null)).toBe(true)
+  })
+
+  it.each<[string, (data: Mutable) => void, string]>([
+    ['bord inconnu', (d) => (d['pieces'][0]['edges'] = ['front']), 'Côté gauche'],
+    ['bord en double', (d) => (d['pieces'][0]['edges'] = ['top', 'top']), 'Côté gauche'],
+    ['chants qui ne sont pas une liste', (d) => (d['pieces'][0]['edges'] = 'top'), 'Côté gauche'],
+    ['chants absents', (d) => delete d['pieces'][0]['edges'], 'Côté gauche'],
+    ['prix négatif', (d) => (d['layout']['panels'][0]['panelPrice'] = -1), 'calepinage'],
+    ['prix non entier', (d) => (d['layout']['panels'][0]['panelPrice'] = 12.5), 'calepinage'],
+    ['prix trop élevé', (d) => (d['layout']['panels'][0]['edgePrice'] = 10_000_001), 'calepinage'],
+    ['prix en texte', (d) => (d['layout']['panels'][0]['edgePrice'] = '85'), 'calepinage'],
+    ['chant trop épais', (d) => (d['layout']['panels'][0]['edgeThickness'] = 101), 'calepinage'],
+    ['surlongueur hors limites', (d) => (d['layout']['edgeOverhang'] = 1001), 'calepinage'],
+    ['surlongueur absente', (d) => delete d['layout']['edgeOverhang'], 'calepinage'],
+    ['option du caisson non booléenne', (d) => (d['template']['params']['frontEdges'] = 'oui'), 'modèle'],
+    [
+      'cote à couper nulle',
+      (d) => {
+        d['pieces'][0]['shape']['width'] = 30
+        d['layout']['panels'][0]['edgeThickness'] = 30
+      },
+      'Côté gauche'
+    ]
+  ])('refuse tout le fichier : %s', (_label, change, cause) => {
+    const error = errorOf(parseProject(validV4With(change)))
+    expect(error.code).toBe('file-corrupted')
+    expect(error.message).toContain(cause)
   })
 })
 

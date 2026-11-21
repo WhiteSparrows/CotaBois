@@ -1,4 +1,4 @@
-import type { CornerName, CornerTreatment, Cutout, Shape, ShapedShape } from './model'
+import type { CornerName, CornerTreatment, Cutout, EdgeName, Shape, ShapedShape } from './model'
 import { err, ok, type Result } from './result'
 import { formatMm, type Tenths } from './units'
 
@@ -626,7 +626,17 @@ function shapeSignature(shape: ShapedShape, boxes: readonly ResolvedCutout[], ma
 
 /** Identique pour deux formes égales à une rotation ou un retournement près. Vide pour un rectangle. */
 export function canonicalShapeKey(shape: Shape): string {
-  if (shape.kind === 'rectangle') return ''
+  return canonicalPieceKey(shape, undefined)
+}
+
+/**
+ * Identique pour deux pièces dont la forme et les chants sont égaux à une même rotation ou un même retournement
+ * près. Vide pour un rectangle sans chant.
+ */
+export function canonicalPieceKey(original: Shape, edges: readonly EdgeName[] | undefined): string {
+  const banded = edges ?? []
+  if (original.kind === 'rectangle' && banded.length === 0) return ''
+  const shape = asShaped(original)
 
   // Tout est ramené à un repère où la longueur est la plus grande dimension.
   const transposed = shape.length < shape.width
@@ -644,8 +654,23 @@ export function canonicalShapeKey(shape: Shape): string {
     for (const symmetry of [...symmetries]) symmetries.push((p) => symmetry({ u: p.v, v: p.u }))
   }
 
+  // Un bord est repéré par son milieu, qui suit la même symétrie que les coins et les découpes.
+  const middles: Record<EdgeName, PlanePoint> = {
+    bottom: { u: shape.length / 2, v: 0 },
+    top: { u: shape.length / 2, v: shape.width },
+    left: { u: 0, v: shape.width / 2 },
+    right: { u: shape.length, v: shape.width / 2 }
+  }
   const boxes = shape.cutouts.map((cutout) => resolveCutout(shape, cutout))
-  const signatures = symmetries.map((symmetry) => shapeSignature(shape, boxes, (p) => symmetry(normalize(p)), L, W))
+  const signatures = symmetries.map((symmetry) => {
+    const map: PointMap = (p) => symmetry(normalize(p))
+    const edgePart = banded.map((edge) => {
+      const point = map(middles[edge])
+      return `${point.u},${point.v}`
+    })
+    const signature = shapeSignature(shape, boxes, map, L, W)
+    return banded.length > 0 ? `${signature}|E${edgePart.sort().join(';')}` : signature
+  })
   return signatures.sort()[0]!
 }
 

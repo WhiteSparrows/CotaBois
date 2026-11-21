@@ -22,6 +22,9 @@ const SELECTED_COLOR = 0x7fbf9c
 const OVERLAP_COLOR = 0xe08a7a
 const EDGE_COLOR = 0x5b4326
 const SELECTED_EDGE_COLOR = 0x1d4a34
+/** Les bords chantés : une bande d'épaisseur fixe, visible même pour un chant très fin. */
+const BAND_COLOR = 0xb4532a
+const BAND_MM = 1.5
 
 export interface ViewportCallbacks {
   /** `null` : un clic dans le vide. `additive` : la touche Ctrl était enfoncée. */
@@ -33,6 +36,8 @@ interface PieceObjects {
   piece: Piece
   mesh: THREE.Mesh
   edges: THREE.LineSegments
+  /** Une bande par bord chanté, placée pour la position enregistrée de la pièce. */
+  bands: THREE.Mesh[]
 }
 
 function woodMaterial(color: number): THREE.MeshStandardMaterial {
@@ -75,7 +80,8 @@ export class Viewport {
     selected: woodMaterial(SELECTED_COLOR),
     overlap: woodMaterial(OVERLAP_COLOR),
     edge: new THREE.LineBasicMaterial({ color: EDGE_COLOR }),
-    selectedEdge: new THREE.LineBasicMaterial({ color: SELECTED_EDGE_COLOR })
+    selectedEdge: new THREE.LineBasicMaterial({ color: SELECTED_EDGE_COLOR }),
+    band: new THREE.MeshStandardMaterial({ color: BAND_COLOR, roughness: 0.6 })
   }
   private readonly resizeObserver: ResizeObserver
   private readonly objects = new Map<string, PieceObjects>()
@@ -125,15 +131,19 @@ export class Viewport {
     this.project = project
     this.group.clear()
     this.objects.clear()
+    let bandCount = 0
     for (const piece of project.pieces) {
       const objects = piece.shape.kind === 'shaped' ? this.createShapedObjects(piece, piece.shape) : this.createBoxObjects(piece)
       objects.mesh.userData['pieceId'] = piece.id
+      objects.bands = this.createBands(piece)
       this.placeObjects(objects, piece.position)
-      this.group.add(objects.mesh, objects.edges)
+      this.group.add(objects.mesh, objects.edges, ...objects.bands)
       this.objects.set(piece.id, objects)
+      bandCount += objects.bands.length
     }
     this.shapeGeometries.releaseUnused()
     this.container.dataset['pieceCount'] = String(project.pieces.length)
+    this.container.dataset['edgeBandCount'] = String(bandCount)
     this.applyMarks()
   }
 
@@ -144,17 +154,46 @@ export class Viewport {
     const edges = new THREE.LineSegments(this.edgeGeometry, this.materials.edge)
     mesh.scale.copy(scale)
     edges.scale.copy(scale)
-    return { piece, mesh, edges }
+    return { piece, mesh, edges, bands: [] }
   }
 
   private createShapedObjects(piece: Piece, shape: ShapedShape): PieceObjects {
     const geometries = this.shapeGeometries.get(shape, piece.thickness)
     const mesh = new THREE.Mesh(geometries.body, this.materials.wood)
     const edges = new THREE.LineSegments(geometries.edges, this.materials.edge)
-    return { piece, mesh, edges }
+    return { piece, mesh, edges, bands: [] }
   }
 
-  private placeObjects({ piece, mesh, edges }: PieceObjects, position: Vector): void {
+  /** Une bande collée à la face de chaque bord chanté, dans le repère de la pièce, rectangle ou forme. */
+  private createBands(piece: Piece): THREE.Mesh[] {
+    if (!piece.edges) return []
+    const frame = pieceFrame(piece)
+    const u = toVector3(frame.u)
+    const v = toVector3(frame.v)
+    const normal = toVector3(frame.normal)
+    const origin = toVector3(frame.origin).multiplyScalar(TENTHS_TO_MM)
+    const basis = new THREE.Matrix4().makeBasis(u, v, normal)
+    const length = piece.shape.length * TENTHS_TO_MM
+    const width = piece.shape.width * TENTHS_TO_MM
+    const thickness = piece.thickness * TENTHS_TO_MM
+
+    return piece.edges.map((edge) => {
+      const alongLength = edge === 'bottom' || edge === 'top'
+      const centerU = alongLength ? length / 2 : edge === 'left' ? -BAND_MM / 2 : length + BAND_MM / 2
+      const centerV = alongLength ? (edge === 'bottom' ? -BAND_MM / 2 : width + BAND_MM / 2) : width / 2
+      const band = new THREE.Mesh(this.boxGeometry, this.materials.band)
+      band.quaternion.setFromRotationMatrix(basis)
+      band.scale.set(alongLength ? length : BAND_MM, alongLength ? BAND_MM : width, thickness)
+      band.position.copy(origin).addScaledVector(u, centerU).addScaledVector(v, centerV).addScaledVector(normal, thickness / 2)
+      band.userData['basePosition'] = band.position.clone()
+      return band
+    })
+  }
+
+  private placeObjects({ piece, mesh, edges, bands }: PieceObjects, position: Vector): void {
+    // Pendant un glissement, les bandes suivent la pièce du même déplacement.
+    const shift = new THREE.Vector3(position.x - piece.position.x, position.y - piece.position.y, position.z - piece.position.z)
+    for (const band of bands) band.position.copy(band.userData['basePosition'] as THREE.Vector3).addScaledVector(shift, TENTHS_TO_MM)
     if (piece.shape.kind === 'rectangle') {
       const center = pieceCenter(piece, position)
       mesh.position.copy(center)

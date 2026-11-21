@@ -126,6 +126,37 @@ test('SC-005 : le calepinage de 200 pièces s\'affiche en moins de 2 secondes', 
   await app.close()
 })
 
+test('SC-005 des chants : poser un chant sur de nombreuses pièces met à jour la vue en moins de 1 seconde', async () => {
+  const { app, page } = await launchApp()
+  await chooseFile(app, LARGE_SHAPES_PROJECT)
+  await clickMenu(app, 'Ouvrir…')
+  await expect(page.getByTestId('viewport')).toHaveAttribute('data-piece-count', '200')
+
+  // La ligne qui regroupe le plus de pièces
+  const quantities = await page.getByTestId('cut-list').locator('tbody tr td:first-child').allInnerTexts()
+  const largest = quantities.map(Number).reduce((best, quantity, index, all) => (quantity > all[best]! ? index : best), 0)
+  await page.getByTestId('cut-list').locator('tbody tr').nth(largest).click()
+  const count = Number(quantities[largest])
+
+  const durations: number[] = []
+  for (const edge of ['Bord haut', 'Bord bas', 'Bord gauche', 'Bord droit']) {
+    durations.push(
+      await page.evaluate(async (label) => {
+        const box = [...document.querySelectorAll('label')].find((candidate) => candidate.textContent?.trim() === label)?.querySelector('input')
+        const start = performance.now()
+        box!.click()
+        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+        return performance.now() - start
+      }, edge)
+    )
+  }
+  const bands = Number(await page.getByTestId('viewport').getAttribute('data-edge-band-count'))
+  console.log(`Chants (${count} pièces sélectionnées sur 200) : médiane ${median(durations).toFixed(0)} ms, max ${Math.max(...durations).toFixed(0)} ms`)
+  expect(bands).toBe(4 * count)
+  expect(Math.max(...durations)).toBeLessThan(1000)
+  await app.close()
+})
+
 test.describe('démarrage', () => {
   test.skip(!existsSync(EXECUTABLE), 'Exécuter `npm run pack` avant ce test')
 

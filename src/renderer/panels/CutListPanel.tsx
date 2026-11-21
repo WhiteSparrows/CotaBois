@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { computeCutList } from '../../core/cutList'
 import { projectBounds } from '../../core/geometry'
-import { formatMm, formatSquareMeters } from '../../core/units'
+import { formatMeters, formatMm, formatSquareMeters } from '../../core/units'
 import { exportCsv, exportPdf, selectPieces, useEditor } from '../store'
 
 const NO_MATERIAL = '—'
@@ -11,6 +11,7 @@ export function CutListPanel() {
   const { lines, totals } = useMemo(() => computeCutList(project), [project])
   const bounds = useMemo(() => projectBounds(project), [project])
   const isEmpty = lines.length === 0
+  const hasEdges = totals.some((total) => total.edgeCount > 0)
 
   return (
     <section className="panel cut-panel" aria-label="Liste de découpe">
@@ -66,6 +67,12 @@ export function CutListPanel() {
                         {line.names.join(', ')}
                       </button>
                       {line.plan !== null && <span className="plan-badge">Plan {line.plan}</span>}
+                      {line.edges && <span className="edge-badge">{line.edges}</span>}
+                      {(line.length !== line.finishedLength || line.width !== line.finishedWidth) && (
+                        <span className="finished-size">
+                          fini {formatMm(line.finishedLength)} × {formatMm(line.finishedWidth)}
+                        </span>
+                      )}
                     </td>
                     <td className="number">{formatMm(line.length)}</td>
                     <td className="number">{formatMm(line.width)}</td>
@@ -76,7 +83,9 @@ export function CutListPanel() {
               })}
             </tbody>
           </table>
-          <p className="table-note">Cotes finies, en millimètres.</p>
+          <p className="table-note">
+            {hasEdges ? 'Cotes à couper, en millimètres : la cote finie est indiquée quand un chant la réduit.' : 'Cotes finies, en millimètres.'}
+          </p>
 
           <h3>Totaux</h3>
           <table className="data-table" data-testid="cut-totals">
@@ -86,6 +95,7 @@ export function CutListPanel() {
                 <th scope="col" className="number">Ép.</th>
                 <th scope="col" className="number">Pièces</th>
                 <th scope="col" className="number">Surface</th>
+                {hasEdges && <th scope="col" className="number">Chant</th>}
               </tr>
             </thead>
             <tbody>
@@ -95,6 +105,7 @@ export function CutListPanel() {
                   <td className="number">{formatMm(total.thickness)}</td>
                   <td className="number">{total.pieceCount}</td>
                   <td className="number">{formatSquareMeters(total.area)} m²</td>
+                  {hasEdges && <td className="number">{total.edgeCount > 0 ? formatMeters(total.edgeLength) : NO_MATERIAL}</td>}
                 </tr>
               ))}
             </tbody>

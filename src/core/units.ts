@@ -35,6 +35,42 @@ export function formatMm(tenths: Tenths): string {
   return decimalPart === 0 ? `${sign}${integerPart}` : `${sign}${integerPart},${decimalPart}`
 }
 
+/** Montant en centimes d'euro : toujours un entier. */
+export type Cents = number
+
+/** 100 000 € */
+export const MAX_CENTS = 10_000_000
+
+const NBSP = ' '
+
+/** Accepte `45,90`, `45.9`, `1 234,50` ou `12 €` ; refuse le négatif et ce qui est plus précis que le centime. */
+export function parseEuros(text: string): Result<Cents> {
+  const trimmed = text.trim().replace(/\s*€$/, '').trim()
+  if (trimmed.startsWith('-')) return err('invalid-price', 'Un prix ne peut pas être négatif.')
+  const compact = trimmed.replace(/(?<=\d)[\s  ]+(?=\d)/g, '')
+  const match = /^(\d+)(?:[.,](\d+))?$/.exec(compact)
+  if (!match) return err('invalid-price', 'Saisissez un prix en euros, par exemple 45,90.')
+  const decimals = match[2] ?? ''
+  if (decimals.length > 2) return err('too-precise', 'Les prix se saisissent au centime près.')
+  const cents = Number(match[1]) * 100 + Number(decimals.padEnd(2, '0'))
+  if (!Number.isSafeInteger(cents) || cents > MAX_CENTS) {
+    return err('invalid-price', `Un prix ne peut pas dépasser 100${NBSP}000${NBSP}€.`)
+  }
+  return ok(cents)
+}
+
+/** `1 234,50 €`, avec des espaces insécables. */
+export function formatEuros(cents: Cents): string {
+  const euros = String(Math.floor(cents / 100)).replace(/\B(?=(\d{3})+(?!\d))/g, NBSP)
+  return `${euros},${String(cents % 100).padStart(2, '0')}${NBSP}€`
+}
+
+/** Un métrage arrondi au centimètre supérieur : on n'achète jamais trop court. */
+export function formatMeters(tenths: Tenths): string {
+  const centimeters = Math.ceil(tenths / 100)
+  return `${Math.floor(centimeters / 100)},${String(centimeters % 100).padStart(2, '0')} m`
+}
+
 /** Une surface est un produit de dixièmes de mm : 1 m² vaut 100 000 000 unités. */
 export function formatSquareMeters(area: number): string {
   const hundredths = Math.round(area / 1_000_000)

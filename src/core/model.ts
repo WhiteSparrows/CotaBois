@@ -76,10 +76,18 @@ export interface ShapedShape {
 
 export type Shape = RectangleShape | ShapedShape
 
+/** `bottom` et `top` longent la longueur ; `left` et `right`, la largeur. Ce sont les bords de l'éditeur de forme. */
+export type EdgeName = 'bottom' | 'top' | 'left' | 'right'
+
+/** L'ordre dans lequel les bords chantés sont toujours rangés. */
+export const EDGE_NAMES: readonly EdgeName[] = ['bottom', 'top', 'left', 'right']
+
 export interface Piece {
   id: string
   name: string
   shape: Shape
+  /** Les bords chantés, dans l'ordre de `EDGE_NAMES`, jamais vide : absent pour une pièce sans chant. */
+  edges?: readonly EdgeName[]
   thickness: Tenths
   material: string
   /** Coin minimal de la boîte englobante. */
@@ -95,6 +103,8 @@ export interface CaissonParams {
   /** 0 si le caisson n'a pas de fond. */
   backThickness: Tenths
   shelfCount: number
+  /** Chant sur le bord avant des côtés, du dessus, du dessous et des étagères. Absent : pas de chant. */
+  frontEdges?: true
 }
 
 /** Seule variante pour l'instant : d'autres modèles s'ajouteront ici. */
@@ -114,23 +124,32 @@ export interface PanelStock {
   length: Tenths
   width: Tenths
   grain: boolean
+  /** L'épaisseur du chant de ce matériau, retirée de la cote à couper pour chaque bord chanté. */
+  edgeThickness: Tenths
+  /** Prix d'un panneau, en centimes, ou `null` s'il n'est pas saisi. */
+  panelPrice: number | null
+  /** Prix d'un mètre de chant, en centimes, ou `null`. */
+  edgePrice: number | null
 }
 
 /** Seuls les réglages sont enregistrés : le calepinage lui-même est toujours recalculé. */
 export interface LayoutSettings {
   kerf: Tenths
   edgeMargin: Tenths
+  /** Ajoutée à chaque bord chanté, pour couper le chant après la pose. */
+  edgeOverhang: Tenths
   /** Uniquement les panneaux réglés par l'utilisateur ; les autres groupes utilisent le panneau par défaut. */
   panels: readonly PanelStock[]
 }
 
 export const DEFAULT_KERF = 30
 export const DEFAULT_EDGE_MARGIN = 0
+export const DEFAULT_EDGE_OVERHANG = 200
 export const DEFAULT_PANEL_LENGTH = 28_000
 export const DEFAULT_PANEL_WIDTH = 20_700
 
 export function defaultLayoutSettings(): LayoutSettings {
-  return { kerf: DEFAULT_KERF, edgeMargin: DEFAULT_EDGE_MARGIN, panels: [] }
+  return { kerf: DEFAULT_KERF, edgeMargin: DEFAULT_EDGE_MARGIN, edgeOverhang: DEFAULT_EDGE_OVERHANG, panels: [] }
 }
 
 export interface Project {
@@ -184,6 +203,13 @@ export function validatePiece(piece: Piece): Result<Piece> {
   if (piece.shape.kind === 'shaped') {
     const shapeValidation = validateShape(piece.shape)
     if (!shapeValidation.ok) return err('invalid-piece', shapeValidation.error.message, 'shape')
+  }
+  if (piece.edges !== undefined) {
+    const indexes = piece.edges.map((edge) => EDGE_NAMES.indexOf(edge))
+    const ordered = indexes.every((index, position) => index >= 0 && (position === 0 || index > indexes[position - 1]!))
+    if (!Array.isArray(piece.edges) || piece.edges.length === 0 || !ordered) {
+      return err('invalid-piece', 'Les chants de la pièce sont invalides.', 'edges')
+    }
   }
 
   const { x, y, z } = piece.position
