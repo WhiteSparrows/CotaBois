@@ -15,7 +15,7 @@ function GroupView({ group, margin }: { group: LayoutGroup; margin: number }) {
   const summary = groupSummary(group)
   const [grainError, setGrainError] = useState<CoreError | null>(null)
 
-  function commitStock(field: 'length' | 'width') {
+  function commitStock(field: 'length' | 'width' | 'edgeThickness') {
     return (text: string): CoreError | null => {
       const parsed = parseMm(text)
       return parsed.ok ? failure(changePanelStock(group.material, group.thickness, { [field]: parsed.value })) : parsed.error
@@ -30,6 +30,19 @@ function GroupView({ group, margin }: { group: LayoutGroup; margin: number }) {
         <CommitField label="Longueur du panneau" unit="mm" value={formatMm(group.stock.length)} onCommit={commitStock('length')} />
         <CommitField label="Largeur du panneau" unit="mm" value={formatMm(group.stock.width)} onCommit={commitStock('width')} />
       </div>
+      <div className="layout-fields">
+        <CommitField
+          label="Épaisseur du chant"
+          unit="mm"
+          value={formatMm(group.stock.edgeThickness)}
+          onCommit={commitStock('edgeThickness')}
+        />
+      </div>
+      {group.edgeCount > 0 && group.stock.edgeThickness === 0 && (
+        <p className="panel-note">
+          L'épaisseur du chant est nulle : les cotes à couper sont les cotes finies. Renseignez-la pour qu'elle en soit retirée.
+        </p>
+      )}
       <label className="check-field">
         <input
           type="checkbox"
@@ -49,6 +62,7 @@ function GroupView({ group, margin }: { group: LayoutGroup; margin: number }) {
 
       <p className="layout-summary" data-testid="layout-summary">
         <strong>{summary.panels}</strong> · {summary.usage} · {summary.pieces}
+        {summary.edges && <> · {summary.edges}</>}
       </p>
 
       {group.unplaced.length > 0 && (
@@ -90,7 +104,7 @@ export function LayoutView() {
   const layout = useMemo(() => computeLayout(project), [project])
   const isEmpty = project.pieces.length === 0
 
-  function commitOption(field: 'kerf' | 'edgeMargin') {
+  function commitOption(field: 'kerf' | 'edgeMargin' | 'edgeOverhang') {
     return (text: string): CoreError | null => {
       const parsed = parseMm(text)
       return parsed.ok ? failure(changeLayoutOptions({ [field]: parsed.value })) : parsed.error
@@ -110,6 +124,12 @@ export function LayoutView() {
       <div className="layout-fields">
         <CommitField label="Trait de scie" unit="mm" value={formatMm(project.layout.kerf)} onCommit={commitOption('kerf')} />
         <CommitField label="Marge de bord" unit="mm" value={formatMm(project.layout.edgeMargin)} onCommit={commitOption('edgeMargin')} />
+        <CommitField
+          label="Surlongueur de chant"
+          unit="mm"
+          value={formatMm(project.layout.edgeOverhang)}
+          onCommit={commitOption('edgeOverhang')}
+        />
       </div>
 
       {isEmpty ? (

@@ -1,7 +1,7 @@
 import { computeCutList } from '../../core/cutList'
 import { projectBounds } from '../../core/geometry'
 import type { Project } from '../../core/model'
-import { formatMm, formatSquareMeters } from '../../core/units'
+import { formatMeters, formatMm, formatSquareMeters } from '../../core/units'
 import type { ReportContent } from '../store'
 import { ShapePlan } from './ShapePlan'
 import './report.css'
@@ -13,6 +13,7 @@ export function ReportView({ project, content }: { project: Project; content: Re
   const { lines, totals } = computeCutList(project)
   const bounds = projectBounds(project)
   const planLines = lines.filter((line) => line.plan !== null)
+  const hasEdges = totals.some((total) => total.edgeCount > 0)
 
   return (
     <article className="report" data-testid="report">
@@ -51,6 +52,12 @@ export function ReportView({ project, content }: { project: Project; content: Re
               <td>
                 {line.names.join(', ')}
                 {line.plan !== null && <strong> · Plan {line.plan}</strong>}
+                {line.edges && <> · chants : {line.edges}</>}
+                {(line.length !== line.finishedLength || line.width !== line.finishedWidth) && (
+                  <span className="report-finished">
+                    fini {formatMm(line.finishedLength)} × {formatMm(line.finishedWidth)}
+                  </span>
+                )}
               </td>
               <td className="number">{formatMm(line.length)}</td>
               <td className="number">{formatMm(line.width)}</td>
@@ -60,7 +67,11 @@ export function ReportView({ project, content }: { project: Project; content: Re
           ))}
         </tbody>
       </table>
-      <p className="report-note">Cotes finies, en millimètres.</p>
+      <p className="report-note">
+        {hasEdges
+          ? 'Cotes à couper, en millimètres : la cote finie, chant compris, est indiquée quand elle diffère.'
+          : 'Cotes finies, en millimètres.'}
+      </p>
 
       <h2>Totaux</h2>
       <table className="report-table report-totals">
@@ -70,6 +81,7 @@ export function ReportView({ project, content }: { project: Project; content: Re
             <th scope="col" className="number">Épaisseur (mm)</th>
             <th scope="col" className="number">Pièces</th>
             <th scope="col" className="number">Surface</th>
+            {hasEdges && <th scope="col" className="number">Chant</th>}
           </tr>
         </thead>
         <tbody>
@@ -79,6 +91,7 @@ export function ReportView({ project, content }: { project: Project; content: Re
               <td className="number">{formatMm(total.thickness)}</td>
               <td className="number">{total.pieceCount}</td>
               <td className="number">{formatSquareMeters(total.area)} m²</td>
+              {hasEdges && <td className="number">{total.edgeCount > 0 ? formatMeters(total.edgeLength) : NO_MATERIAL}</td>}
             </tr>
           ))}
         </tbody>

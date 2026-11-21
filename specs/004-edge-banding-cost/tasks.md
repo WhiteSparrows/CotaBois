@@ -66,18 +66,18 @@ description: "Liste des tâches pour les chants et le coût du meuble"
 
 ### Tests for User Story 1 ⚠️
 
-- [ ] T014 [P] [US1] Écrire dans `tests/core/cutList.test.ts` : lignes à la cote à couper, avec la cote finie ; résumé des chants ; pièces aux chants différents sur deux lignes, et pièces tournées d'un demi-tour sur une seule ; totaux de surface sur la cote à couper ; liste identique sans chant (FR-003, FR-004, FR-007, FR-019)
-- [ ] T015 [P] [US1] Écrire dans `tests/core/layout.test.ts` : le calepinage place 764 × 393 pour l'étagère de la spec, et ne change pas avec une épaisseur de chant nulle (FR-007, FR-019)
-- [ ] T016 [P] [US1] Écrire `tests/e2e/us8-edges-cost.spec.ts`, scénarios C1 et C2 : cases des bords, une seule annulation, repère `1 long`, bande en 3D, cote à couper et cote finie, épaisseur impossible refusée (FR-001, FR-002, FR-003, FR-007)
+- [X] T014 [P] [US1] Écrire dans `tests/core/cutList.test.ts` : lignes à la cote à couper, avec la cote finie ; résumé des chants ; pièces aux chants différents sur deux lignes, et pièces tournées d'un demi-tour sur une seule ; totaux de surface sur la cote à couper ; liste identique sans chant (FR-003, FR-004, FR-007, FR-019)
+- [X] T015 [P] [US1] Écrire dans `tests/core/layout.test.ts` : le calepinage place 764 × 393 pour l'étagère de la spec, et ne change pas avec une épaisseur de chant nulle (FR-007, FR-019)
+- [X] T016 [P] [US1] Écrire `tests/e2e/us8-edges-cost.spec.ts`, scénarios C1 et C2 : cases des bords, une seule annulation, repère `1 long`, bande en 3D, cote à couper et cote finie, épaisseur impossible refusée (FR-001, FR-002, FR-003, FR-007)
 
 ### Implementation for User Story 1
 
-- [ ] T017 [US1] Mettre à jour `src/core/cutList.ts` : cote à couper, cote finie, résumé des chants, regroupement par `canonicalPieceKey` (FR-003, FR-004, FR-007)
-- [ ] T018 [US1] Placer les pièces à leur cote à couper dans `computeLayout`, `src/core/layout.ts` (FR-007)
-- [ ] T019 [US1] Ajouter l'action des chants dans `src/renderer/store.ts`, et la section Chants avec ses quatre cases, « long » ou « court », dans `src/renderer/panels/PiecePanel.tsx`, pour une ou plusieurs pièces (FR-001, FR-002, FR-003)
-- [ ] T020 [US1] Dessiner une bande colorée sur chaque bord chanté dans `src/renderer/viewport/Viewport.ts`, rectangles et pièces de forme, selon `research.md`, R10 (FR-003)
-- [ ] T021 [US1] Afficher dans `src/renderer/panels/CutListPanel.tsx` la cote à couper, la mention `fini …` et le repère des chants (FR-003, FR-007)
-- [ ] T022 [US1] Ajouter le champ `Épaisseur du chant` de chaque groupe dans `src/renderer/panels/LayoutView.tsx`, avec le rappel d'une épaisseur nulle quand des chants sont posés (FR-006, FR-007)
+- [X] T017 [US1] Mettre à jour `src/core/cutList.ts` : cote à couper, cote finie, résumé des chants, regroupement par `canonicalPieceKey` (FR-003, FR-004, FR-007)
+- [X] T018 [US1] Placer les pièces à leur cote à couper dans `computeLayout`, `src/core/layout.ts` (FR-007)
+- [X] T019 [US1] Ajouter l'action des chants dans `src/renderer/store.ts`, et la section Chants avec ses quatre cases, « long » ou « court », dans `src/renderer/panels/PiecePanel.tsx`, pour une ou plusieurs pièces (FR-001, FR-002, FR-003)
+- [X] T020 [US1] Dessiner une bande colorée sur chaque bord chanté dans `src/renderer/viewport/Viewport.ts`, rectangles et pièces de forme, selon `research.md`, R10 (FR-003)
+- [X] T021 [US1] Afficher dans `src/renderer/panels/CutListPanel.tsx` la cote à couper, la mention `fini …` et le repère des chants (FR-003, FR-007)
+- [X] T022 [US1] Ajouter le champ `Épaisseur du chant` de chaque groupe dans `src/renderer/panels/LayoutView.tsx`, avec le rappel d'une épaisseur nulle quand des chants sont posés (FR-006, FR-007)
 
 **Checkpoint**: C1 et C2 passent. On sait quels bords plaquer, et les pièces se coupent à la bonne cote.
 
@@ -91,16 +91,16 @@ description: "Liste des tâches pour les chants et le coût du meuble"
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T023 [P] [US2] Écrire dans `tests/core/cutList.test.ts` : nombre de bords et métrage de chaque total, métrage de chaque ligne, sur `edge-references.ts`, exacts au centimètre (FR-008, FR-009, SC-002)
-- [ ] T024 [P] [US2] Écrire dans `tests/core/csv.test.ts` : colonnes `Chants`, `Longueur finie (mm)`, `Largeur finie (mm)` et `Chant (m)` seulement s'il y a des chants, contenu exact pour le caisson de référence, CSV inchangé sans chant (FR-010, FR-019)
-- [ ] T025 [P] [US2] Compléter `tests/e2e/us8-edges-cost.spec.ts`, scénarios C3 et C4 : surlongueur, métrage, CSV exact, chants dans la liste imprimée et dans le plan de coupe (FR-008, FR-009, FR-010)
+- [X] T023 [P] [US2] Écrire dans `tests/core/cutList.test.ts` : nombre de bords et métrage de chaque total, métrage de chaque ligne, sur `edge-references.ts`, exacts au centimètre (FR-008, FR-009, SC-002)
+- [X] T024 [P] [US2] Écrire dans `tests/core/csv.test.ts` : colonnes `Chants`, `Longueur finie (mm)`, `Largeur finie (mm)` et `Chant (m)` seulement s'il y a des chants, contenu exact pour le caisson de référence, CSV inchangé sans chant (FR-010, FR-019)
+- [X] T025 [P] [US2] Compléter `tests/e2e/us8-edges-cost.spec.ts`, scénarios C3 et C4 : surlongueur, métrage, CSV exact, chants dans la liste imprimée et dans le plan de coupe (FR-008, FR-009, FR-010)
 
 ### Implementation for User Story 2
 
-- [ ] T026 [US2] Ajouter les métrages aux lignes et aux totaux dans `src/core/cutList.ts` (FR-008)
-- [ ] T027 [US2] Ajouter les colonnes des chants dans `src/core/csv.ts` (FR-010)
-- [ ] T028 [US2] Ajouter `Surlongueur de chant` et la ligne `Chant : 7,56 m (7 bords)` dans `src/renderer/panels/LayoutView.tsx`, et la colonne `Chant` des totaux dans `src/renderer/panels/CutListPanel.tsx` (FR-008, FR-009)
-- [ ] T029 [US2] Ajouter les cotes finies, les chants et les métrages dans `src/renderer/report/ReportView.tsx`, et la ligne de chant des achats dans `src/renderer/report/CuttingPlanReport.tsx`, seulement s'il y a des chants (FR-010, FR-019)
+- [X] T026 [US2] Ajouter les métrages aux lignes et aux totaux dans `src/core/cutList.ts` (FR-008)
+- [X] T027 [US2] Ajouter les colonnes des chants dans `src/core/csv.ts` (FR-010)
+- [X] T028 [US2] Ajouter `Surlongueur de chant` et la ligne `Chant : 7,56 m (7 bords)` dans `src/renderer/panels/LayoutView.tsx`, et la colonne `Chant` des totaux dans `src/renderer/panels/CutListPanel.tsx` (FR-008, FR-009)
+- [X] T029 [US2] Ajouter les cotes finies, les chants et les métrages dans `src/renderer/report/ReportView.tsx`, et la ligne de chant des achats dans `src/renderer/report/CuttingPlanReport.tsx`, seulement s'il y a des chants (FR-010, FR-019)
 - [ ] T030 [US2] Produire de vrais PDF et un CSV avec des chants, les contrôler à l'œil, et les consigner dans `specs/004-edge-banding-cost/checklists/validation.md` (FR-010)
 
 **Checkpoint**: C3 et C4 passent. On sait combien de chant acheter.

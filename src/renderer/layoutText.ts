@@ -1,5 +1,5 @@
 import { formatUsage, groupLabel, type LayoutGroup, type LayoutPlacement, type UnplacedPiece } from '../core/layout'
-import { formatMm } from '../core/units'
+import { formatMeters, formatMm } from '../core/units'
 
 export const NO_MINIMUM_GUARANTEE = 'Le logiciel cherche le plus petit nombre de panneaux, sans garantir que ce soit le minimum.'
 
@@ -16,12 +16,18 @@ export function stockSize(group: LayoutGroup): string {
   return `${formatMm(group.stock.length)} × ${formatMm(group.stock.width)}`
 }
 
-export function groupSummary(group: LayoutGroup): { panels: string; usage: string; pieces: string } {
+export function groupSummary(group: LayoutGroup): { panels: string; usage: string; pieces: string; edges: string } {
   return {
     panels: `${plural(group.panelCount, 'panneau', 'panneaux')} de ${stockSize(group)} mm`,
     usage: `Utilisation : ${formatUsage(group.usedArea, group.panelArea)}`,
-    pieces: `${plural(group.placedCount, 'pièce')} sur ${group.pieceCount}`
+    pieces: `${plural(group.placedCount, 'pièce')} sur ${group.pieceCount}`,
+    edges: group.edgeCount > 0 ? `Chant : ${edgeMeters(group)}` : ''
   }
+}
+
+/** `7,56 m (7 bords)` */
+export function edgeMeters(group: Pick<LayoutGroup, 'edgeCount' | 'edgeLength'>): string {
+  return `${formatMeters(group.edgeLength)} (${plural(group.edgeCount, 'bord')})`
 }
 
 /** `Panneau 2 sur 3`, `Panneaux 2 et 3 sur 3 (× 2)` ou `Panneaux 1 à 4 sur 4 (× 4)`. */

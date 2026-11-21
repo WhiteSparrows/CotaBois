@@ -1,7 +1,7 @@
 import { computeLayout, formatUsage, groupLabel } from '../../core/layout'
 import type { Project } from '../../core/model'
 import { formatMm } from '../../core/units'
-import { groupTitle, NO_MINIMUM_GUARANTEE, panelTitle, stockSize, unplacedText } from '../layoutText'
+import { edgeMeters, groupTitle, NO_MINIMUM_GUARANTEE, panelTitle, stockSize, unplacedText } from '../layoutText'
 import { LayoutDrawing } from '../panels/LayoutDrawing'
 import type { ReportContent } from '../store'
 import './report.css'
@@ -46,11 +46,41 @@ export function CuttingPlanReport({ project, content }: { project: Project; cont
         </tbody>
       </table>
 
+      {layout.groups.some((group) => group.edgeCount > 0) && (
+        <>
+          <h2>Chant à acheter</h2>
+          <table className="report-table report-buy">
+            <thead>
+              <tr>
+                <th scope="col">Matériau du panneau</th>
+                <th scope="col" className="number">Épaisseur (mm)</th>
+                <th scope="col" className="number">Chant (mm)</th>
+                <th scope="col" className="number">Métrage</th>
+              </tr>
+            </thead>
+            <tbody>
+              {layout.groups
+                .filter((group) => group.edgeCount > 0)
+                .map((group) => (
+                  <tr key={`${group.thickness}|${group.material}`}>
+                    <td>{group.material || NO_MATERIAL}</td>
+                    <td className="number">{formatMm(group.thickness)}</td>
+                    <td className="number">{formatMm(group.stock.edgeThickness)}</td>
+                    <td className="number strong">{edgeMeters(group)}</td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </>
+      )}
+
       <p className="report-settings">
         Trait de scie : {formatMm(kerf)} mm · Marge de bord : {formatMm(edgeMargin)} mm
+        {layout.groups.some((group) => group.edgeCount > 0) && <> · Surlongueur de chant : {formatMm(project.layout.edgeOverhang)} mm</>}
       </p>
       <p className="report-note">
-        {NO_MINIMUM_GUARANTEE} Cotes finies, en millimètres. Le trait de scie n'est pas dessiné : il correspond à l'écart entre les pièces.
+        {NO_MINIMUM_GUARANTEE} Cotes à couper, en millimètres : la cote finie moins l'épaisseur des chants. Le trait de scie
+        n'est pas dessiné : il correspond à l'écart entre les pièces.
       </p>
 
       {!layout.complete && (

@@ -10,6 +10,7 @@ import {
   type CornerName,
   type CornerTreatment,
   type Cutout,
+  type EdgeName,
   type Piece,
   type Project,
   type Vector
@@ -25,6 +26,7 @@ import {
   renameProject,
   rotatePiece,
   setCorner,
+  setEdges,
   updateCutout,
   updatePiece,
   type CutoutChanges,
@@ -258,6 +260,13 @@ export function setCutoutReference(pieceId: string, cutout: Cutout, axis: 'u' | 
 
 export function removeCutoutOfPiece(pieceId: string, cutoutId: string): Result<Project> {
   return commitShape(removeCutout(state.project, pieceId, cutoutId))
+}
+
+/** Une seule action annulable, quel que soit le nombre de pièces sélectionnées. */
+export function setEdgeOfSelection(edge: EdgeName, banded: boolean): Result<Project> {
+  const result = setEdges(state.project, state.selection, edge, banded)
+  if (result.ok && result.value !== state.project) publish(pushState(history, result.value), state.selection)
+  return result
 }
 
 export function openLayout(): void {

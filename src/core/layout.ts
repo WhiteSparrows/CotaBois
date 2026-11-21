@@ -1,5 +1,5 @@
 import { computeCutList } from './cutList'
-import { checkCutSizes } from './edges'
+import { checkCutSizes, pieceCutSize } from './edges'
 import { iterationsFor, packPanels, type CutDirection, type PackedPanel } from './guillotine'
 import {
   defaultLayoutSettings,
@@ -195,6 +195,9 @@ export interface LayoutGroup {
   material: string
   thickness: Tenths
   stock: ResolvedStock
+  /** Bords chantés du groupe, et leur métrage, surlongueurs comprises. */
+  edgeCount: number
+  edgeLength: Tenths
   panelCount: number
   pieceCount: number
   placedCount: number
@@ -298,7 +301,11 @@ export function computeLayout(project: Project): Layout {
     const pieces = project.pieces.filter((piece) => stockKey(piece.material, piece.thickness) === key)
     const stock = resolveStock(project.layout, total.material, total.thickness)
     const usable = { sizeX: stock.length - 2 * margin, sizeY: stock.width - 2 * margin }
-    const items = pieces.map((piece) => ({ sizeX: piece.shape.length, sizeY: piece.shape.width }))
+    // Chaque pièce est placée à sa cote à couper, la longueur suivant le fil.
+    const items = pieces.map((piece) => {
+      const cut = pieceCutSize(piece, project.layout)
+      return { sizeX: cut.length, sizeY: cut.width }
+    })
     const refs = pieces.map((piece) => ({ id: piece.id, name: piece.name, plan: planOf.get(piece.id) ?? null }))
 
     const result =
@@ -309,7 +316,7 @@ export function computeLayout(project: Project): Layout {
 
     const unplaced = result.unplaced.map((index): UnplacedPiece => {
       const piece = pieces[index]!
-      const { length, width } = piece.shape
+      const { sizeX: length, sizeY: width } = items[index]!
       const fitsTurned = width <= usable.sizeX && length <= usable.sizeY
       return { pieceId: piece.id, name: piece.name, length, width, reason: stock.grain && fitsTurned ? 'grain' : 'too-large' }
     })
@@ -318,6 +325,8 @@ export function computeLayout(project: Project): Layout {
       material: total.material,
       thickness: total.thickness,
       stock,
+      edgeCount: total.edgeCount,
+      edgeLength: total.edgeLength,
       panelCount,
       pieceCount: pieces.length,
       placedCount: pieces.length - unplaced.length,

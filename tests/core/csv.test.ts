@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { toCsv } from '../../src/core/csv'
 import { computeCutList, type CutLine } from '../../src/core/cutList'
-import { createEmptyProject, type Piece } from '../../src/core/model'
+import { applyCaisson } from '../../src/core/caisson'
+import { setPanelStock } from '../../src/core/layout'
+import { createEmptyProject, type Piece, type Project } from '../../src/core/model'
+import { setEdges } from '../../src/core/pieces'
+import type { Result } from '../../src/core/result'
+import { REFERENCE_PARAMS } from '../fixtures/edge-references'
 import { round, shaped } from '../fixtures/shape-references'
 
 function piece(id: string, name: string, length: number, width: number, thickness: number, material = ''): Piece {
@@ -23,17 +28,21 @@ function line(changes: Partial<CutLine>): CutLine {
     names: ['Pièce'],
     length: 1000,
     width: 500,
+    finishedLength: 1000,
+    finishedWidth: 500,
     thickness: 180,
     material: '',
     shapeKey: '',
     shape: null,
     plan: null,
+    edges: '',
+    edgeLength: 0,
     ...changes
   }
 }
 
 function rows(lines: CutLine[]): string[] {
-  return toCsv({ lines, totals: [] }).replace(/^﻿/, '').split('\r\n')
+  return toCsv({ lines, totals: [] }).replace(/^\uFEFF/, '').split('\r\n')
 }
 
 const HEADER = 'Quantité;Pièces;Longueur (mm);Largeur (mm);Épaisseur (mm);Matériau'
@@ -125,5 +134,43 @@ describe('toCsv', () => {
   it('n\'exporte que les lignes, sans les totaux', () => {
     const csv = toCsv(computeCutList({ ...createEmptyProject(), pieces: [piece('a', 'A', 1000, 500, 180)] }))
     expect(csv.trimEnd().split('\r\n')).toHaveLength(2)
+  })
+})
+
+function value<T>(result: Result<T>): T {
+  if (!result.ok) throw new Error(result.error.message)
+  return result.value
+}
+
+function frontEdgedCaisson(): Project {
+  let id = 0
+  const project = value(applyCaisson(createEmptyProject(), REFERENCE_PARAMS, () => `c${++id}`))
+  const front = project.pieces.filter((item) => item.name !== 'Fond').map((item) => item.id)
+  return value(setEdges(project, front, 'top', true))
+}
+
+const EDGE_HEADER = `${HEADER};Chants;Longueur finie (mm);Largeur finie (mm);Chant (m)`
+
+describe('toCsv : chants (US2)', () => {
+  it('ajoute les colonnes des chants, avec le métrage de chaque ligne et sa surlongueur', () => {
+    expect(toCsv(computeCutList(frontEdgedCaisson())).replace(/^\uFEFF/, '').split('\r\n')).toEqual([
+      EDGE_HEADER,
+      // 2 × (1800 + 20) mm et 5 × (764 + 20) mm
+      '2;Côté gauche, Côté droit;1800;395;18;;1 long;1800;395;3,64',
+      '5;Dessous, Dessus, Étagère 1, Étagère 2, Étagère 3;764;395;18;;1 long;764;395;3,92',
+      '1;Fond;1800;800;5;;;1800;800;',
+      ''
+    ])
+  })
+
+  it('donne la cote à couper, et la cote finie dans ses colonnes', () => {
+    const project = value(setPanelStock(frontEdgedCaisson(), '', 180, { edgeThickness: 20 }))
+    const csvRows = toCsv(computeCutList(project)).split('\r\n')
+    expect(csvRows[1]).toBe('2;Côté gauche, Côté droit;1800;393;18;;1 long;1800;395;3,64')
+  })
+
+  it('place les colonnes des chants après celle des plans', () => {
+    const header = rows([line({ plan: 1, shape: shaped(1000, 500, { topLeft: round(50) }), shapeKey: 'x' }), line({ edges: '1 long', edgeLength: 1200 })])[0]
+    expect(header).toBe(`${HEADER};Plan;Chants;Longueur finie (mm);Largeur finie (mm);Chant (m)`)
   })
 })

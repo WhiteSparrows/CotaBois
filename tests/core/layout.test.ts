@@ -11,7 +11,7 @@ import {
   type Layout
 } from '../../src/core/layout'
 import { createEmptyProject, type LayoutSettings, type Project } from '../../src/core/model'
-import { addPiece, newPanelInput } from '../../src/core/pieces'
+import { addPiece, newPanelInput, setEdges } from '../../src/core/pieces'
 import type { Result } from '../../src/core/result'
 import { HAND_CASES } from '../fixtures/layout-references'
 import { TABLET } from '../fixtures/shape-references'
@@ -388,5 +388,21 @@ describe('validateLayoutSettings', () => {
     ['prix trop élevé', { ...base, panels: [{ ...stock, edgePrice: 10_000_001 }] }]
   ])('refuse : %s', (_label, settings) => {
     expect(validateLayoutSettings(settings).ok).toBe(false)
+  })
+})
+
+describe('computeLayout : cote à couper (US1 des chants)', () => {
+  function placedSizes(project: Project): number[][] {
+    return computeLayout(project).groups.flatMap((group) =>
+      group.panels.flatMap((panel) => panel.placements.map((placement) => [placement.sizeX, placement.sizeY].sort((a, b) => a - b)))
+    )
+  }
+
+  it('place 764 × 393 pour une étagère chantée sur un bord long avec un chant de 2 mm', () => {
+    let project = furniture([['Étagère', '', 180, 7640, 3950]])
+    project = value(setEdges(project, [project.pieces[0]!.id], 'bottom', true))
+    expect(placedSizes(project)).toEqual([[3950, 7640]])
+    project = value(setPanelStock(project, '', 180, { edgeThickness: 20 }))
+    expect(placedSizes(project)).toEqual([[3930, 7640]])
   })
 })

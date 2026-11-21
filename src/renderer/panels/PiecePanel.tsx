@@ -1,4 +1,6 @@
-import type { Axis, Piece } from '../../core/model'
+import { useState } from 'react'
+import { EDGE_LABELS } from '../../core/edges'
+import { EDGE_NAMES, type Axis, type EdgeName, type Piece } from '../../core/model'
 import type { CoreError, Result } from '../../core/result'
 import { formatMm, parseMm } from '../../core/units'
 import {
@@ -7,6 +9,7 @@ import {
   openShapeEditor,
   rotateSelection,
   selectPieces,
+  setEdgeOfSelection,
   updateSelectedPiece,
   useEditor
 } from '../store'
@@ -56,6 +59,56 @@ function SinglePieceFields({ piece }: { piece: Piece }) {
   )
 }
 
+/** Une case par bord ; avec plusieurs pièces, cochée si toutes ont ce chant. */
+function EdgeFields({ pieces }: { pieces: readonly Piece[] }) {
+  const [error, setError] = useState<string | null>(null)
+  const first = pieces[0]!
+  const sameOrientation = pieces.every(
+    (piece) => piece.shape.length === piece.shape.width ? first.shape.length === first.shape.width : (piece.shape.length > piece.shape.width) === (first.shape.length > first.shape.width)
+  )
+
+  function kind(edge: EdgeName): string {
+    if (!sameOrientation || first.shape.length === first.shape.width) return ''
+    const alongLength = edge === 'bottom' || edge === 'top'
+    return alongLength === first.shape.length > first.shape.width ? 'long' : 'court'
+  }
+
+  return (
+    <>
+      <h3>Chants</h3>
+      <div className="edge-grid">
+        {EDGE_NAMES.map((edge) => {
+          const count = pieces.filter((piece) => piece.edges?.includes(edge)).length
+          return (
+            <div key={edge} className="edge-field">
+              <label className="check-field">
+                <input
+                  type="checkbox"
+                  checked={count === pieces.length}
+                  ref={(input) => {
+                    if (input) input.indeterminate = count > 0 && count < pieces.length
+                  }}
+                  onChange={(event) => {
+                    const result = setEdgeOfSelection(edge, event.target.checked)
+                    setError(result.ok ? null : result.error.message)
+                  }}
+                />
+                {EDGE_LABELS[edge]}
+              </label>
+              {kind(edge) && <span className="edge-kind">{kind(edge)}</span>}
+            </div>
+          )
+        })}
+      </div>
+      {error && (
+        <p className="field-error" role="alert">
+          {error}
+        </p>
+      )}
+    </>
+  )
+}
+
 export function PiecePanel() {
   const { project, selection } = useEditor()
   const selected = project.pieces.filter((piece) => selection.includes(piece.id))
@@ -100,6 +153,8 @@ export function PiecePanel() {
           </button>
         ))}
       </div>
+
+      {selected.length > 0 && <EdgeFields pieces={selected} />}
 
       {only && <SinglePieceFields key={only.id} piece={only} />}
     </section>
