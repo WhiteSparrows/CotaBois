@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import type { Cutout, ShapedShape } from '../../src/core/model'
+import type { Cutout, RectangleShape, ShapedShape } from '../../src/core/model'
 import {
   asShaped,
+  canonicalPieceKey,
   canonicalShapeKey,
   describeShape,
   maxCornerSize,
@@ -103,6 +104,46 @@ describe('maxCornerSize', () => {
 
   it('vaut 0 quand une découpe occupe le coin', () => {
     expect(maxCornerSize(TABLET, 'bottomLeft')).toBe(0)
+  })
+})
+
+describe('canonicalPieceKey : forme et chants ensemble', () => {
+  const shelf: RectangleShape = { kind: 'rectangle', length: 7640, width: 3950 }
+  const turned: RectangleShape = { kind: 'rectangle', length: 3950, width: 7640 }
+  const square: RectangleShape = { kind: 'rectangle', length: 5000, width: 5000 }
+  const key = canonicalPieceKey
+
+  it('reste vide pour un rectangle sans chant', () => {
+    expect(key(shelf, undefined)).toBe('')
+    expect(key(shelf, [])).toBe('')
+  })
+
+  it('est identique sous un demi-tour ou un retournement', () => {
+    expect(key(shelf, ['top'])).toBe(key(shelf, ['bottom']))
+    expect(key(shelf, ['left'])).toBe(key(shelf, ['right']))
+    expect(key(shelf, ['top', 'left'])).toBe(key(shelf, ['bottom', 'right']))
+  })
+
+  it('suit la normalisation de la longueur : un bord long reste un bord long', () => {
+    expect(key(turned, ['left'])).toBe(key(shelf, ['top']))
+  })
+
+  it('distingue des chants différents', () => {
+    expect(key(shelf, ['top'])).not.toBe(key(shelf, ['left']))
+    expect(key(shelf, ['top'])).not.toBe(key(shelf, ['bottom', 'top']))
+    expect(key(shelf, ['top'])).not.toBe('')
+  })
+
+  it('distingue, sur un carré, deux bords voisins de deux bords opposés', () => {
+    expect(key(square, ['top', 'left'])).toBe(key(square, ['bottom', 'right']))
+    expect(key(square, ['top', 'left'])).not.toBe(key(square, ['bottom', 'top']))
+    expect(key(square, ['top'])).toBe(key(square, ['left']))
+  })
+
+  it('applique la même symétrie à la forme et aux chants', () => {
+    // Tablette arrondie en haut : un chant sur le bord arrondi n'est pas un chant sur le bord droit
+    expect(key(TABLET, ['top'])).not.toBe(key(TABLET, ['bottom']))
+    expect(key(TABLET, undefined)).toBe(canonicalShapeKey(TABLET))
   })
 })
 

@@ -4,11 +4,11 @@ Aucune question technique ne restait ouverte après la spécification. Chaque d�
 
 ## R1. Bords chantés dans le modèle
 
-**Decision**: `Piece.edges`, un enregistrement des quatre bords `bottom`, `top`, `left`, `right`, chacun vrai ou faux. Il est toujours présent, tous faux par défaut. Dans le fichier, il s'écrit comme la liste des bords chantés, dans cet ordre.
+**Decision**: `Piece.edges`, la liste des bords chantés parmi `bottom`, `top`, `left`, `right`, rangée dans cet ordre, absente pour une pièce sans chant. Dans le fichier, elle est toujours écrite, `[]` compris.
 
-**Rationale**: les bords sont exprimés dans le repère de la pièce, comme les coins et les découpes. Une rotation ne change que l'orientation, une duplication ou un copier-coller copient la pièce entière, et un changement de dimension ne touche pas aux bords : FR-005 est respecté sans code particulier. Un champ toujours présent évite les cas « absent » ; une liste dans le fichier reste courte et lisible.
+**Rationale**: les bords sont exprimés dans le repère de la pièce, comme les coins et les découpes. Une rotation ne change que l'orientation, une duplication ou un copier-coller copient la pièce entière, et un changement de dimension ne touche pas aux bords : FR-005 est respecté sans code particulier. Un champ absent quand il est vide laisse identiques en mémoire les projets sans chant, et évite de réécrire les pièces des tests existants.
 
-**Alternatives considered**: bords exprimés dans le repère du meuble (avant, arrière…), qui ne survivent pas à une rotation ; champ facultatif, qui obligerait chaque lecture à traiter l'absence.
+**Alternatives considered**: bords exprimés dans le repère du meuble (avant, arrière…), qui ne survivent pas à une rotation ; un enregistrement des quatre bords toujours présent, envisagé d'abord, abandonné pour la raison ci-dessus.
 
 ## R2. Cote à couper
 

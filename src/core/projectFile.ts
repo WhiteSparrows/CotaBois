@@ -1,8 +1,12 @@
 import { validateCaissonParams } from './caisson'
+import { checkCutSizes } from './edges'
 import { validateLayoutSettings } from './layout'
 import {
   axisOf,
+  DEFAULT_EDGE_OVERHANG,
   defaultLayoutSettings,
+  EDGE_NAMES,
+  type EdgeName,
   type LayoutSettings,
   type PanelStock,
   validatePiece,
@@ -23,7 +27,7 @@ import {
 import { err, ok, type Result } from './result'
 import { CORNER_NAMES, normalizeShape } from './shape'
 
-export const FORMAT_VERSION = 3
+export const FORMAT_VERSION = 4
 
 /**
  * Migrations successives, indexées par la version de départ. Toute évolution incompatible du format
@@ -33,7 +37,30 @@ const MIGRATIONS: Record<number, (data: Record<string, unknown>) => Record<strin
   // La version 2 ajoute les pièces de forme : un fichier en version 1 est déjà valide.
   1: (data) => data,
   // La version 3 ajoute les réglages du calepinage.
-  2: (data) => ({ ...data, layout: serializeLayout(defaultLayoutSettings()) })
+  2: (data) => ({ ...data, layout: serializeLayout(defaultLayoutSettings()) }),
+  // La version 4 ajoute les chants, les prix et l'option du caisson, avec des valeurs neutres.
+  3: (data) => {
+    const layout = data['layout']
+    const template = data['template']
+    const pieces = data['pieces']
+    return {
+      ...data,
+      layout: isRecord(layout)
+        ? {
+            edgeOverhang: DEFAULT_EDGE_OVERHANG,
+            ...layout,
+            panels: Array.isArray(layout['panels'])
+              ? layout['panels'].map((panel) => (isRecord(panel) ? { edgeThickness: 0, panelPrice: null, edgePrice: null, ...panel } : panel))
+              : layout['panels']
+          }
+        : layout,
+      template:
+        isRecord(template) && isRecord(template['params'])
+          ? { ...template, params: { frontEdges: false, ...template['params'] } }
+          : template,
+      pieces: Array.isArray(pieces) ? pieces.map((piece) => (isRecord(piece) ? { edges: [], ...piece } : piece)) : pieces
+    }
+  }
 }
 
 const SIGNED_AXES: ReadonlySet<string> = new Set(['+x', '-x', '+y', '-y', '+z', '-z'])
@@ -88,12 +115,16 @@ function serializeLayout(layout: LayoutSettings): Record<string, unknown> {
   return {
     kerf: layout.kerf,
     edgeMargin: layout.edgeMargin,
+    edgeOverhang: layout.edgeOverhang,
     panels: (panels.ok ? panels.value.panels : layout.panels).map((panel) => ({
       material: panel.material,
       thickness: panel.thickness,
       length: panel.length,
       width: panel.width,
-      grain: panel.grain
+      grain: panel.grain,
+      edgeThickness: panel.edgeThickness,
+      panelPrice: panel.panelPrice,
+      edgePrice: panel.edgePrice
     }))
   }
 }
@@ -107,7 +138,8 @@ export function serializeProject(project: Project): string {
       depth: project.template.params.depth,
       boardThickness: project.template.params.boardThickness,
       backThickness: project.template.params.backThickness,
-      shelfCount: project.template.params.shelfCount
+      shelfCount: project.template.params.shelfCount,
+      frontEdges: project.template.params.frontEdges === true
     },
     customized: project.template.customized
   }
@@ -115,6 +147,7 @@ export function serializeProject(project: Project): string {
     id: piece.id,
     name: piece.name,
     shape: serializeShape(piece.shape),
+    edges: [...(piece.edges ?? [])],
     thickness: piece.thickness,
     material: piece.material,
     position: { x: piece.position.x, y: piece.position.y, z: piece.position.z },
@@ -175,14 +208,23 @@ function readProject(data: Record<string, unknown>): Result<Project> {
     pieces.push(piece.value)
   }
 
-  return ok({ name: name.value, template: template.value, layout: layout.value, pieces })
+  const project: Project = { name: name.value, template: template.value, layout: layout.value, pieces }
+  const cuts = checkCutSizes(project)
+  return cuts.ok ? ok(project) : corrupted(`Problème sur ${cuts.error.message}`)
 }
 
 function readLayout(raw: unknown): Result<LayoutSettings> {
   const invalid = 'Les réglages du calepinage sont invalides'
-  if (!isRecord(raw) || typeof raw['kerf'] !== 'number' || typeof raw['edgeMargin'] !== 'number' || !Array.isArray(raw['panels'])) {
+  if (
+    !isRecord(raw) ||
+    typeof raw['kerf'] !== 'number' ||
+    typeof raw['edgeMargin'] !== 'number' ||
+    typeof raw['edgeOverhang'] !== 'number' ||
+    !Array.isArray(raw['panels'])
+  ) {
     return corrupted(`${invalid}.`)
   }
+  const isPrice = (value: unknown): value is number | null => value === null || typeof value === 'number'
   const panels: PanelStock[] = []
   for (const panel of raw['panels']) {
     if (
@@ -191,14 +233,17 @@ function readLayout(raw: unknown): Result<LayoutSettings> {
       typeof panel['thickness'] !== 'number' ||
       typeof panel['length'] !== 'number' ||
       typeof panel['width'] !== 'number' ||
-      typeof panel['grain'] !== 'boolean'
+      typeof panel['grain'] !== 'boolean' ||
+      typeof panel['edgeThickness'] !== 'number' ||
+      !isPrice(panel['panelPrice']) ||
+      !isPrice(panel['edgePrice'])
     ) {
       return corrupted(`${invalid}.`)
     }
-    const { material, thickness, length, width, grain } = panel
-    panels.push({ material, thickness, length, width, grain })
+    const { material, thickness, length, width, grain, edgeThickness, panelPrice, edgePrice } = panel
+    panels.push({ material, thickness, length, width, grain, edgeThickness, panelPrice, edgePrice })
   }
-  const validated = validateLayoutSettings({ kerf: raw['kerf'], edgeMargin: raw['edgeMargin'], panels })
+  const validated = validateLayoutSettings({ kerf: raw['kerf'], edgeMargin: raw['edgeMargin'], edgeOverhang: raw['edgeOverhang'], panels })
   return validated.ok ? validated : corrupted(`${invalid} : ${validated.error.message}`)
 }
 
@@ -213,13 +258,15 @@ function readTemplate(raw: unknown): Result<Template | null> {
 
   const fields = ['width', 'height', 'depth', 'boardThickness', 'backThickness', 'shelfCount'] as const
   if (fields.some((field) => typeof params[field] !== 'number')) return corrupted(`${invalid}.`)
+  if (typeof params['frontEdges'] !== 'boolean') return corrupted(`${invalid}.`)
   const validated = validateCaissonParams({
     width: params['width'] as number,
     height: params['height'] as number,
     depth: params['depth'] as number,
     boardThickness: params['boardThickness'] as number,
     backThickness: params['backThickness'] as number,
-    shelfCount: params['shelfCount'] as number
+    shelfCount: params['shelfCount'] as number,
+    ...(params['frontEdges'] ? { frontEdges: true } : {})
   } satisfies CaissonParams)
   if (!validated.ok) return corrupted(`${invalid} : ${validated.error.message}`)
   return ok({ kind: 'caisson', params: validated.value, customized: raw['customized'] })
@@ -284,6 +331,13 @@ function readShape(raw: unknown): Shape | null {
   return normalizeShape({ kind, length, width, corners: treatments, cutouts: parsedCutouts as Cutout[] })
 }
 
+/** Une liste sans doublon de noms de bords, rangée dans l'ordre de `EDGE_NAMES` ; `null` si elle est invalide. */
+function readEdges(raw: unknown): EdgeName[] | null {
+  if (!Array.isArray(raw)) return null
+  if (raw.some((edge) => !EDGE_NAMES.includes(edge as EdgeName)) || new Set(raw).size !== raw.length) return null
+  return EDGE_NAMES.filter((edge) => raw.includes(edge))
+}
+
 function readPiece(raw: unknown): Result<Piece> {
   const invalid = (detail: string) => err<Piece>('invalid-piece', detail)
   if (!isRecord(raw)) return invalid("ce n'est pas une pièce.")
@@ -302,11 +356,14 @@ function readPiece(raw: unknown): Result<Piece> {
   if (!orientation || axisOf(orientation.u) === axisOf(orientation.v)) {
     return invalid('son orientation est invalide.')
   }
+  const edges = readEdges(raw['edges'])
+  if (!edges) return invalid('ses chants sont invalides.')
 
   return validatePiece({
     id,
     name,
     shape,
+    ...(edges.length > 0 ? { edges } : {}),
     thickness,
     material,
     position,

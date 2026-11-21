@@ -11,6 +11,13 @@ Mêmes conventions que les contrats précédents : fonctions pures, résultat `{
 | `checkCutSizes(project, pieceIds?)` | Refuse, en nommant la pièce, toute cote à couper inférieure à 0,1 mm. |
 | `edgeSummary(edges, length, width)` | `2 longs, 1 court`, `4 bords`, ou vide. |
 | `edgeLength(piece, overhang)` | Somme des côtés finis chantés et des surlongueurs. |
+
+Les matériaux sont reconnus par `src/core/stock.ts` (`materialKey`, `resolveStock`, `groupLabel`), commun à la liste, au calepinage et aux chants.
+
+## Modification (`src/core/pieces.ts`)
+
+| Fonction | Rôle |
+|---|---|
 | `setEdges(project, pieceIds, edge, banded)` | Pose ou retire un chant sur plusieurs pièces, en une action. Atomique : si une pièce refuse, aucune ne change, et le message la nomme. Marque le caisson comme retouché. |
 
 ## Coût (`src/core/cost.ts`)

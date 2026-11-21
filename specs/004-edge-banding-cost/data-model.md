@@ -8,7 +8,7 @@ Toutes les longueurs sont des entiers en dixièmes de millimètre (`Tenths`), to
 
 | Champ | Type | Règle |
 |---|---|---|
-| `edges` | `Record<EdgeName, boolean>` | Toujours présent ; tous faux par défaut |
+| `edges` | `EdgeName[]` facultatif | Les bords chantés, sans doublon, dans l'ordre `bottom`, `top`, `left`, `right` ; jamais vide, absent pour une pièce sans chant |
 
 `EdgeName` : `bottom` et `top` bornent la largeur et longent la longueur ; `left` et `right` bornent la longueur et longent la largeur. Ce sont les noms de l'éditeur de forme : bas, haut, gauche, droit.
 
@@ -16,7 +16,9 @@ Toutes les longueurs sont des entiers en dixièmes de millimètre (`Tenths`), to
 
 | Champ | Type | Règle | Défaut |
 |---|---|---|---|
-| `frontEdges` | `boolean` | Chant sur le bord `top` des côtés, du dessus, du dessous et des étagères | `false` |
+| `frontEdges` | `true` facultatif | Chant sur le bord `top` des côtés, du dessus, du dessous et des étagères ; absent quand l'option est désactivée | absent |
+
+Dans le fichier, ces deux champs sont toujours écrits (`[]` et `false` compris). En mémoire, ils sont absents quand ils sont vides : un projet sans chant reste ainsi identique à celui des versions précédentes.
 
 ### LayoutSettings (étendus)
 

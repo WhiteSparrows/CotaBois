@@ -6,7 +6,8 @@ import { formatMm, parseMm } from '../../core/units'
 import { applyCaissonParams, useEditor } from '../store'
 import { ConfirmDialog } from './ConfirmDialog'
 
-type Field = keyof CaissonParams
+/** Les champs à saisir ; l'option des chants est une case à cocher. */
+type Field = Exclude<keyof CaissonParams, 'frontEdges'>
 type Drafts = Record<Field, string>
 
 const FIELDS: ReadonlyArray<{ field: Field; label: string; unit?: string }> = [

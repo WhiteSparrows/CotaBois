@@ -1,5 +1,6 @@
 import { shapeExtent, type Piece, type Project, type ShapedShape } from './model'
 import { canonicalShapeKey } from './shape'
+import { materialKey } from './stock'
 import type { Tenths } from './units'
 
 export interface CutLine {
@@ -31,10 +32,7 @@ export interface CutList {
   totals: CutTotal[]
 }
 
-/** Deux matériaux qui ne diffèrent que par les majuscules ou les espaces autour sont le même. */
-export function materialKey(material: string): string {
-  return material.trim().toLocaleLowerCase('fr')
-}
+export { materialKey }
 
 function compareMaterials(a: string, b: string): number {
   return materialKey(a).localeCompare(materialKey(b), 'fr')

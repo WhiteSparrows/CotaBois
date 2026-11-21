@@ -24,7 +24,7 @@ describe('createEmptyProject', () => {
       name: 'Nouveau meuble',
       pieces: [],
       template: null,
-      layout: { kerf: 30, edgeMargin: 0, panels: [] }
+      layout: { kerf: 30, edgeMargin: 0, edgeOverhang: 200, panels: [] }
     })
   })
 })

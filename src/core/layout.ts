@@ -1,8 +1,7 @@
-import { computeCutList, materialKey } from './cutList'
+import { computeCutList } from './cutList'
+import { checkCutSizes } from './edges'
 import { iterationsFor, packPanels, type CutDirection, type PackedPanel } from './guillotine'
 import {
-  DEFAULT_PANEL_LENGTH,
-  DEFAULT_PANEL_WIDTH,
   defaultLayoutSettings,
   DIMENSION_RANGE,
   isValidDimension,
@@ -12,48 +11,23 @@ import {
   type Project
 } from './model'
 import { err, ok, type Result } from './result'
-import { formatMm, type Tenths } from './units'
+import { groupLabel, materialKey, resolveStock, stockKey, type ResolvedStock } from './stock'
+import { formatMm, MAX_CENTS, type Tenths } from './units'
 
-export { defaultLayoutSettings }
+export { defaultLayoutSettings, groupLabel, resolveStock, type ResolvedStock }
 
 export const MAX_KERF = 200
 export const MAX_EDGE_MARGIN = 1000
+export const MAX_EDGE_OVERHANG = 1000
+export const MAX_EDGE_THICKNESS = 100
 
 export interface LayoutOptionChanges {
   kerf?: Tenths
   edgeMargin?: Tenths
+  edgeOverhang?: Tenths
 }
 
-export type PanelStockChanges = Partial<Pick<PanelStock, 'length' | 'width' | 'grain'>>
-
-export interface ResolvedStock extends PanelStock {
-  /** Vrai si l'utilisateur n'a pas réglé ce panneau. */
-  isDefault: boolean
-}
-
-function stockKey(material: string, thickness: Tenths): string {
-  return `${thickness}|${materialKey(material)}`
-}
-
-/** Le nom d'un groupe dans les messages : `« Chêne », 18 mm` ou `sans matériau, 18 mm`. */
-export function groupLabel(material: string, thickness: Tenths): string {
-  const name = material.trim()
-  return `${name ? `« ${name} »` : 'sans matériau'}, ${formatMm(thickness)} mm`
-}
-
-export function resolveStock(settings: LayoutSettings, material: string, thickness: Tenths): ResolvedStock {
-  const key = stockKey(material, thickness)
-  const saved = settings.panels.find((panel) => stockKey(panel.material, panel.thickness) === key)
-  if (saved) return { ...saved, isDefault: false }
-  return {
-    material: material.trim(),
-    thickness,
-    length: DEFAULT_PANEL_LENGTH,
-    width: DEFAULT_PANEL_WIDTH,
-    grain: false,
-    isDefault: true
-  }
-}
+export type PanelStockChanges = Partial<Pick<PanelStock, 'length' | 'width' | 'grain' | 'edgeThickness' | 'panelPrice' | 'edgePrice'>>
 
 function sortPanels(panels: readonly PanelStock[]): PanelStock[] {
   return [...panels].sort(
@@ -81,6 +55,16 @@ function validateEdgeMargin(edgeMargin: number): Result<Tenths> {
     : invalid('La marge de bord doit être comprise entre 0 et 100 mm, à 0,1 mm près.', 'edgeMargin')
 }
 
+function validateEdgeOverhang(edgeOverhang: number): Result<Tenths> {
+  return isTenthsInRange(edgeOverhang, MAX_EDGE_OVERHANG)
+    ? ok(edgeOverhang)
+    : invalid('La surlongueur de chant doit être comprise entre 0 et 100 mm, à 0,1 mm près.', 'edgeOverhang')
+}
+
+function isPrice(value: number | null): boolean {
+  return value === null || (Number.isInteger(value) && value >= 0 && value <= MAX_CENTS)
+}
+
 function validateStock(stock: PanelStock): Result<PanelStock> {
   const material = stock.material.trim()
   if (material.length > MAX_MATERIAL) {
@@ -90,6 +74,11 @@ function validateStock(stock: PanelStock): Result<PanelStock> {
   if (!isValidDimension(stock.length)) return invalid(`La longueur du panneau doit être ${DIMENSION_RANGE}.`, 'length')
   if (!isValidDimension(stock.width)) return invalid(`La largeur du panneau doit être ${DIMENSION_RANGE}.`, 'width')
   if (typeof stock.grain !== 'boolean') return invalid('Le sens du fil doit être respecté ou non.', 'grain')
+  if (!isTenthsInRange(stock.edgeThickness, MAX_EDGE_THICKNESS)) {
+    return invalid("L'épaisseur du chant doit être comprise entre 0 et 10 mm, à 0,1 mm près.", 'edgeThickness')
+  }
+  if (!isPrice(stock.panelPrice)) return invalid('Le prix du panneau doit être compris entre 0 et 100 000 €, au centime près.', 'panelPrice')
+  if (!isPrice(stock.edgePrice)) return invalid('Le prix du chant doit être compris entre 0 et 100 000 €, au centime près.', 'edgePrice')
   return ok({ ...stock, material })
 }
 
@@ -123,6 +112,8 @@ export function validateLayoutSettings(settings: LayoutSettings): Result<LayoutS
   if (!kerf.ok) return kerf
   const edgeMargin = validateEdgeMargin(settings.edgeMargin)
   if (!edgeMargin.ok) return edgeMargin
+  const edgeOverhang = validateEdgeOverhang(settings.edgeOverhang)
+  if (!edgeOverhang.ok) return edgeOverhang
 
   const panels: PanelStock[] = []
   const keys = new Set<string>()
@@ -138,16 +129,18 @@ export function validateLayoutSettings(settings: LayoutSettings): Result<LayoutS
   }
   const margin = checkMargin(settings.edgeMargin, panels)
   if (!margin.ok) return margin
-  return ok({ kerf: settings.kerf, edgeMargin: settings.edgeMargin, panels: sortPanels(panels) })
+  return ok({ kerf: settings.kerf, edgeMargin: settings.edgeMargin, edgeOverhang: settings.edgeOverhang, panels: sortPanels(panels) })
 }
 
-/** Change le trait de scie ou la marge. Un caisson généré n'est pas marqué comme retouché. */
+/** Change le trait de scie, la marge ou la surlongueur de chant. Un caisson généré n'est pas marqué comme retouché. */
 export function setLayoutOptions(project: Project, changes: LayoutOptionChanges): Result<Project> {
   const next: LayoutSettings = { ...project.layout, ...changes }
   const kerf = validateKerf(next.kerf)
   if (!kerf.ok) return kerf
   const edgeMargin = validateEdgeMargin(next.edgeMargin)
   if (!edgeMargin.ok) return edgeMargin
+  const edgeOverhang = validateEdgeOverhang(next.edgeOverhang)
+  if (!edgeOverhang.ok) return edgeOverhang
   const margin = checkMargin(next.edgeMargin, stocksInUse(project, next))
   if (!margin.ok) return margin
   return ok({ ...project, layout: next })
@@ -349,5 +342,8 @@ export function setPanelStock(project: Project, material: string, thickness: Ten
   if (!margin.ok) return margin
 
   const others = project.layout.panels.filter((panel) => stockKey(panel.material, panel.thickness) !== key)
-  return ok({ ...project, layout: { ...project.layout, panels: sortPanels([...others, stock.value]) } })
+  const next: Project = { ...project, layout: { ...project.layout, panels: sortPanels([...others, stock.value]) } }
+  // Un chant plus épais réduit la cote à couper des pièces du groupe : elle doit rester positive.
+  const cuts = checkCutSizes(next)
+  return cuts.ok ? ok(next) : cuts
 }

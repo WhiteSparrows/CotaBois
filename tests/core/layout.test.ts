@@ -35,7 +35,7 @@ function withPiece(project: Project, material: string, thickness = 180, length =
 
 describe('réglages par défaut', () => {
   it("un projet neuf a un trait de 3 mm, aucune marge et aucun panneau enregistré", () => {
-    const expected: LayoutSettings = { kerf: 30, edgeMargin: 0, panels: [] }
+    const expected: LayoutSettings = { kerf: 30, edgeMargin: 0, edgeOverhang: 200, panels: [] }
     expect(defaultLayoutSettings()).toEqual(expected)
     expect(createEmptyProject().layout).toEqual(expected)
   })
@@ -86,13 +86,17 @@ describe('setLayoutOptions', () => {
 describe('setPanelStock', () => {
   it('crée le panneau du groupe, avec les valeurs par défaut pour le reste', () => {
     const project = value(setPanelStock(createEmptyProject(), ' Chêne ', 180, { length: 25000 }))
-    expect(project.layout.panels).toEqual([{ material: 'Chêne', thickness: 180, length: 25000, width: 20700, grain: false }])
+    expect(project.layout.panels).toEqual([
+      { material: 'Chêne', thickness: 180, length: 25000, width: 20700, grain: false, edgeThickness: 0, panelPrice: null, edgePrice: null }
+    ])
   })
 
   it('reconnaît le matériau sans tenir compte des majuscules ni des espaces', () => {
     let project = value(setPanelStock(createEmptyProject(), 'Chêne', 180, { length: 25000 }))
     project = value(setPanelStock(project, ' chêne ', 180, { width: 12500, grain: true }))
-    expect(project.layout.panels).toEqual([{ material: 'Chêne', thickness: 180, length: 25000, width: 12500, grain: true }])
+    expect(project.layout.panels).toEqual([
+      { material: 'Chêne', thickness: 180, length: 25000, width: 12500, grain: true, edgeThickness: 0, panelPrice: null, edgePrice: null }
+    ])
   })
 
   it.each([
@@ -354,20 +358,34 @@ describe('computeLayout : sens du fil (US5)', () => {
 })
 
 describe('validateLayoutSettings', () => {
-  const stock = { material: 'Chêne', thickness: 180, length: 25000, width: 12500, grain: false }
+  const stock = {
+    material: 'Chêne',
+    thickness: 180,
+    length: 25000,
+    width: 12500,
+    grain: false,
+    edgeThickness: 0,
+    panelPrice: null,
+    edgePrice: null
+  }
+  const base = { kerf: 30, edgeMargin: 0, edgeOverhang: 200 }
 
   it('accepte des réglages valides', () => {
-    const settings = { kerf: 30, edgeMargin: 100, panels: [stock] }
+    const settings = { ...base, edgeMargin: 100, panels: [{ ...stock, edgeThickness: 20, panelPrice: 4590, edgePrice: 85 }] }
     expect(value(validateLayoutSettings(settings))).toEqual(settings)
   })
 
   it.each<[string, LayoutSettings]>([
-    ['trait de scie hors limites', { kerf: 201, edgeMargin: 0, panels: [] }],
-    ['marge hors limites', { kerf: 30, edgeMargin: 1001, panels: [] }],
-    ['épaisseur invalide', { kerf: 30, edgeMargin: 0, panels: [{ ...stock, thickness: 0 }] }],
-    ['matériau trop long', { kerf: 30, edgeMargin: 0, panels: [{ ...stock, material: 'x'.repeat(81) }] }],
-    ['couple en double', { kerf: 30, edgeMargin: 0, panels: [stock, { ...stock, material: ' chêne ' }] }],
-    ['marge trop grande pour un panneau', { kerf: 30, edgeMargin: 1000, panels: [{ ...stock, width: 2000 }] }]
+    ['trait de scie hors limites', { ...base, kerf: 201, panels: [] }],
+    ['marge hors limites', { ...base, edgeMargin: 1001, panels: [] }],
+    ['surlongueur hors limites', { ...base, edgeOverhang: 1001, panels: [] }],
+    ['épaisseur invalide', { ...base, panels: [{ ...stock, thickness: 0 }] }],
+    ['matériau trop long', { ...base, panels: [{ ...stock, material: 'x'.repeat(81) }] }],
+    ['couple en double', { ...base, panels: [stock, { ...stock, material: ' chêne ' }] }],
+    ['marge trop grande pour un panneau', { ...base, edgeMargin: 1000, panels: [{ ...stock, width: 2000 }] }],
+    ['chant trop épais', { ...base, panels: [{ ...stock, edgeThickness: 101 }] }],
+    ['prix négatif', { ...base, panels: [{ ...stock, panelPrice: -1 }] }],
+    ['prix trop élevé', { ...base, panels: [{ ...stock, edgePrice: 10_000_001 }] }]
   ])('refuse : %s', (_label, settings) => {
     expect(validateLayoutSettings(settings).ok).toBe(false)
   })
