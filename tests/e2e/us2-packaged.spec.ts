@@ -136,6 +136,34 @@ test.describe('logiciel empaqueté', () => {
     }
   })
 
+  test('C9 : les chants et le coût, dans le logiciel empaqueté', async () => {
+    const app = await electron.launch({ executablePath: EXECUTABLE, env: cleanEnv() })
+    try {
+      const page = await app.firstWindow()
+      await page.waitForLoadState('domcontentloaded')
+      const fillIn = async (scope: typeof page | ReturnType<typeof page.getByRole>, label: string, value: string) => {
+        await scope.getByLabel(label, { exact: true }).fill(value)
+        await scope.getByLabel(label, { exact: true }).press('Enter')
+      }
+
+      await page.getByLabel("Nombre d'étagères", { exact: true }).fill('3')
+      await page.getByRole('checkbox', { name: 'Chants sur les bords avant', exact: true }).check()
+      await page.getByRole('button', { name: 'Créer le caisson' }).click()
+      await page.getByRole('button', { name: 'Calepinage', exact: true }).click()
+
+      const boards = page.getByRole('region', { name: 'Panneaux sans matériau, 18 mm' })
+      const backs = page.getByRole('region', { name: 'Panneaux sans matériau, 5 mm' })
+      await expect(boards.getByTestId('layout-summary')).toContainText('Chant : 7,56 m (7 bords)')
+      await fillIn(boards, 'Prix du panneau', '45,90')
+      await fillIn(boards, 'Prix du chant', '0,85')
+      await fillIn(backs, 'Prix du panneau', '12')
+      await expect(page.getByTestId('cost')).toContainText('Total 64,33 €')
+    } finally {
+      await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().forEach((w) => w.destroy())).catch(() => undefined)
+      await app.close().catch(() => undefined)
+    }
+  })
+
   test('F9 : une pièce de forme se dessine et se retrouve dans les exports', async () => {
     const dir = mkdtempSync(join(tmpdir(), 'cotabois-packaged-'))
     const app = await electron.launch({ executablePath: EXECUTABLE, env: cleanEnv() })

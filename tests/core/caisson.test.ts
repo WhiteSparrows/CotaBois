@@ -205,3 +205,37 @@ describe('validateCaissonParams', () => {
     expect(error.message).toContain('0')
   })
 })
+
+describe('applyCaisson : chants sur les bords avant (US4 des chants)', () => {
+  it('pose un chant sur le bord avant des côtés, du dessus, du dessous et des étagères, jamais sur le fond', () => {
+    const project = generate({ ...REFERENCE, frontEdges: true })
+    expect(project.pieces.map((piece) => [piece.name, piece.edges])).toEqual([
+      ['Côté gauche', ['top']],
+      ['Côté droit', ['top']],
+      ['Dessous', ['top']],
+      ['Dessus', ['top']],
+      ['Étagère 1', ['top']],
+      ['Étagère 2', ['top']],
+      ['Étagère 3', ['top']],
+      ['Fond', undefined]
+    ])
+    expect(project.template?.params.frontEdges).toBe(true)
+    expect(project.template?.customized).toBe(false)
+  })
+
+  it('le bord haut des pièces chantées est bien celui de l\'avant du caisson', () => {
+    const project = generate({ ...REFERENCE, frontEdges: true })
+    // La largeur des pièces suit la profondeur, de l'arrière (fond) vers l'avant : le bord haut est à z = profondeur.
+    for (const piece of project.pieces.filter((item) => item.edges)) {
+      expect(piece.orientation.v).toBe('+z')
+      expect(piece.position.z + piece.shape.width).toBe(REFERENCE.depth)
+    }
+  })
+
+  it('sans l\'option, aucune pièce n\'a de chant, et le caisson est identique à aujourd\'hui', () => {
+    const without = generate(REFERENCE)
+    expect(without.pieces.every((piece) => piece.edges === undefined)).toBe(true)
+    expect(generate({ ...REFERENCE, frontEdges: undefined })).toEqual(without)
+    expect(without.template?.params).toEqual(REFERENCE)
+  })
+})

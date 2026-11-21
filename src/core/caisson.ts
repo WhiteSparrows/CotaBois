@@ -52,10 +52,13 @@ export function applyCaisson(project: Project, params: CaissonParams, nextId: ()
   const validation = validateCaissonParams(params)
   if (!validation.ok) return validation
 
+  // L'option n'est enregistrée que si elle est active : sans elle, le caisson reste celui d'avant.
+  const { frontEdges, ...dimensions } = params
+  const normalized: CaissonParams = frontEdges ? { ...dimensions, frontEdges: true } : dimensions
   return ok({
     ...project,
-    pieces: generatePieces(params, nextId),
-    template: { kind: 'caisson', params, customized: false }
+    pieces: generatePieces(normalized, nextId),
+    template: { kind: 'caisson', params: normalized, customized: false }
   })
 }
 
@@ -65,10 +68,12 @@ function generatePieces(params: CaissonParams, nextId: () => string): Piece[] {
   const innerWidth = width - 2 * e
   const freeHeight = height - 2 * e - n * e
 
+  // La largeur des côtés, du dessus, du dessous et des étagères va du fond vers l'avant : l'avant est le bord haut.
   const board = (name: string, length: Tenths, position: Vector, orientation: Orientation): Piece => ({
     id: nextId(),
     name,
     shape: { kind: 'rectangle', length, width: pieceDepth },
+    ...(params.frontEdges ? { edges: ['top'] as const } : {}),
     thickness: e,
     material: '',
     position,

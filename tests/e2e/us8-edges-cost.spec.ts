@@ -239,3 +239,47 @@ test('C6 : les prix impossibles sont refusés, sans rien modifier', async () => 
   await expect(page.getByTestId('cost')).toContainText('45,90 €')
   await app.close()
 })
+
+test('C7 : un caisson créé avec ses chants sur les bords avant', async () => {
+  const { app, page } = await launchApp()
+  await field(page, "Nombre d'étagères").fill('3')
+  const option = page.getByRole('checkbox', { name: 'Chants sur les bords avant', exact: true })
+  await expect(option).not.toBeChecked()
+  await option.check()
+  await page.getByRole('button', { name: 'Créer le caisson' }).click()
+
+  await expect(cutRows(page).nth(0)).toContainText('1 long')
+  await expect(cutRows(page).nth(1)).toContainText('1 long')
+  await expect(cutRows(page).nth(2)).not.toContainText('long')
+  await expect(page.getByTestId('viewport')).toHaveAttribute('data-edge-band-count', '7')
+  await page.getByRole('button', { name: 'Calepinage', exact: true }).click()
+  await expect(group(page, BOARDS).getByTestId('layout-summary')).toContainText('Chant : 7,56 m (7 bords)')
+
+  // Décocher régénère le caisson, qui n'a pas été retouché : plus aucun chant
+  await option.uncheck()
+  await expect(cutRows(page).nth(0)).not.toContainText('long')
+  await expect(page.getByTestId('viewport')).toHaveAttribute('data-edge-band-count', '0')
+  await app.close()
+})
+
+test('C8 : les projets des versions 1 à 3 s\'ouvrent sans chant ni prix, et la version 4 avec', async () => {
+  const { app, page } = await launchApp()
+  const fixtures = join(__dirname, '../fixtures/projects')
+  for (const [name, rows] of [['valid-v1.cotabois', 2], ['valid-v2.cotabois', 3], ['valid-v3.cotabois', 2]] as const) {
+    await chooseFile(app, join(fixtures, name))
+    await clickMenu(app, 'Ouvrir…')
+    await expect(cutRows(page)).toHaveCount(rows)
+    await expect(page.getByTestId('file-error')).toHaveCount(0)
+    await expect(page.getByTestId('cut-list')).not.toContainText('long')
+    await expect(page.getByTestId('viewport')).toHaveAttribute('data-edge-band-count', '0')
+  }
+
+  await chooseFile(app, join(fixtures, 'valid-v4.cotabois'))
+  await clickMenu(app, 'Ouvrir…')
+  await expect(page.getByTestId('cut-list').locator('tbody tr', { hasText: 'Côté gauche' })).toContainText('1 long')
+  await expect(page.getByTestId('cut-list').locator('tbody tr', { hasText: 'Étagère' })).toContainText('2 longs, 1 court')
+  await page.getByRole('button', { name: 'Calepinage', exact: true }).click()
+  await expect(group(page, BOARDS).getByLabel('Prix du panneau', { exact: true })).toHaveValue('45,90')
+  await expect(group(page, BOARDS).getByLabel('Épaisseur du chant', { exact: true })).toHaveValue('2')
+  await app.close()
+})
