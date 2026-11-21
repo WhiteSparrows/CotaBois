@@ -713,6 +713,17 @@ button.ghost:hover {
   font-weight: 600;
 }
 
+.advanced-fields {
+  margin: 4px 0 12px;
+}
+
+.advanced-fields summary {
+  margin-bottom: 10px;
+  cursor: pointer;
+  color: var(--accent);
+  font-weight: 600;
+}
+
 .layout-cuts-note {
   margin: 4px 0 0;
   color: var(--text-muted);

@@ -1,12 +1,11 @@
 import { useSyncExternalStore } from 'react'
-import { applyCaisson } from '../core/caisson'
 import { toCsv } from '../core/csv'
+import { applyTemplate, type TemplateChoice } from '../core/templates'
 import { computeCutList } from '../core/cutList'
 import { canRedo, canUndo, createHistory, pushState, redo as redoHistory, undo as undoHistory, type History } from '../core/history'
 import {
   createEmptyProject,
   type Axis,
-  type CaissonParams,
   type CornerName,
   type CornerTreatment,
   type Cutout,
@@ -122,8 +121,9 @@ function nextId(): string {
   return crypto.randomUUID()
 }
 
-export function applyCaissonParams(params: CaissonParams): Result<Project> {
-  const result = applyCaisson(state.project, params, nextId)
+/** Crée ou régénère le meuble du modèle choisi, en une action annulable. */
+export function applyTemplateParams(choice: TemplateChoice): Result<Project> {
+  const result = applyTemplate(state.project, choice, nextId)
   if (result.ok) publish(pushState(history, result.value), [], true)
   return result
 }

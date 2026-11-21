@@ -62,6 +62,11 @@ export function applyCaisson(project: Project, params: CaissonParams, nextId: ()
   })
 }
 
+/** Le caisson sans étagère : côtés, dessous, dessus et fond. Le meuble à tiroirs part de cette carcasse. */
+export function carcassPieces(params: Omit<CaissonParams, 'shelfCount'>, nextId: () => string): Piece[] {
+  return generatePieces({ ...params, shelfCount: 0 }, nextId)
+}
+
 function generatePieces(params: CaissonParams, nextId: () => string): Piece[] {
   const { width, height, depth, boardThickness: e, backThickness: back, shelfCount: n } = params
   const pieceDepth = depth - back

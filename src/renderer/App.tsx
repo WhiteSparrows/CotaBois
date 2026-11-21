@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { findOverlaps } from '../core/geometry'
-import { CaissonForm } from './panels/CaissonForm'
+import { FurnitureForm } from './panels/FurnitureForm'
 import { CommitField } from './panels/CommitField'
 import { CutListPanel } from './panels/CutListPanel'
 import { LayoutView } from './panels/LayoutView'
@@ -175,7 +175,7 @@ export function App() {
             }}
           />
         </div>
-        {selection.length > 0 ? <PiecePanel /> : <CaissonForm />}
+        {selection.length > 0 ? <PiecePanel /> : <FurnitureForm />}
       </aside>
 
       <main className="viewport-area">

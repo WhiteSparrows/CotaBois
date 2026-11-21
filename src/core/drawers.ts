@@ -1,4 +1,14 @@
-import { DIMENSION_RANGE, isValidDimension, type DrawerParams } from './model'
+import { carcassPieces } from './caisson'
+import {
+  DIMENSION_RANGE,
+  EDGE_NAMES,
+  isValidDimension,
+  type DrawerParams,
+  type Orientation,
+  type Piece,
+  type Project,
+  type Vector
+} from './model'
 import { err, ok, type Result } from './result'
 import { formatMm, type Tenths } from './units'
 
@@ -159,4 +169,59 @@ export function validateDrawerParams(params: DrawerParams): Result<DrawerParams>
     )
   }
   return ok(params)
+}
+
+/** Remplace les pièces par le meuble généré : la carcasse, puis chaque façade suivie de sa boîte, de haut en bas. */
+export function applyDrawerCabinet(project: Project, params: DrawerParams, nextId: () => string): Result<Project> {
+  const validation = validateDrawerParams(params)
+  if (!validation.ok) return validation
+
+  // Comme pour le caisson, l'option n'est enregistrée que si elle est active.
+  const { frontEdges, ...values } = params
+  const normalized: DrawerParams = frontEdges ? { ...values, frontEdges: true } : values
+  return ok({
+    ...project,
+    pieces: generatePieces(normalized, nextId),
+    template: { kind: 'drawers', params: normalized, customized: false }
+  })
+}
+
+function generatePieces(params: DrawerParams, nextId: () => string): Piece[] {
+  const { width, height, depth, boardThickness: e, backThickness, frontEdges } = params
+  const t = params.drawerThickness
+  const f = params.drawerBottomThickness
+  const layout = drawerLayout(params)
+
+  const panel = (name: string, length: Tenths, panelWidth: Tenths, thickness: Tenths, position: Vector, orientation: Orientation): Piece => ({
+    id: nextId(),
+    name,
+    shape: { kind: 'rectangle', length, width: panelWidth },
+    thickness,
+    material: '',
+    position,
+    orientation
+  })
+
+  const pieces = carcassPieces({ width, height, depth, boardThickness: e, backThickness, ...(frontEdges ? { frontEdges } : {}) }, nextId)
+  layout.fronts.forEach((front, index) => {
+    const k = index + 1
+    const facade = panel(`Façade ${k}`, layout.frontWidth, front.height, e, { x: layout.frontX, y: front.y, z: depth }, { u: '+x', v: '+y' })
+    pieces.push(frontEdges ? { ...facade, edges: EDGE_NAMES } : facade)
+
+    const bottomY = layout.drawerBottoms[index]!
+    const sideY = bottomY + f
+    const { boxX: x, boxZ: z, boxDepth, boxWidth, sideHeight, endLength } = layout
+    const side = (label: string, sideX: Tenths) =>
+      panel(`Tiroir ${k} ${label}`, boxDepth, sideHeight, t, { x: sideX, y: sideY, z }, { u: '+z', v: '+y' })
+    const end = (label: string, endZ: Tenths) =>
+      panel(`Tiroir ${k} ${label}`, endLength, sideHeight, t, { x: x + t, y: sideY, z: endZ }, { u: '+x', v: '+y' })
+    pieces.push(
+      side('côté gauche', x),
+      side('côté droit', x + boxWidth - t),
+      end('avant', depth - t),
+      end('arrière', z),
+      panel(`Tiroir ${k} fond`, boxWidth, boxDepth, f, { x, y: bottomY, z }, { u: '+x', v: '+z' })
+    )
+  })
+  return pieces
 }

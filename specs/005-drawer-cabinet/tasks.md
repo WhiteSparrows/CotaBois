@@ -60,16 +60,17 @@ description: "Liste des tâches pour le meuble à tiroirs"
 
 ### Tests for User Story 1 ⚠️
 
-- [ ] T008 [P] [US1] Compléter `tests/core/drawers.test.ts` : liste du meuble de référence identique à `drawer-references.ts` ; variante de 721 mm ; positions clés ; aucun chevauchement selon `findOverlaps` ; noms numérotés de haut en bas ; sans fond de caisson, 4 pièces de carcasse ; `template` de type `drawers` avec `customized: false` (FR-005, FR-006, FR-007, FR-008, FR-013, SC-002)
-- [ ] T009 [P] [US1] Écrire `tests/core/templates.test.ts` : `applyTemplate` d'un caisson identique à `applyCaisson` sur `REFERENCE_CAISSONS` ; `carcassPieces` identique à un caisson sans étagère ; aiguillage vers le meuble à tiroirs (FR-002, FR-005)
-- [ ] T010 [P] [US1] Écrire `tests/e2e/us9-drawers.spec.ts`, scénarios T1 et T3 : choix du modèle, création, 7 lignes et 23 pièces, aucun chevauchement signalé ; refus avec la limite, sans rien créer (FR-001, FR-009, SC-003)
+- [X] T008 [P] [US1] Compléter `tests/core/drawers.test.ts` : liste du meuble de référence identique à `drawer-references.ts` ; variante de 721 mm ; positions clés ; aucun chevauchement selon `findOverlaps` ; noms numérotés de haut en bas ; sans fond de caisson, 4 pièces de carcasse ; `template` de type `drawers` avec `customized: false` (FR-005, FR-006, FR-007, FR-008, FR-013, SC-002)
+- [X] T009 [P] [US1] Écrire `tests/core/templates.test.ts` : `applyTemplate` d'un caisson identique à `applyCaisson` sur `REFERENCE_CAISSONS` ; `carcassPieces` identique à un caisson sans étagère ; aiguillage vers le meuble à tiroirs (FR-002, FR-005)
+- [X] T010 [P] [US1] Écrire `tests/e2e/us9-drawers.spec.ts`, scénarios T1 et T3 : choix du modèle, création, 7 lignes et 23 pièces, aucun chevauchement signalé ; refus avec la limite, sans rien créer (FR-001, FR-009, SC-003)
 
 ### Implementation for User Story 1
 
-- [ ] T011 [US1] Exporter `carcassPieces` depuis `src/core/caisson.ts`, sans changer le caisson (FR-005)
-- [ ] T012 [US1] Compléter `src/core/drawers.ts` : `drawerLayout` et `applyDrawerCabinet`, selon `research.md`, R3 à R6 (FR-006, FR-007, FR-008, FR-013)
-- [ ] T013 [US1] Créer `src/core/templates.ts` : `applyTemplate` et `TEMPLATE_LABELS` (FR-001, FR-002)
-- [ ] T014 [US1] Ajouter `applyTemplateParams` dans `src/renderer/store.ts` ; créer `src/renderer/panels/FurnitureForm.tsx` avec le sélecteur `Modèle`, `src/renderer/panels/CaissonFields.tsx` extrait de `CaissonForm.tsx` sans changement de comportement, et `src/renderer/panels/DrawerFields.tsx` avec ses champs et la section repliée **Réglages des tiroirs** ; brancher le formulaire dans `src/renderer/App.tsx` (FR-001, FR-002, FR-004)
+- [X] T011 [US1] Exporter `carcassPieces` depuis `src/core/caisson.ts`, sans changer le caisson (FR-005)
+- [X] T012 [US1] Compléter `src/core/drawers.ts` : `drawerLayout` et `applyDrawerCabinet`, selon `research.md`, R3 à R6 (FR-006, FR-007, FR-008, FR-013)
+- [X] T013 [US1] Créer `src/core/templates.ts` : `applyTemplate` et `TEMPLATE_LABELS` (FR-001, FR-002)
+- [X] T014 [US1] Ajouter `applyTemplateParams` dans `src/renderer/store.ts` ; créer `src/renderer/panels/FurnitureForm.tsx` avec le sélecteur `Modèle`, `src/renderer/panels/CaissonFields.tsx` extrait de `CaissonForm.tsx` sans changement de comportement, et `src/renderer/panels/DrawerFields.tsx` avec ses champs et la section repliée **Réglages des tiroirs** ; brancher le formulaire dans `src/renderer/App.tsx` (FR-001, FR-002, FR-004)
+  - Écart : au lieu de `CaissonFields.tsx` et `DrawerFields.tsx`, chaque modèle est décrit par sa liste de champs dans `src/renderer/panels/furnitureModels.ts`, et `FurnitureForm.tsx` les affiche ; `CaissonForm.tsx` est retiré. Ajouter un modèle revient à ajouter une entrée.
 
 **Checkpoint**: T1 et T3 passent. On crée un meuble à tiroirs exact.
 
@@ -83,12 +84,12 @@ description: "Liste des tâches pour le meuble à tiroirs"
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T015 [P] [US2] Compléter `tests/core/drawers.test.ts` : appliquer de nouveaux réglages remplace toutes les pièces et remet `customized` à faux ; une retouche par `updatePiece` le met à vrai (FR-010)
-- [ ] T016 [P] [US2] Compléter `tests/e2e/us9-drawers.spec.ts`, scénario T4 : 4 tiroirs en une action annulable ; confirmation avant de remplacer un meuble retouché (FR-010)
+- [X] T015 [P] [US2] Compléter `tests/core/drawers.test.ts` : appliquer de nouveaux réglages remplace toutes les pièces et remet `customized` à faux ; une retouche par `updatePiece` le met à vrai (FR-010)
+- [X] T016 [P] [US2] Compléter `tests/e2e/us9-drawers.spec.ts`, scénario T4 : 4 tiroirs en une action annulable ; confirmation avant de remplacer un meuble retouché (FR-010)
 
 ### Implementation for User Story 2
 
-- [ ] T017 [US2] Appliquer chaque champ de `src/renderer/panels/DrawerFields.tsx` à la sortie ou avec Entrée pour un meuble existant, avec la confirmation du caisson si le meuble a été retouché, dans `src/renderer/panels/FurnitureForm.tsx` (FR-010)
+- [X] T017 [US2] Appliquer chaque champ de `src/renderer/panels/DrawerFields.tsx` à la sortie ou avec Entrée pour un meuble existant, avec la confirmation du caisson si le meuble a été retouché, dans `src/renderer/panels/FurnitureForm.tsx` (FR-010)
 
 **Checkpoint**: T4 passe. Le meuble s'ajuste comme un caisson.
 
