@@ -136,13 +136,13 @@ description: "Liste des tâches pour les chants et le coût du meuble"
 
 ### Tests for User Story 4 ⚠️
 
-- [ ] T036 [P] [US4] Écrire dans `tests/core/caisson.test.ts` : avec `frontEdges`, le bord `top` des côtés, du dessus, du dessous et des étagères est chanté, et le fond n'a aucun chant ; sans, aucune pièce n'a de chant et le caisson est identique à aujourd'hui (FR-016)
-- [ ] T037 [P] [US4] Compléter `tests/e2e/us8-edges-cost.spec.ts`, scénario C7, avec le métrage de 7,56 m obtenu directement (FR-016)
+- [X] T036 [P] [US4] Écrire dans `tests/core/caisson.test.ts` : avec `frontEdges`, le bord `top` des côtés, du dessus, du dessous et des étagères est chanté, et le fond n'a aucun chant ; sans, aucune pièce n'a de chant et le caisson est identique à aujourd'hui (FR-016)
+- [X] T037 [P] [US4] Compléter `tests/e2e/us8-edges-cost.spec.ts`, scénario C7, avec le métrage de 7,56 m obtenu directement (FR-016)
 
 ### Implementation for User Story 4
 
-- [ ] T038 [US4] Appliquer `frontEdges` dans `src/core/caisson.ts` (FR-016)
-- [ ] T039 [US4] Ajouter la case `Chants sur les bords avant` dans `src/renderer/panels/CaissonForm.tsx` (FR-016)
+- [X] T038 [US4] Appliquer `frontEdges` dans `src/core/caisson.ts` (FR-016)
+- [X] T039 [US4] Ajouter la case `Chants sur les bords avant` dans `src/renderer/panels/CaissonForm.tsx` (FR-016)
 
 **Checkpoint**: C7 passe. Tous les parcours sont fonctionnels.
 
@@ -152,10 +152,10 @@ description: "Liste des tâches pour les chants et le coût du meuble"
 
 **Purpose**: Vérifier l'ensemble, y compris ce que les tests automatiques ne prouvent pas.
 
-- [ ] T040 Compléter `tests/e2e/us8-edges-cost.spec.ts`, scénario C8 : les fichiers en versions 1, 2, 3 et 4 s'ouvrent, les trois premiers sans chant ni prix, avec une liste identique (FR-018, SC-004)
-- [ ] T041 Étendre `tests/e2e/v6-performance.spec.ts` : sur `200-pieces-shapes.cotabois`, poser un chant sur 50 pièces et mesurer la mise à jour, en moins de 1 s (SC-005)
-- [ ] T042 [P] Mettre à jour `README.md` : chants et coût dans la présentation, et leurs limites
-- [ ] T043 Compléter `tests/e2e/us2-packaged.spec.ts` avec C3 et C5 dans le logiciel empaqueté, exécuter `npm run pack` puis toute la suite, construire l'installeur avec `npm run dist`, et consigner les résultats dans `specs/004-edge-banding-cost/checklists/validation.md` (C9)
+- [X] T040 Compléter `tests/e2e/us8-edges-cost.spec.ts`, scénario C8 : les fichiers en versions 1, 2, 3 et 4 s'ouvrent, les trois premiers sans chant ni prix, avec une liste identique (FR-018, SC-004)
+- [X] T041 Étendre `tests/e2e/v6-performance.spec.ts` : sur `200-pieces-shapes.cotabois`, poser un chant sur 50 pièces et mesurer la mise à jour, en moins de 1 s (SC-005)
+- [X] T042 [P] Mettre à jour `README.md` : chants et coût dans la présentation, et leurs limites
+- [X] T043 Compléter `tests/e2e/us2-packaged.spec.ts` avec C3 et C5 dans le logiciel empaqueté, exécuter `npm run pack` puis toute la suite, construire l'installeur avec `npm run dist`, et consigner les résultats dans `specs/004-edge-banding-cost/checklists/validation.md` (C9)
 - [ ] T044 Faire chronométrer par l'utilisateur la pose des chants d'un caisson et la lecture du métrage, et vérifier un plan de coupe imprimé avec ses prix ; consigner dans `specs/004-edge-banding-cost/checklists/validation.md` (SC-001)
 
 ---
