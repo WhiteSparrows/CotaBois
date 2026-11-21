@@ -136,9 +136,9 @@ description: "Liste des tâches pour le meuble à tiroirs"
 
 **Purpose**: Vérifier l'ensemble, y compris ce que les tests automatiques ne prouvent pas.
 
-- [ ] T023 Contrôler à l'œil la vue 3D du meuble de référence, tiroirs fermés, et la liste imprimée, et consigner dans `specs/005-drawer-cabinet/checklists/validation.md`
-- [ ] T024 [P] Mettre à jour `README.md` : le meuble à tiroirs dans la présentation, et ses limites
-- [ ] T025 Compléter `tests/e2e/us2-packaged.spec.ts` avec T1 dans le logiciel empaqueté, exécuter `npm run pack` puis toute la suite, construire l'installeur avec `npm run dist`, et consigner les résultats dans `specs/005-drawer-cabinet/checklists/validation.md` (T8)
+- [X] T023 Contrôler à l'œil la vue 3D du meuble de référence, tiroirs fermés, et la liste imprimée, et consigner dans `specs/005-drawer-cabinet/checklists/validation.md`
+- [X] T024 [P] Mettre à jour `README.md` : le meuble à tiroirs dans la présentation, et ses limites
+- [X] T025 Compléter `tests/e2e/us2-packaged.spec.ts` avec T1 dans le logiciel empaqueté, exécuter `npm run pack` puis toute la suite, construire l'installeur avec `npm run dist`, et consigner les résultats dans `specs/005-drawer-cabinet/checklists/validation.md` (T8)
 - [ ] T026 Faire chronométrer par l'utilisateur la création d'un meuble à 3 tiroirs jusqu'à la liste, et fabriquer les tiroirs à partir de la seule liste ; consigner dans `specs/005-drawer-cabinet/checklists/validation.md` (SC-001, SC-005)
 
 ---

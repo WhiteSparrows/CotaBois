@@ -6,7 +6,8 @@ Logiciel de bureau pour Windows, en français : on conçoit un meuble en 3D et o
 
 ## Ce qu'il permet
 
-- Créer un caisson à partir de ses dimensions, ou dessiner un meuble panneau par panneau.
+- Partir d'un modèle, un caisson à étagères ou un meuble à tiroirs, à partir de ses dimensions, ou dessiner un meuble panneau par panneau.
+- Pour le meuble à tiroirs : façades en applique, boîtes de tiroir sur coulisses à billes, tiroirs fermés en 3D ; les jeux et les épaisseurs des tiroirs se règlent, et une saisie impossible est refusée avec la limite.
 - Ajuster les pièces en 3D : poignées avec alignement automatique, cotes, matériau, quarts de tour, copier-coller, duplication, annulation.
 - Donner une forme aux pièces : coins arrondis ou chanfreinés, encoches, trous ronds ou rectangulaires, à saisir ou à tirer à la souris sur un aperçu à plat.
 - Lire la liste de découpe : pièces identiques regroupées, cotes exactes à 0,1 mm, totaux de surface par matériau et épaisseur.
@@ -16,7 +17,7 @@ Logiciel de bureau pour Windows, en français : on conçoit un meuble en 3D et o
 - Poser des chants bord par bord : les pièces se coupent à la bonne cote, épaisseur du chant retirée, et le logiciel donne le métrage de chant à acheter.
 - Estimer le prix du meuble à partir du prix des panneaux et du chant, avec un total signalé comme partiel s'il manque un prix.
 
-Les formes traversent toute l'épaisseur et se définissent par des cotes, et le seul modèle de départ est le caisson. Le calepinage utilise une seule taille de panneau par matériau et épaisseur, uniquement des coupes traversantes, et les pièces de forme y occupent leur rectangle complet. Il cherche le plus petit nombre de panneaux, sans garantir que ce soit le minimum. Chaque matériau a un seul chant, posé sur toute la longueur du bord ; le coût ne comprend que les panneaux entiers et le chant. D'autres meubles, les contours libres, les usinages partiels, la réutilisation des chutes et le prix des panneaux sont prévus plus tard.
+Les formes traversent toute l'épaisseur et se définissent par des cotes, et il y a deux modèles de départ, le caisson et le meuble à tiroirs. Ce dernier a des façades en applique, de 1 à 10 tiroirs de même hauteur, et des coulisses de 250 mm au moins, de 50 en 50 mm ; il ne fait ni façades encastrées, ni tiroirs de hauteurs différentes, ni poignées. Le calepinage utilise une seule taille de panneau par matériau et épaisseur, uniquement des coupes traversantes, et les pièces de forme y occupent leur rectangle complet. Il cherche le plus petit nombre de panneaux, sans garantir que ce soit le minimum. Chaque matériau a un seul chant, posé sur toute la longueur du bord ; le coût ne comprend que les panneaux entiers et le chant. D'autres meubles, les contours libres, les usinages partiels, la réutilisation des chutes et le prix des panneaux sont prévus plus tard.
 
 ## Installer
 
@@ -43,7 +44,7 @@ Les tests du logiciel empaqueté et du démarrage ne s'exécutent qu'après `npm
 
 ## Organisation
 
-- `src/core` : le cœur métier (cotes, caisson, liste de découpe, fichiers), sans dépendance à l'interface. Toutes les longueurs y sont des entiers en dixièmes de millimètre.
+- `src/core` : le cœur métier (cotes, modèles de meubles, liste de découpe, fichiers), sans dépendance à l'interface. Toutes les longueurs y sont des entiers en dixièmes de millimètre.
 - `src/main`, `src/preload` : le processus principal Electron et son pont avec l'interface.
 - `src/renderer` : l'interface React et la vue 3D Three.js.
 - `specs/` et `.specify/` : la spécification, le plan, les décisions et la constitution du projet.

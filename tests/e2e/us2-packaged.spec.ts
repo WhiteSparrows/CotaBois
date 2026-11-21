@@ -164,6 +164,25 @@ test.describe('logiciel empaqueté', () => {
     }
   })
 
+  test('T8 : le meuble à tiroirs de référence, dans le logiciel empaqueté', async () => {
+    const app = await electron.launch({ executablePath: EXECUTABLE, env: cleanEnv() })
+    try {
+      const page = await app.firstWindow()
+      await page.waitForLoadState('domcontentloaded')
+      await page.getByLabel('Modèle', { exact: true }).selectOption({ label: 'Meuble à tiroirs' })
+      await page.getByRole('button', { name: 'Créer le meuble à tiroirs' }).click()
+      await expect(page.getByTestId('viewport')).toHaveAttribute('data-piece-count', '23')
+      const rows = page.getByTestId('cut-list').locator('tbody tr')
+      await expect(rows).toHaveCount(7)
+      await expect(rows.nth(1)).toHaveText(/^3\s*Façade 1, Façade 2, Façade 3\s*597\s*237\s*18/)
+      await expect(rows.nth(6)).toHaveText(/^3\s*Tiroir 1 fond, Tiroir 2 fond, Tiroir 3 fond\s*539\s*500\s*5/)
+      await expect(page.getByTestId('overlap-warning')).toHaveCount(0)
+    } finally {
+      await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().forEach((w) => w.destroy())).catch(() => undefined)
+      await app.close().catch(() => undefined)
+    }
+  })
+
   test('F9 : une pièce de forme se dessine et se retrouve dans les exports', async () => {
     const dir = mkdtempSync(join(tmpdir(), 'cotabois-packaged-'))
     const app = await electron.launch({ executablePath: EXECUTABLE, env: cleanEnv() })

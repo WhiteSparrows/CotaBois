@@ -178,7 +178,7 @@ export function App() {
         {selection.length > 0 ? <PiecePanel /> : <FurnitureForm />}
       </aside>
 
-      <main className="viewport-area">
+      <main className={layoutOpen ? "viewport-area layout-mode" : "viewport-area"}>
         <div className="viewport" ref={containerRef} data-testid="viewport" data-piece-count="0" />
         {layoutOpen && <LayoutView />}
 
@@ -220,7 +220,7 @@ export function App() {
         )}
         {!viewportError && !layoutOpen && project.pieces.length === 0 && (
           <p className="viewport-message">
-            Saisissez les dimensions à gauche pour créer un caisson, ou ajoutez un panneau pour dessiner librement.
+            Saisissez les dimensions à gauche pour créer un meuble, ou ajoutez un panneau pour dessiner librement.
           </p>
         )}
         {!layoutOpen && overlaps.length > 0 && (
