@@ -264,4 +264,11 @@
     display: block;
     font-size: 9pt;
   }
+
+  .report-cost-total {
+    margin: 6px 0 0;
+    font-size: 12pt;
+    font-weight: 600;
+    text-align: right;
+  }
 }

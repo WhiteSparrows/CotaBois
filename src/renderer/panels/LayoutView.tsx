@@ -1,8 +1,23 @@
 import { useMemo, useState } from 'react'
+import { computeCost, type Cost } from '../../core/cost'
 import { computeLayout, groupLabel, type LayoutGroup } from '../../core/layout'
 import type { CoreError, Result } from '../../core/result'
-import { formatMm, parseMm } from '../../core/units'
-import { groupSummary, groupTitle, NO_MINIMUM_GUARANTEE, panelTitle, unplacedText } from '../layoutText'
+import { formatEuros, formatMm, parseEuros, parseMm } from '../../core/units'
+import {
+  capitalize,
+  costLabel,
+  costMissing,
+  costQuantity,
+  costTotal,
+  costUnitPrice,
+  groupSummary,
+  groupTitle,
+  hasAnyPrice,
+  NO_MINIMUM_GUARANTEE,
+  panelTitle,
+  priceField,
+  unplacedText
+} from '../layoutText'
 import { changeLayoutOptions, changePanelStock, exportCuttingPlan, useEditor } from '../store'
 import { CommitField } from './CommitField'
 import { LayoutDrawing } from './LayoutDrawing'
@@ -22,6 +37,14 @@ function GroupView({ group, margin }: { group: LayoutGroup; margin: number }) {
     }
   }
 
+  function commitPrice(field: 'panelPrice' | 'edgePrice') {
+    return (text: string): CoreError | null => {
+      if (text.trim() === '') return failure(changePanelStock(group.material, group.thickness, { [field]: null }))
+      const parsed = parseEuros(text)
+      return parsed.ok ? failure(changePanelStock(group.material, group.thickness, { [field]: parsed.value })) : parsed.error
+    }
+  }
+
   let first = 1
   return (
     <section className="layout-group" aria-label={`Panneaux ${groupLabel(group.material, group.thickness)}`}>
@@ -37,6 +60,10 @@ function GroupView({ group, margin }: { group: LayoutGroup; margin: number }) {
           value={formatMm(group.stock.edgeThickness)}
           onCommit={commitStock('edgeThickness')}
         />
+      </div>
+      <div className="layout-fields">
+        <CommitField label="Prix du panneau" unit="€" value={priceField(group.stock.panelPrice)} onCommit={commitPrice('panelPrice')} />
+        <CommitField label="Prix du chant" unit="€/m" value={priceField(group.stock.edgePrice)} onCommit={commitPrice('edgePrice')} />
       </div>
       {group.edgeCount > 0 && group.stock.edgeThickness === 0 && (
         <p className="panel-note">
@@ -98,10 +125,41 @@ function GroupView({ group, margin }: { group: LayoutGroup; margin: number }) {
   )
 }
 
+/** Chaque achat, puis le total, jamais présenté comme complet s'il manque un prix. */
+function CostView({ cost, hasPrice }: { cost: Cost; hasPrice: boolean }) {
+  const missing = costMissing(cost)
+  return (
+    <section className="layout-cost" aria-label="Coût du meuble" data-testid="cost">
+      <h3>Coût du meuble</h3>
+      {!hasPrice ? (
+        <p className="panel-note">Saisissez le prix de vos panneaux et de vos chants pour obtenir le coût du meuble.</p>
+      ) : (
+        <>
+          <table className="data-table">
+            <tbody>
+              {cost.items.map((item) => (
+                <tr key={`${item.kind}|${item.thickness}|${item.material}`}>
+                  <td>{capitalize(costLabel(item))}</td>
+                  <td className="number">{costQuantity(item)}</td>
+                  <td className="number">{costUnitPrice(item)}</td>
+                  <td className="number strong">{item.amount === null ? '—' : formatEuros(item.amount)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p className={`cost-total${cost.complete ? '' : ' partial'}`}>{costTotal(cost)}</p>
+          {missing && <p className="layout-warning">{missing}</p>}
+        </>
+      )}
+    </section>
+  )
+}
+
 /** Le calepinage du meuble, recalculé à chaque modification. */
 export function LayoutView() {
   const { project } = useEditor()
   const layout = useMemo(() => computeLayout(project), [project])
+  const cost = useMemo(() => computeCost(project, layout), [project, layout])
   const isEmpty = project.pieces.length === 0
 
   function commitOption(field: 'kerf' | 'edgeMargin' | 'edgeOverhang') {
@@ -135,9 +193,12 @@ export function LayoutView() {
       {isEmpty ? (
         <p className="empty-note">Ajoutez une pièce pour calculer le calepinage.</p>
       ) : (
-        layout.groups.map((group) => (
-          <GroupView key={`${group.thickness}|${group.material}`} group={group} margin={project.layout.edgeMargin} />
-        ))
+        <>
+          <CostView cost={cost} hasPrice={hasAnyPrice(project.layout.panels)} />
+          {layout.groups.map((group) => (
+            <GroupView key={`${group.thickness}|${group.material}`} group={group} margin={project.layout.edgeMargin} />
+          ))}
+        </>
       )}
     </section>
   )

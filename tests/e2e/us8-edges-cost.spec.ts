@@ -74,7 +74,8 @@ async function printedText(app: ElectronApplication): Promise<string> {
   await expect.poll(() => app.evaluate(() => (globalThis as { printedText?: string }).printedText)).toBeTruthy()
   const text = (await app.evaluate(() => (globalThis as { printedText?: string }).printedText))!
   await app.evaluate(() => delete (globalThis as { printedText?: string }).printedText)
-  return text
+  // Les montants s'écrivent avec des espaces insécables : on les compare comme des espaces ordinaires.
+  return text.replace(/[  ]/g, ' ')
 }
 
 test('C1 : poser un chant sur les 5 pièces d\'une ligne, en une seule action', async () => {
@@ -177,5 +178,64 @@ test('C4 : les chants dans la liste, le CSV, la liste imprimée et le plan de co
   const plan = await printedText(app)
   expect(plan).toContain('Chant à acheter')
   expect(plan).toContain('7,56 m')
+  await app.close()
+})
+
+const BACKS = 'sans matériau, 5 mm'
+
+test('C5 : le coût du meuble, complet puis partiel, conservé à l\'enregistrement', async () => {
+  const { app, page } = await launchApp()
+  await createCaisson(page)
+  await bandFrontEdges(page)
+  await page.getByRole('button', { name: 'Calepinage', exact: true }).click()
+  const cost = page.getByTestId('cost')
+  await expect(cost).toContainText('Saisissez le prix')
+
+  await commitInGroup(page, BOARDS, 'Prix du panneau', '45,90')
+  await commitInGroup(page, BOARDS, 'Prix du chant', '0,85')
+  await commitInGroup(page, BACKS, 'Prix du panneau', '12')
+  await expect(cost).toContainText('45,90 €')
+  await expect(cost).toContainText('6,43 €')
+  await expect(cost).toContainText('12,00 €')
+  await expect(cost).toContainText('Total 64,33 €')
+  await expect(cost).not.toContainText('partiel')
+
+  // Un prix retiré : le total est partiel, et ce qui manque est nommé
+  await commitInGroup(page, BACKS, 'Prix du panneau', '')
+  await expect(cost).toContainText('Total partiel 52,33 €')
+  await expect(cost).toContainText(`Prix manquant : panneaux ${BACKS}`)
+
+  await capturePrinted(app, 'cutting-plan')
+  await chooseFile(app, join(dir, 'plan.pdf'))
+  await page.getByRole('button', { name: 'Exporter le plan de coupe' }).click()
+  const plan = await printedText(app)
+  expect(plan).toContain('Coût du meuble')
+  expect(plan).toContain('Total partiel')
+  expect(plan).toContain('52,33 €')
+
+  const path = join(dir, 'meuble.cotabois')
+  await chooseFile(app, path)
+  await clickMenu(app, 'Enregistrer')
+  await expect.poll(() => existsSync(path)).toBe(true)
+  const saved = JSON.parse(readFileSync(path, 'utf8'))
+  expect(saved.layout.panels.find((panel: { thickness: number }) => panel.thickness === 180)).toMatchObject({ panelPrice: 4590, edgePrice: 85 })
+
+  await clickMenu(app, 'Ouvrir…')
+  await page.getByRole('button', { name: 'Calepinage', exact: true }).click()
+  await expect(group(page, BOARDS).getByLabel('Prix du panneau', { exact: true })).toHaveValue('45,90')
+  await app.close()
+})
+
+test('C6 : les prix impossibles sont refusés, sans rien modifier', async () => {
+  const { app, page } = await launchApp()
+  await createCaisson(page)
+  await page.getByRole('button', { name: 'Calepinage', exact: true }).click()
+  await commitInGroup(page, BOARDS, 'Prix du panneau', '45,90')
+
+  for (const [text, word] of [['-3', 'négatif'], ['12,345', 'centime'], ['abc', 'par exemple']] as const) {
+    await commitInGroup(page, BOARDS, 'Prix du panneau', text)
+    await expect(group(page, BOARDS).getByRole('alert').first()).toContainText(word)
+  }
+  await expect(page.getByTestId('cost')).toContainText('45,90 €')
   await app.close()
 })

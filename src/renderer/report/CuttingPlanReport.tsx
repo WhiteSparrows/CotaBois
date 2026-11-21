@@ -1,7 +1,22 @@
+import { computeCost } from '../../core/cost'
 import { computeLayout, formatUsage, groupLabel } from '../../core/layout'
 import type { Project } from '../../core/model'
-import { formatMm } from '../../core/units'
-import { edgeMeters, groupTitle, NO_MINIMUM_GUARANTEE, panelTitle, stockSize, unplacedText } from '../layoutText'
+import { formatEuros, formatMm } from '../../core/units'
+import {
+  capitalize,
+  costLabel,
+  costMissing,
+  costQuantity,
+  costTotal,
+  costUnitPrice,
+  edgeMeters,
+  groupTitle,
+  hasAnyPrice,
+  NO_MINIMUM_GUARANTEE,
+  panelTitle,
+  stockSize,
+  unplacedText
+} from '../layoutText'
 import { LayoutDrawing } from '../panels/LayoutDrawing'
 import type { ReportContent } from '../store'
 import './report.css'
@@ -12,6 +27,8 @@ const NO_MATERIAL = '—'
 export function CuttingPlanReport({ project, content }: { project: Project; content: ReportContent }) {
   const layout = computeLayout(project)
   const { kerf, edgeMargin } = project.layout
+  const cost = computeCost(project, layout)
+  const missing = costMissing(cost)
 
   return (
     <article className="report cutting-plan" data-testid="cutting-plan">
@@ -72,6 +89,26 @@ export function CuttingPlanReport({ project, content }: { project: Project; cont
             </tbody>
           </table>
         </>
+      )}
+
+      {hasAnyPrice(project.layout.panels) && (
+        <section className="report-cost">
+          <h2>Coût du meuble</h2>
+          <table className="report-table">
+            <tbody>
+              {cost.items.map((item) => (
+                <tr key={`${item.kind}|${item.thickness}|${item.material}`}>
+                  <td>{capitalize(costLabel(item))}</td>
+                  <td className="number">{costQuantity(item)}</td>
+                  <td className="number">{costUnitPrice(item)}</td>
+                  <td className="number strong">{item.amount === null ? '—' : formatEuros(item.amount)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p className="report-cost-total">{costTotal(cost)}</p>
+          {missing && <p className="report-note">{missing}</p>}
+        </section>
       )}
 
       <p className="report-settings">

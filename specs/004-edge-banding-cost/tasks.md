@@ -101,7 +101,7 @@ description: "Liste des tâches pour les chants et le coût du meuble"
 - [X] T027 [US2] Ajouter les colonnes des chants dans `src/core/csv.ts` (FR-010)
 - [X] T028 [US2] Ajouter `Surlongueur de chant` et la ligne `Chant : 7,56 m (7 bords)` dans `src/renderer/panels/LayoutView.tsx`, et la colonne `Chant` des totaux dans `src/renderer/panels/CutListPanel.tsx` (FR-008, FR-009)
 - [X] T029 [US2] Ajouter les cotes finies, les chants et les métrages dans `src/renderer/report/ReportView.tsx`, et la ligne de chant des achats dans `src/renderer/report/CuttingPlanReport.tsx`, seulement s'il y a des chants (FR-010, FR-019)
-- [ ] T030 [US2] Produire de vrais PDF et un CSV avec des chants, les contrôler à l'œil, et les consigner dans `specs/004-edge-banding-cost/checklists/validation.md` (FR-010)
+- [X] T030 [US2] Produire de vrais PDF et un CSV avec des chants, les contrôler à l'œil, et les consigner dans `specs/004-edge-banding-cost/checklists/validation.md` (FR-010)
 
 **Checkpoint**: C3 et C4 passent. On sait combien de chant acheter.
 
@@ -115,14 +115,14 @@ description: "Liste des tâches pour les chants et le coût du meuble"
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T031 [P] [US3] Écrire `tests/core/cost.test.ts` : exemples de `edge-references.ts` (9 823 c ; 6 433 c ; 5 233 c partiel avec le panneau de 5 mm nommé) ; prix nul ; groupe sans panneau placé ; chant sans métrage absent ; arrondi au centime, demis vers le haut ; total égal à la somme des achats arrondis ; tous exacts au centime (FR-011, FR-013, FR-014, FR-015, SC-003)
-- [ ] T032 [P] [US3] Compléter `tests/e2e/us8-edges-cost.spec.ts`, scénarios C5 et C6 : coût affiché, total partiel, saisies refusées, prix conservés après enregistrement et réouverture, coût dans le plan de coupe (FR-012, FR-013, FR-014, FR-017)
+- [X] T031 [P] [US3] Écrire `tests/core/cost.test.ts` : exemples de `edge-references.ts` (9 823 c ; 6 433 c ; 5 233 c partiel avec le panneau de 5 mm nommé) ; prix nul ; groupe sans panneau placé ; chant sans métrage absent ; arrondi au centime, demis vers le haut ; total égal à la somme des achats arrondis ; tous exacts au centime (FR-011, FR-013, FR-014, FR-015, SC-003)
+- [X] T032 [P] [US3] Compléter `tests/e2e/us8-edges-cost.spec.ts`, scénarios C5 et C6 : coût affiché, total partiel, saisies refusées, prix conservés après enregistrement et réouverture, coût dans le plan de coupe (FR-012, FR-013, FR-014, FR-017)
 
 ### Implementation for User Story 3
 
-- [ ] T033 [US3] Créer `src/core/cost.ts` : `computeCost`, selon `data-model.md` et `research.md`, R6 et R8 (FR-011, FR-013, FR-014, FR-015)
-- [ ] T034 [US3] Ajouter les champs `Prix du panneau` et `Prix du chant` de chaque groupe et la section **Coût du meuble** dans `src/renderer/panels/LayoutView.tsx`, avec les actions de `src/renderer/store.ts` (FR-012, FR-013, FR-014)
-- [ ] T035 [US3] Ajouter prix, montants et total, marqué partiel s'il le faut, dans `src/renderer/report/CuttingPlanReport.tsx` (FR-013, FR-014)
+- [X] T033 [US3] Créer `src/core/cost.ts` : `computeCost`, selon `data-model.md` et `research.md`, R6 et R8 (FR-011, FR-013, FR-014, FR-015)
+- [X] T034 [US3] Ajouter les champs `Prix du panneau` et `Prix du chant` de chaque groupe et la section **Coût du meuble** dans `src/renderer/panels/LayoutView.tsx`, avec les actions de `src/renderer/store.ts` (FR-012, FR-013, FR-014)
+- [X] T035 [US3] Ajouter prix, montants et total, marqué partiel s'il le faut, dans `src/renderer/report/CuttingPlanReport.tsx` (FR-013, FR-014)
 
 **Checkpoint**: C5 et C6 passent. Le premier jalon utile est atteint : chants, métrage et coût.
 
